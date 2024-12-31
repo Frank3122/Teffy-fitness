@@ -1,0 +1,274 @@
+.navbar{
+    background-color: #9f772c;
+  
+}
+.number{
+    color: white;
+    font-family: "Inter", serif;
+    /* margin-right: 40px; */
+    /* justify-content: end; */
+}
+.logo{
+    margin-left: 40px;
+}
+.socialmedia{
+    color: white;
+    padding: 20px;
+}
+/* . */
+
+body{
+    background-image: url('./image/gym.png'); 
+    height:100vh;
+    font-family: "Inter", serif;
+    background-repeat: no-repeat;
+    background-size: cover;
+   
+}
+
+body{
+
+    background-color: black;
+    /* opacity: 0.5; */
+}
+
+textarea{
+    resize: none;
+}
+
+.formcard{
+    background-color: #ffbb0023;
+    opacity: 0.8;
+    border-radius: 25px;
+}
+.formlabel{
+    color: white;
+}
+
+.form-control{
+    border: 1px solid white;
+    background: transparent;
+    color: white;
+}
+
+.form-control::placeholder{
+    color: white;
+}
+
+
+.form-check-input:checked {
+    background-color: yellow !important;
+    border-color: yellow !important;
+}
+
+input[type=radio]{
+accent-color:yellow;
+border: 2px solid yellow;
+background-color: transparent;
+}
+
+.form-control address{
+    border: none;
+    border-top: 2px solid white;
+    background: transparent;
+    border-bottom: 2px solid white; 
+    height: 100%;
+    width: 100%;
+}
+.form-control::placeholder{
+    color: white;
+}
+
+.enquiry-heading{
+    color: white;
+}
+.line{
+    color: white;
+}
+.next-btn{
+    width: 70px;
+    color:white;
+    background-color: #9f772c;
+    border: 2px solid #FFBB00;
+    border-radius: 8px;
+    padding: 5px;
+}
+.end-btn{
+    display: flex;
+    justify-content: end;
+}
+
+#genderDropdown{
+    color:white !important
+}
+
+
+
+.form-control:focus {
+    color:white;
+    background-color: var(--bs-body-bg);
+    border-color: none;
+    outline: none;
+    box-shadow:none;
+    border-top: 2px solid white;
+    background: transparent;
+    border-bottom: 2px solid white;
+}
+
+.page-number{
+    padding-right: 40px;
+    display: flex;
+    justify-content: end;
+}
+
+
+.one{
+    color:white;
+    background-color: #9f772c !important;
+    border: 2px solid #FFBB00 !important;
+}
+
+.page-link{
+    color:white;
+    background-color: #9f772c !important;
+    border: 2px solid #FFBB00 !important;
+}
+
+.page-link :hover{
+    color:white;
+    background-color: #9f772c !important;
+    border: 2px solid #FFBB00 !important;
+}
+
+
+/* second page */
+
+
+.line{
+    color: white;
+}
+.build-text{
+    color: white;
+    text-transform: capitalize;
+}
+
+.form-check-input:checked {
+    background-color: #FFBB00!important;
+    border-color: #FFBB00 !important;
+}
+
+input[type=radio]{
+accent-color:#FFBB00;
+border-color: #FFBB00!important;
+}
+.form-check-label{
+    color: white;
+}
+
+.btn-back{
+    width: 10%;
+    color:white;
+    background-color: #9f772c58;
+    border: 2px solid #FFBB00;
+    border-radius: 8px;
+    padding: 5px;
+}
+
+.back-btn{
+    display: flex;
+    justify-content: end;
+    gap: 20px;
+}
+
+.next-btn{
+    width: 10%;
+    color:white;
+    background-color: #9f772c;
+    border: 2px solid #FFBB00;
+    border-radius: 8px;
+    padding: 5px;
+}
+
+.body-type{
+    color: white;
+}
+.goal{
+    color: white;
+}
+
+.next-green{
+    color:white;
+    background-color: #285E13 !important;
+    border:2px solid #40FF00;
+     border-radius: 8px; 
+     padding: 5px;
+     width: 10%;
+}
+nav
+{
+    width: 60%;
+}
+
+.tab{
+    display: none;
+  }
+
+.pages
+{
+    display: flex;
+    align-items: center;
+    width: 100%;
+    color: white;
+    justify-content: space-evenly;
+}
+
+.pages .page{
+    opacity: 0.2;
+}
+
+.pages .page
+{
+    list-style-type: none;
+    margin: 10px;
+    background-color:  #775805;
+    color: white;
+    padding: 8px 18px;
+    border: 2px solid yellow;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.pages .active
+{
+    opacity: 1;
+    padding: 12px 24px;
+    transition: all 0.5s;
+}
+
+.drop-down option
+{
+    background-color: #9f772c;
+}
+
+.invalid{
+    border: 1px solid red;
+}
+
+.submit-btn{
+    width: 10%;
+    color:white;
+    background-color: #285E13;
+    border: 2px solid #40FF00;
+    border-radius: 8px;
+    padding: 5px;
+}
+
+.table th, .table td {
+    vertical-align: middle;
+    padding: 10px;
+  }
+  
+  .table th {
+    background-color: #f8f9fa; /* Light grey */
+    font-weight: bold;
+  }

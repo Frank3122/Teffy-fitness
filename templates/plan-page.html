@@ -1,0 +1,292 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}PLANS{% endblock %}
+
+{% block content %}
+<main class="app-main">
+    <!--begin::App Content Header-->
+    <div class="app-content-header">
+        <!--begin::Container-->
+        <div class="container-fluid">
+            <!--begin::Row-->
+            <div class="row">
+                <div class="col-sm-6">
+                    <h3 class="mb-0">PLAN DETAILS</h3>
+                </div>
+            </div>
+            <!--end::Row-->
+        </div>
+        <!--end::Container-->
+    </div>
+    <!--end::App Content Header-->
+
+    <!--begin::App Content-->
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Plan Details Form Section -->
+            <div class="col-md-6">
+                <div class="card card-warning card-outline mb-4">
+                    <!--begin::Form-->
+                    <form id="planForm" >
+                        <!--begin::Body-->
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="planInput" class="form-label">PLAN</label>
+                                <input type="text" id="planInput" class="form-control" placeholder="Enter plan name">
+                            </div>
+                            <div class="mb-3">
+                                <label for="priceInput" class="form-label">Price</label>
+                                <input type="text" id="priceInput" class="form-control" placeholder="Enter plan price">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="batchSelect" class="form-label">Batch</label>
+                                <select id="batchSelect" class="form-control">
+                                    <option value="" disabled selected>Select Batch</option>
+                                    <option value="morning">Morning Batch</option>
+                                    <option value="afternoon">Afternoon Batch</option>
+                                    <option value="evening">Evening Batch</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="priceInput" class="form-label">Duration</label>
+                                <input type="text" id="durationInput" class="form-control" placeholder="Enter Duration">
+                            </div>
+
+                            
+                            <div class="card-footer">
+                                <button type="submit" class="btn btn-primary" id = "plansubmit">Submit</button>
+                            </div>
+                        </div>
+                        <!--end::Body-->
+                    </form>
+                </div>
+            </div>
+
+            <!-- Simple Table Section -->
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3 class="card-title">PLAN DETAILS</h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table" id="planTable">
+                            <thead>
+                                <tr>
+                                    <th style="width:5px">S.No</th>
+                                    <th>PLAN NAME</th>
+                                    <th>PRICE</th>
+                                    <th>BATCH</th>
+                                    <th>DURATION</th>
+                                    <th>ACTION</th>
+                                </tr>
+                            </thead>
+                            <tbody id="planTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--end::App Content-->
+</main>
+{% endblock content %}
+
+{% include "footer.html" %}
+
+{% block script %}
+
+<script>
+    // Example starter JavaScript for disabling form submissions if there are invalid fields
+    (() => {
+        "use strict";
+
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        const forms = document.querySelectorAll(".needs-validation");
+
+        // Loop over them and prevent submission
+        Array.from(forms).forEach((form) => {
+            form.addEventListener(
+                "submit",
+                (event) => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add("was-validated");
+                },
+                false
+            );
+        });
+    })();
+</script> <!--end::JavaScript-->
+
+
+
+
+
+<!--begin::Script-->  
+<script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.3.0/browser/overlayscrollbars.browser.es6.min.js" integrity="sha256-H2VM7BKda+v2Z4+DRy69uknwxjyDRhszjXFhsL4gD3w=" crossorigin="anonymous"></script> <!--end::Third Party Plugin(OverlayScrollbars)-->
+
+<!--begin::Required Plugin(popperjs for Bootstrap 5)-->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha256-whL0tQWoY1Ku1iskqPFvmZ+CHsvmRWx/PIoEvIeWh4I=" crossorigin="anonymous"></script> <!--end::Required Plugin(popperjs for Bootstrap 5)-->
+
+<!--begin::Required Plugin(Bootstrap 5)-->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha256-YMa+wAM6QkVyz999odX7lPRxkoYAan8suedu4k2Zur8=" crossorigin="anonymous"></script> <!--end::Required Plugin(Bootstrap 5)-->
+
+<!--begin::Required Plugin(AdminLTE)-->
+<script src="/static/js/adminlte.js"></script> <!--end::Required Plugin(AdminLTE)-->
+
+<!--begin::OverlayScrollbars Configure-->
+<script>
+    const SELECTOR_SIDEBAR_WRAPPER = ".sidebar-wrapper";
+    const Default = {
+        scrollbarTheme: "os-theme-light",
+        scrollbarAutoHide: "leave",
+        scrollbarClickScroll: true,
+    };
+    document.addEventListener("DOMContentLoaded", function() {
+        const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
+        if (sidebarWrapper && typeof OverlayScrollbarsGlobal?.OverlayScrollbars !== "undefined") {
+            OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
+                scrollbars: {
+                    theme: Default.scrollbarTheme,
+                    autoHide: Default.scrollbarAutoHide,
+                    clickScroll: Default.scrollbarClickScroll,
+                },
+            });
+        }
+    });
+</script> <!--end::OverlayScrollbars Configure-->
+
+
+<script>
+    let editingPlanId = null; // Tracks the ID of the plan being edited
+
+    // Function to add a row to the table
+    function addRowToTable(plan, index) {
+        const tableBody = document.getElementById("planTableBody");
+        const newRow = document.createElement("tr");
+        newRow.id = `row-${plan.id}`;
+        newRow.innerHTML = `
+            <td>${index + 1}</td> <!-- S.No is the row index + 1 -->
+            <td>${plan.name}</td>
+            <td>${plan.price}</td>
+            <td>${plan.batch}</td>
+            <td>${plan.duration}</td>
+            <td>
+                <a href="#" onclick="editRow('${plan.id}')" class="text-decoration-none">
+                    <i class="bi bi-pencil-square text-primary"></i>
+                </a>
+                <a href="#" onclick="deleteRow('${plan.id}')" class="text-decoration-none ms-3">
+                    <i class="bi bi-trash text-danger"></i>
+                </a>
+            </td>
+        `;
+        tableBody.appendChild(newRow);
+    }
+
+    // Redirect to edit page
+    function editRow(id) {
+        window.location.href = `edit-plan.html?id=${id}`;
+    }
+
+    // Save plans to localStorage
+    function saveToLocalStorage(plans) {
+        localStorage.setItem("plans", JSON.stringify(plans));
+    }
+
+    // Load plans from localStorage
+    function loadFromLocalStorage() {
+        const data = localStorage.getItem("plans");
+        return data ? JSON.parse(data) : [];
+    }
+
+    // Refresh the table
+    function refreshTable() {
+        const tableBody = document.getElementById("planTableBody");
+        tableBody.innerHTML = ""; // Clear existing rows
+        const plans = loadFromLocalStorage();
+        plans.forEach((plan, index) => addRowToTable(plan, index)); // Pass index to addRowToTable
+    }
+
+    // Initialize table on page load
+    document.addEventListener("DOMContentLoaded", refreshTable);
+
+
+    // Add or update a plan
+    document.getElementById("plansubmit").addEventListener("click", (event) => {
+        event.preventDefault();
+
+        const name = document.getElementById("planInput").value;
+        const price = document.getElementById("priceInput").value;
+        const batch = document.getElementById("batchSelect").value;
+        const duration = document.getElementById("durationInput").value;
+
+        if (name && price && batch && duration) {
+            let plans = loadFromLocalStorage();
+
+            if (editingPlanId) {
+                // Update the existing plan
+                const index = plans.findIndex(plan => plan.id === editingPlanId);
+                plans[index] = { id: editingPlanId, name, price, batch, duration };
+                editingPlanId = null;
+                document.getElementById("plansubmit").innerText = "Submit";
+            } else {
+                // Add a new plan
+                const newPlan = {
+                    id: Date.now().toString(), // Use timestamp as a unique ID
+                    name,
+                    price,
+                    batch,
+                    duration
+                };
+                plans.push(newPlan);
+            }
+
+            saveToLocalStorage(plans);
+            refreshTable();
+
+            // Reset the form
+            document.getElementById("planForm").reset();
+        } else {
+            alert("Please fill in all fields.");
+        }
+    });
+
+    // Edit a plan
+    function editRow(id) {
+        const plans = loadFromLocalStorage();
+        const plan = plans.find(plan => plan.id === id);
+
+        if (plan) {
+            document.getElementById("planInput").value = plan.name;
+            document.getElementById("priceInput").value = plan.price;
+            document.getElementById("batchSelect").value = plan.batch;
+            document.getElementById("durationInput").value = plan.duration;
+
+            editingPlanId = id; // Set the plan being edited
+            document.getElementById("plansubmit").innerText = "Update";
+        }
+    }
+
+    // Delete a plan
+    function deleteRow(id) {
+        let plans = loadFromLocalStorage();
+        plans = plans.filter(plan => plan.id !== id);
+        saveToLocalStorage(plans);
+        refreshTable();
+    }
+
+    // Initialize table on page load
+    document.addEventListener("DOMContentLoaded", refreshTable);
+</script>
+
+{% endblock script %}
+
+        
+        
+        
+        

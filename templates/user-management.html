@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}USER MANAGEMENT{% endblock %}
+
+{% block content %}
+
+<main class="app-main">
+    <div class="app-content-header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-6">
+                    <h3 class="mb-0">USER MANAGEMENT</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Display Messages Section -->
+            {% if messages %}
+                <div class="alert alert-info w-100">
+                    {% for message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Plan Details Form Section -->
+            <div class="container mt-4">
+                <div class="row">
+                    <!-- User Registration Form -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card card-warning card-outline">
+                            <div class="card-body">
+                                <form method="POST" action="{% url 'user_management' %}">
+                                    {% csrf_token %}
+                                    <div class="mb-3">
+                                        <label for="user_id" class="form-label mt-2">USER ID</label>
+                                        <input type="text" id="user_id" name="user_id" class="form-control" placeholder="User ID" value="{{ profile_user_id }}" readonly>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="username" class="form-label mt-2">USER NAME</label>
+                                        <input type="text" id="username" name="name" class="form-control" placeholder="Username" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="groupSelect" class="form-label mt-2">GROUP</label>
+                                        <select id="groupSelect" name="group" class="form-control" required>
+                                            <option value="" disabled selected>Select Group</option>
+                                            <option value="admin">Admin</option>
+                                            <option value="staff">Staff</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="password" class="form-label mt-2">PASSWORD</label>
+                                        <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">ADD USER</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- User List Section -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">USER DETAILS</h3>
+                            </div>
+                            <div class="card-body p-0">
+                                <table class="table" id="planTable">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Name</th>
+                                            <th>Group</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for da in data %}
+                                            {% if da.group == "admin" %}
+                                                <tr>
+                                                    <td>{{ da.profile_user_id }}</td>
+                                                    <td>{{ da.user.username }}</td>
+                                                    <td>ADMIN</td>
+                                                    <td>
+                                                        <a href="{% url 'edit_user' da.profile_user_id %}" class="btn btn-sm btn-warning" title="Edit">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <form method="POST" action="{% url 'delete_user' da.profile_user_id %}" style="display:inline;">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-sm btn-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this user?');">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            {% elif da.group == "staff" %}
+                                                <tr>
+                                                    <td>{{ da.profile_user_id }}</td>
+                                                    <td>{{ da.user.username }}</td>
+                                                    <td>Staff</td>
+                                                    <td>
+                                                        <a href="{% url 'edit_user' da.profile_user_id %}" class="btn btn-sm btn-warning" title="Edit">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <form method="POST" action="{% url 'delete_user' da.profile_user_id %}" style="display:inline;">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-sm btn-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this user?');">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            {% else %}
+                                                <tr>
+                                                    <td>{{ da.profile_user_id }}</td>
+                                                    <td>{{ da.user.username }}</td>
+                                                    <td>Unknown</td>
+                                                    <td>-</td>
+                                                </tr>
+                                            {% endif %}
+                                        {% empty %}
+                                            <tr>
+                                                <td colspan="4" class="text-center">No users found</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+{% endblock content %}
+
+{% include "footer.html" %}
+
+{% block script %}
+
+      
+<script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.3.0/browser/overlayscrollbars.browser.es6.min.js" integrity="sha256-H2VM7BKda+v2Z4+DRy69uknwxjyDRhszjXFhsL4gD3w=" crossorigin="anonymous"></script> <!--end::Third Party Plugin(OverlayScrollbars)--><!--begin::Required Plugin(popperjs for Bootstrap 5)-->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha256-whL0tQWoY1Ku1iskqPFvmZ+CHsvmRWx/PIoEvIeWh4I=" crossorigin="anonymous"></script> <!--end::Required Plugin(popperjs for Bootstrap 5)--><!--begin::Required Plugin(Bootstrap 5)-->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha256-YMa+wAM6QkVyz999odX7lPRxkoYAan8suedu4k2Zur8=" crossorigin="anonymous"></script> <!--end::Required Plugin(Bootstrap 5)--><!--begin::Required Plugin(AdminLTE)-->
+<script src="/static/js/adminlte.js"></script> <!--end::Required Plugin(AdminLTE)--><!--begin::OverlayScrollbars Configure-->
+    
+      <script>
+        // DataTable Initialization
+        $(function () {
+          // Initialize DataTable for example1 with default pagination
+          $("#example1").DataTable({
+            "paging": true, // Enable pagination
+            "lengthChange": true, // Allow users to change number of rows per page
+            "searching": true, // Enable searching
+            "ordering": true, // Enable column ordering
+            "info": true, // Display information about the table (e.g., "Showing 1 to 10 of 50 entries")
+            "autoWidth": false // Disable auto-width calculation to allow more control over the layout
+          });
+
+        });
+      
+        // OverlayScrollbars Initialization
+        const SELECTOR_SIDEBAR_WRAPPER = ".sidebar-wrapper";
+        
+        const Default = {
+          scrollbarTheme: "os-theme-light",  // Set the scrollbar theme
+          scrollbarAutoHide: "leave",       // Hide the scrollbar when not in use
+          scrollbarClickScroll: true,       // Enable click-to-scroll functionality
+        };
+      
+        // Ensure the script runs after the DOM is loaded
+        document.addEventListener("DOMContentLoaded", function() {
+          const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
+      
+          // Check if the sidebarWrapper element exists and if OverlayScrollbars is available
+          if (
+            sidebarWrapper &&
+            typeof OverlayScrollbarsGlobal?.OverlayScrollbars !== "undefined"
+          ) {
+            // Initialize the custom scrollbar on the sidebarWrapper
+            OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
+              scrollbars: {
+                theme: Default.scrollbarTheme,
+                autoHide: Default.scrollbarAutoHide,
+                clickScroll: Default.scrollbarClickScroll,
+              },
+            });
+          }
+        });
+      </script>
+       <script>
+          // Example starter JavaScript for disabling form submissions if there are invalid fields
+          (() => {
+              "use strict";
+
+              // Fetch all the forms we want to apply custom Bootstrap validation styles to
+              const forms =
+                  document.querySelectorAll(".needs-validation");
+
+              // Loop over them and prevent submission
+              Array.from(forms).forEach((form) => {
+                  form.addEventListener(
+                      "submit",
+                      (event) => {
+                          if (!form.checkValidity()) {
+                              event.preventDefault();
+                              event.stopPropagation();
+                          }
+
+                          form.classList.add("was-validated");
+                      },
+                      false
+                  );
+              });
+          })();
+      </script> <!--end::JavaScript-->
+
+{% endblock script %}
+      
+
+

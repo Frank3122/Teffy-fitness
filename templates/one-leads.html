@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}TEFFY CLIENT DETAILS{% endblock %}
+
+{% block content %}
+<main class="app-main"> <!--begin::App Content Header-->
+    <div class="app-content-header"> <!--begin::Container-->
+        <div class="container-fluid"> <!--begin::Row-->
+            <div class="row">
+                <div class="col-sm-6">
+                    <h3 class="mb-0">Leads Form</h3>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-end">
+                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">
+                            Leads Form
+                        </li>
+                    </ol>
+                </div>
+            </div> <!--end::Row-->
+        </div> <!--end::Container-->
+    </div> <!--end::App Content Header--> <!--begin::App Content-->
+    <div class="app-content">
+        <!--begin::Container-->
+        <div class="container-fluid">
+            <!--begin::Row-->
+            <div class="row g-4">
+                <!--begin::Col-->
+                <div class="col-12">
+                    <div class="card card-warning card-outline mb-4">
+                        <!--begin::Form-->
+                        <form method="POST" action="" style="display: inline;">
+                            {% csrf_token %}
+                            <div class="card-body">
+                                <!-- <p>Data ID: {{ data.id }}</p> -->
+                                <!-- Row 1 -->
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="name" class="form-label">Name:</label>
+                                            <input type="text" id="name" name="name" value="{{name}}" class="form-control" placeholder="Name" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="address" class="form-label">Address:</label>
+                                            <textarea name="address" class="form-control" spellcheck="false" placeholder="Address" id="address">{{ address }}</textarea required maxlength="10">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="occupation" class="form-label">Occupation:</label>
+                                            <input type="text" name="occupation" id="occupation" value="{{ occupation }}" class="form-control" placeholder="Occupation" required >
+                                        </div>
+                                    </div>
+                                </div>
+    
+                                <!-- Row 2 -->
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="gender" class="form-label">Gender:</label>
+                                            <input type="text" name="gender" id="gender" value="{{ gender }}" class="form-control" placeholder="Gender" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="mobile_number" class="form-label">Mobile Number:</label>
+                                            <input type="tel" name="mobile_number" id="mobile_number" value="{{ mobile_number }}" class="form-control" placeholder="Mobile Number" maxlength="10"   required >
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="email" class="form-label">Email:</label>
+                                            <input type="email" name="email" id="email" value="{{ email }}" class="form-control" placeholder="Email" required>
+                                        </div>
+                                    </div>
+                                </div>
+    
+                                <!-- Row 3 -->
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="perfect_body" class="form-label">Perfect Body:</label>
+                                            <input type="text" name="perfect_body" id="perfect_body" value="{{perfect_body }}" class="form-control" placeholder="Perfect Body" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="body_type" class="form-label">Body Type:</label>
+                                            <input type="text" name="body_type" id="body_type" value="{{body_type }}" class="form-control" placeholder="Body Type" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="goal" class="form-label">Goal:</label>
+                                            <input type="text" name="goal" id="goal" value="{{ goal }}" class="form-control" placeholder="Goal" required>
+                                        </div>
+                                    </div>
+                                </div>
+    
+                                <!-- Row 4 -->
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="body_you_want" class="form-label">Body You Want:</label>
+                                            <input type="text" name="body_you_want" id="body_you_want" value="{{body_you_want }}" class="form-control" placeholder="Body Type Wanted" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="body_fat_level" class="form-label">Level of Body Fat:</label>
+                                            <input type="text" name="body_fat_level" id="body_fat_level" value="{{level_of_body_fat }}" class="form-control" placeholder="Level of Body Fat" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="problem_areas" class="form-label">Problem Areas:</label>
+                                            <input type="text" name="problem_areas" id="problem_areas" value="{{problem_areas }}" class="form-control" placeholder="Problem Areas" required>
+                                        </div>
+                                    </div>
+                                </div>
+    
+                                <!-- Row 5 -->
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="diets" class="form-label">Diet:</label>
+                                            <input type="text" name="diets" id="diets" value="{{diets }}" class="form-control" placeholder="Diet" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="water_you_drink_daily" class="form-label">Water Intake:</label>
+                                            <input type="text" name="water_you_drink_daily" id="water_you_drink_daily" value="{{water_you_drink_daily }}" class="form-control" placeholder="Water Intake" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="eat_or_dividie_foods_or_beverages" class="form-label">Food/Beverages:</label>
+                                            <input type="text" name="eat_or_dividie_foods_or_beverages" id="eat_or_dividie_foods_or_beverages" value="{{eat_or_dividie_foods_or_beverages }}" class="form-control" placeholder="Food/Beverages" required>
+                                        </div>
+                                    </div>
+                                </div>
+    
+                                <!-- Row 6 -->
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="event_coming_up" class="form-label">Upcoming Events:</label>
+                                            <input type="text" name="event_coming_up" id="event_coming_up" value="{{event_coming_up }}" class="form-control" placeholder="Upcoming Events" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="height" class="form-label">Height(in cm):</label>
+                                            <input type="text" name="height" id="height" value="{{height }}" class="form-control" placeholder="Height" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="current_weight" class="form-label">Current Weight(in Kg):</label>
+                                            <input type="text" name="current_weight" id="current_weight" value="{{ current_weight }}" class="form-control" placeholder="Current Weight" required>
+                                        </div>
+                                    </div>
+                                </div>
+    
+                                <!-- Row 7 -->
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="target_weight" class="form-label">Target Weight(in Kg):</label>
+                                            <input type="text" name="target_weight" id="target_weight" value="{{ target_weight }}" class="form-control" placeholder="Target Weight" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="level_of_fitness" class="form-label">Fitness Level:</label>
+                                            <input type="text" name="level_of_fitness" id="level_of_fitness" value="{{ level_of_fitness }}" class="form-control" placeholder="Fitness Level" required>
+                                        </div>
+                                    </div>
+                                </div>
+    
+                                <!-- <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="status" class="form-label">Status:</label>
+                                            <select name="status" id="status" class="form-control" required>
+                                                <option value="new" {% if lead.status == 'new' %} selected {% endif %}>New</option>
+                                                <option value="converted" {% if lead.status == 'converted' %} selected {% endif %}>Converted</option>
+                                                <option value="pending" {% if lead.status == 'pending' %} selected {% endif %}>Pending</option>
+                                                <option value="follow_up" {% if lead.status == 'follow_up' %} selected {% endif %}>Follow Up</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div> -->
+                        
+                                <!-- Submit Button -->
+                                <button type="submit" class="btn btn-sm btn-link" style="padding: 5px 10px; font-size: 15px; float: right;">
+                                    UPDATE
+                                </button>
+                            </div>
+                        </form>
+                        <!--end::Form-->
+                    </div>
+                </div>
+            </div>
+            <!--end::Row-->
+        </div>
+        <!--end::Container-->
+    </div>
+
+{% endblock content %}
+
+{% include "footer.html" %}
+
+{% block script %}
+
+
+                
+                <!-- JavaScript for Form Validation -->
+                <script>
+                    (() => {
+                        "use strict";
+                
+                        const forms = document.querySelectorAll(".needs-validation");
+                
+                        Array.from(forms).forEach((form) => {
+                            form.addEventListener(
+                                "submit",
+                                (event) => {
+                                    if (!form.checkValidity()) {
+                                        event.preventDefault();
+                                        event.stopPropagation();
+                                    }
+                                    form.classList.add("was-validated");
+                                },
+                                false
+                            );
+                        });
+                    })();
+                </script>
+                
+
+
+  <!-- Page Script to initialize DataTables -->
+  <script>
+    $(function () {
+      $("#example1").DataTable({
+        "paging": true,       
+        "lengthChange": true,   
+        "searching": true,      
+        "ordering": true,       
+        "info": true,           
+        "autoWidth": false,     
+        "pageLength": 10       
+      });
+    });
+  </script>
+  <script>
+    document.querySelectorAll('input, textarea').forEach(element => {
+  element.addEventListener('click', function() {
+    // Add blinking effect to the element
+    this.classList.add('blinking');
+    
+    // Prevent user from entering value in the input or textarea
+    // this.setAttribute('readonly', true);  // or 'disabled', if you want to prevent interaction entirely
+    
+    // Remove the blinking effect when the user starts typing or leaves the input
+    this.addEventListener('input', () => {
+      this.classList.remove('blinking');
+    //   this.removeAttribute('readonly');
+    });
+    
+    this.addEventListener('blur', () => {
+      this.classList.remove('blinking');
+    //   this.removeAttribute('readonly');
+    });
+  });
+});
+
+
+
+  </script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.3.0/browser/overlayscrollbars.browser.es6.min.js" integrity="sha256-H2VM7BKda+v2Z4+DRy69uknwxjyDRhszjXFhsL4gD3w=" crossorigin="anonymous"></script> <!--end::Third Party Plugin(OverlayScrollbars)--><!--begin::Required Plugin(popperjs for Bootstrap 5)-->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha256-whL0tQWoY1Ku1iskqPFvmZ+CHsvmRWx/PIoEvIeWh4I=" crossorigin="anonymous"></script> <!--end::Required Plugin(popperjs for Bootstrap 5)--><!--begin::Required Plugin(Bootstrap 5)-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha256-YMa+wAM6QkVyz999odX7lPRxkoYAan8suedu4k2Zur8=" crossorigin="anonymous"></script> <!--end::Required Plugin(Bootstrap 5)--><!--begin::Required Plugin(AdminLTE)-->
+    <script src="/static/js/adminlte.js"></script> <!--end::Required Plugin(AdminLTE)--><!--begin::OverlayScrollbars Configure-->
+
+{% endblock script %}

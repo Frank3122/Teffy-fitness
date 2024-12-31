@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>USER MANAGEMENT</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/static/adminlte.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+    <div class="app-wrapper">
+        <!-- Header -->
+        <nav class="app-header navbar navbar-expand bg-body">
+            <div class="container-fluid">
+                <ul class="navbar-nav">
+                    <li class="nav-item"> 
+                        <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button">
+                            <i class="bi bi-list"></i> 
+                        </a> 
+                    </li>
+                    <li class="nav-item d-none d-md-block"> 
+                        <a href="#" class="nav-link">Home</a> 
+                    </li>
+                    <li class="nav-item d-none d-md-block"> 
+                        <a href="#" class="nav-link">Contact</a> 
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"> 
+                        <a class="nav-link" href="#" data-lte-toggle="fullscreen"> 
+                            <i data-lte-icon="maximize" class="bi bi-arrows-fullscreen"></i> 
+                            <i data-lte-icon="minimize" class="bi bi-fullscreen-exit" style="display: none;"></i> 
+                        </a> 
+                    </li>
+                    <li class="nav-item dropdown user-menu"> 
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"> 
+                            <img src="/static/image/user2-160x160.jpg" class="user-image rounded-circle shadow" alt="User Image"> 
+                            <span class="d-none d-md-inline">TEFFY FITNESS</span> 
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
+                            <li class="user-header text-bg-primary"> 
+                                <img src="/static/image/user2-160x160.jpg" class="rounded-circle shadow" alt="User Image">
+                                <p>TEFFY FITNESS</p>
+                            </li>
+                            <li class="user-footer"> 
+                                <a href="#" class="btn btn-default btn-flat">Profile</a> 
+                                <a href="#" class="btn btn-default btn-flat float-end">Sign out</a> 
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Sidebar -->
+        <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
+            <div class="sidebar-brand">
+                <a href="/main/" class="brand-link">
+                    <img src="/static/image/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image opacity-75 shadow">
+                    <span class="brand-text fw-light">TEFFY FITNESS</span>
+                </a>
+            </div>
+            <div class="sidebar-wrapper">
+                <nav class="mt-2">
+                    <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
+                        {% if is_admin %}
+                            <li class="nav-item">
+                                <a href="#" class="nav-link" data-bs-toggle="collapse" data-bs-target="#leadsMenu" aria-expanded="false">
+                                    <i class="nav-icon bi bi-speedometer"></i>
+                                    <p>LEADS <i class="nav-arrow bi bi-chevron-down"></i></p>
+                                </a>
+                                <div id="leadsMenu" class="collapse">
+                                    <ul class="nav nav-treeview">
+                                        <li class="nav-item">
+                                            <a href="{% url 'new_leads' %}" class="nav-link">
+                                                <i class="nav-icon bi bi-circle"></i>
+                                                <p>NEW LEADS</p>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link" data-bs-toggle="collapse" data-bs-target="#masterMenu" aria-expanded="false">
+                                    <i class="nav-icon bi bi-speedometer"></i>
+                                    <p>MASTER <i class="nav-arrow bi bi-chevron-down"></i></p>
+                                </a>
+                                <div id="masterMenu" class="collapse">
+                                    <ul class="nav nav-treeview">
+                                        <li class="nav-item">
+                                            <a href="/plan/" class="nav-link">
+                                                <i class="nav-icon bi bi-circle"></i>
+                                                <p>PLANS</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/user_management/" class="nav-link">
+                                                <i class="nav-icon bi bi-circle"></i>
+                                                <p>USERS</p>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                        {% endif %}
+                        {% if is_staff %}
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon bi bi-speedometer"></i>
+                                    <p>REPORT</p>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="app-main">
+            <div class="app-content-header">
+                <div class="container-fluid">
+                    <h3 class="mb-0">USER MANAGEMENT</h3>
+                </div>
+            </div>
+            <div class="container-fluid">
+                <div class="row">
+                    {% if messages %}
+                        <div class="alert alert-info w-100">
+                            {% for message in messages %}
+                                <p>{{ message }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <div class="col-md-6 mb-4">
+                        <form method="POST" action="{% url 'user_management' %}">
+                            {% csrf_token %}
+                            <input type="text" name="name" placeholder="Username" required>
+                            <select name="group" required>
+                                <option value="admin">Admin</option>
+                                <option value="staff">Staff</option>
+                            </select>
+                            <input type="password" name="password" placeholder="Password" required>
+                            <button type="submit">ADD USER</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
