@@ -24,4 +24,12 @@ urlpatterns = [
     path("logout/", user_logout, name="logout"),
     path("edit_user/<str:user_id>/", edit_user, name="edit_user"),
     path('delete_user/<str:user_id>/',delete_user, name='delete_user'),
+    path('report/',report_view,name="report"),
+    # path('edit-plan/<int:plan_id>/',edit_plan, name='edit-plan'),
+    path('service/',services,name="services"),
+    # path('manage_services/', manage_services, name='manage_services'),
+    path('delete_service/<int:service_id>/',delete_service, name='delete_service'),
+    path('assign-service/<int:id>/',assign_service, name='assign_service'),
+    path('overall-services/',overall_services, name='overall_services'),
+
 ]

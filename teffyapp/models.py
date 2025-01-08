@@ -4,6 +4,15 @@ from django.contrib.auth.models import User
 
 
 # Create your models here.
+class Service(models.Model):
+    name = models.CharField(max_length=100)
+    duration = models.CharField(max_length=50, null=True, blank=True)  # Optional field for service details
+    prices = models.PositiveIntegerField(null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+
     #1st page
 class PersonalInformation(models.Model):
     name = models.CharField(max_length=50)
@@ -38,6 +47,13 @@ class PersonalInformation(models.Model):
     
     #status
     status = models.CharField(max_length=20, default='new')  # Track the status of the lead
+
+    created_date = models.DateTimeField(default=timezone.now)
+
+    #services
+
+    services = models.ForeignKey(Service,on_delete=models.SET_NULL, null=True, related_name="users")   # for services
+
     
 
     def __str__(self):
@@ -78,10 +94,28 @@ class UserProfile(models.Model):
     def __str__(self):
         return str(self.id)
 
-class SalesPurchases(models.Model):
+class Sales(models.Model):
     sales = models.IntegerField()
-    purchase = models.IntegerField()
     created_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.sales
+    
+class Purchase(models.Model):
+    purchase = models.IntegerField()
+    created_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.purchase
+
+
+
+class Plan(models.Model):
+    name = models.CharField(max_length=255)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    batch = models.CharField(max_length=50)
+    duration = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+    

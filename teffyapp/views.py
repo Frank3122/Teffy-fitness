@@ -5,9 +5,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from enum import Enum
 from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponseForbidden
+from django.utils import timezone
+from datetime import date, datetime
 # Create your views here.
 
 class Messages(Enum):
@@ -65,6 +66,7 @@ def register(request):
         messages.success(request, "Successfully Registered! Please login.")
         return redirect("/login/")  
     return render(request, "register.html")
+
 def forms(request):
     if request.method == "POST":
        
@@ -95,7 +97,7 @@ def forms(request):
             "status": status,
         })
 
-        # Save to the database
+        
         personal_info = PersonalInformation(
             name=name,
             address=address,
@@ -128,8 +130,9 @@ def forms(request):
 
 def main(request):
     member_count = PersonalInformation.objects.count() 
-    sales = SalesPurchases.objects.count()
-    purchase = SalesPurchases.objects.count()
+    sales = Sales.objects.count()
+    purchase = Purchase.objects.count()
+    messages.success(request,"WELCOME")
     return render(request, 'main-page.html', {'member_count': member_count, "sales":sales, "purchase":purchase})
 
 def expense(request):
@@ -262,12 +265,30 @@ def update_status(request, id):
     return redirect('new_leads')
 
 def new_leads(request):
-    all_data = PersonalInformation.objects.filter(status='new')
+    all_data = PersonalInformation.objects.filter(status='new') 
     return render(request, 'new-leads.html', {'all_data': all_data, 'status_title': 'New'})
 
 def converted_leads(request):
+    if request.method == "POST":
+        lead_id = request.POST.get('lead_id')
+        service_id = request.POST.get('services')  
+
+        lead = PersonalInformation.objects.get(id=lead_id)
+        selected_service = Service.objects.get(id=service_id)  
+        lead.services = selected_service  
+        lead.save()
+
+        return redirect('converted_leads')
+
     all_data = PersonalInformation.objects.filter(status='converted')
-    return render(request, 'converted_leads.html', {'all_data': all_data, 'status_title': 'Converted'})
+    available_services = Service.objects.all()
+
+    return render(request, 'converted_leads.html', {
+        'all_data': all_data,
+        'status_title': 'Converted',
+        'available_services': available_services,
+    })
+
 
 def not_converted_leads(request):
     all_data = PersonalInformation.objects.filter(status='not_converted')
@@ -285,7 +306,7 @@ def delete_lead(request, id):
     lead = PersonalInformation.objects.get(id=id)
     lead.delete()
     messages.success(request, "Lead deleted successfully.")
-    return redirect('new_leads') 
+    return redirect('new_leads') ############
 
 def user_management(request):
     if request.method == "POST":
@@ -386,4 +407,118 @@ def delete_user(request, user_id):
     
     messages.success(request, "User successfully deleted.")
     return redirect('user_management')
+
+
+def report_view(request):
+    today = timezone.now().date()  
+
+    
+    first_day_of_month = date(today.year, today.month, 1)
+
+    
+    new_leads_today = PersonalInformation.objects.filter(created_date__date=today, status='new').count()
+    converted_leads_today = PersonalInformation.objects.filter(created_date__date=today, status='converted').count()
+    not_converted_leads_today = PersonalInformation.objects.filter(created_date__date=today, status='not_converted').count()
+    follow_up_leads_today  = PersonalInformation.objects.filter(created_date__date=today, status='follow_up').count()
+    pending_leads_today = PersonalInformation.objects.filter(created_date__date=today, status='pending').count()
+
+   
+    new_leads_this_month = PersonalInformation.objects.filter(
+        created_date__date__gte=first_day_of_month,
+        created_date__date__lte=today,
+        status='new'
+    ).count()
+
+    converted_leads_this_month = PersonalInformation.objects.filter(
+        created_date__date__gte=first_day_of_month,
+        created_date__date__lte=today,
+        status='converted'
+    ).count()
+
+    not_converted_leads_this_month = PersonalInformation.objects.filter(
+        created_date__date__gte=first_day_of_month,
+        created_date__date__lte=today,
+        status='not_converted'
+    ).count()
+
+    follow_up_leads_this_month = PersonalInformation.objects.filter(
+        created_date__date__gte=first_day_of_month,
+        created_date__date__lte=today,
+        status='not_converted'
+    ).count()
+
+    pending_leads_this_month = PersonalInformation.objects.filter(
+        created_date__date__gte=first_day_of_month,
+        created_date__date__lte=today,
+        status='not_converted'
+    ).count()
+
+
+    context = {
+        'new_leads_today': new_leads_today,
+        'new_leads_this_month': new_leads_this_month,
+        'converted_leads_today': converted_leads_today,
+        'converted_leads_this_month': converted_leads_this_month,
+        'not_converted_leads_today':not_converted_leads_today,
+        'not_converted_leads_this_month' : not_converted_leads_this_month,
+        'follow_up_leads_today': follow_up_leads_today,
+        'follow_up_leads_this_month' : follow_up_leads_this_month,
+        'pending_leads_today' : pending_leads_today,
+        'pending_leads_this_month' : pending_leads_this_month
+
+    }
+
+    return render(request, 'reports.html', context)
+
+
+def services(request):
+    if request.method == "POST":
+        service_name = request.POST.get('service_name')
+        prices = request.POST.get("price")
+        duration = request.POST.get("duration")
+
+        if service_name:
+            Service.objects.create(name=service_name, prices=prices, duration=duration)
+            return redirect('services')  
+
+    all_services = Service.objects.all()  
+    return render(request, 'manage-services.html', {'services': all_services})
+
+
+def delete_service(request, service_id):
+    service = Service.objects.get(id=service_id)
+    service.delete()
+    return redirect('services')
+
+def assign_service(request, id):
+    if request.method == "POST":
+     
+        service_id = request.POST.get("service")
+       
+        service = Service.objects.filter(id=service_id).first()
+        lead = PersonalInformation.objects.filter(id=id).first()
+
+        if service and lead:
+            lead.services = service
+            lead.save()
+            messages.success(request, "Service successfully assigned!")
+        else:
+            messages.error(request, "Invalid service or lead.")
+
+        return redirect('converted_leads')
+
+
+
+def overall_services(request):
+        client_details = PersonalInformation.objects.filter(status='converted')
+        print("Number of clients:", client_details.count())
+        for client in client_details:
+            print(f"Client: {client.name}, Service: {client.services.name if client.services else 'No Service'}")
+        services = Service.objects.all()
+
+        context = {
+            "client_details": client_details, 
+            "services_taken": services,
+        }
+        return render(request, "overall-service.html", context)
 

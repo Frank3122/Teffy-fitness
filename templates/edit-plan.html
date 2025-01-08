@@ -1,97 +1,42 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}WORKPLAN{% endblock %}
+{% block title %}Edit Plan{% endblock %}
 
 {% block content %}
 <main class="app-main">
-    <!--begin::App Content Header-->
-    <div class="app-content-header">
-        <!--begin::Container-->
-        <div class="container-fluid">
-            <!--begin::Row-->
-            <div class="row">
-                <div class="col-sm-6">
-                    <h3 class="mb-0">PLAN DETAILS</h3>
-                </div>
+    <div class="container">
+        <h2>Edit Plan</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="nameInput" class="form-label">Plan Name</label>
+                <input type="text" id="nameInput" name="name" class="form-control" value="{{ plan.name }}" required>
             </div>
-            <!--end::Row-->
-        </div>
-        <!--end::Container-->
+            <div class="mb-3">
+                <label for="priceInput" class="form-label">Price</label>
+                <input type="text" id="priceInput" name="price" class="form-control" value="{{ plan.price }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="batchInput" class="form-label">Batch</label>
+                <select id="batchInput" name="batch" class="form-control">
+                    <option value="morning" {% if plan.batch == 'morning' %}selected{% endif %}>Morning Batch</option>
+                    <option value="afternoon" {% if plan.batch == 'afternoon' %}selected{% endif %}>Afternoon Batch</option>
+                    <option value="evening" {% if plan.batch == 'evening' %}selected{% endif %}>Evening Batch</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="durationInput" class="form-label">Duration</label>
+                <input type="text" id="durationInput" name="duration" class="form-control" value="{{ plan.duration }}" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a href="{% url 'edit-plan' %}" class="btn btn-secondary">Cancel</a>
+        </form>
     </div>
-    <!--end::App Content Header-->
-
-    <!--begin::App Content-->
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Plan Details Form Section -->
-            <div class="col-md-6">
-                <div class="card card-warning card-outline mb-4">
-                    <!--begin::Form-->
-                    <form id="planForm" >
-                        <!--begin::Body-->
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <label for="planInput" class="form-label">PLAN</label>
-                                <input type="text" id="planInput" class="form-control" placeholder="Enter plan name">
-                            </div>
-                            <div class="mb-3">
-                                <label for="priceInput" class="form-label">Price</label>
-                                <input type="text" id="priceInput" class="form-control" placeholder="Enter plan price">
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="batchSelect" class="form-label">Batch</label>
-                                <select id="batchSelect" class="form-control">
-                                    <option value="" disabled selected>Select Batch</option>
-                                    <option value="morning">Morning Batch</option>
-                                    <option value="afternoon">Afternoon Batch</option>
-                                    <option value="evening">Evening Batch</option>
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="priceInput" class="form-label">Duration</label>
-                                <input type="text" id="durationInput" class="form-control" placeholder="Enter Duration">
-                            </div>
-
-                            
-                            <div class="card-footer">
-                                <button type="submit" class="btn btn-primary" id = "plansubmit">Submit</button>
-                            </div>
-                        </div>
-                        <!--end::Body-->
-                    </form>
-                </div>
-            </div>
-
-            <!-- Simple Table Section -->
-            <div class="col-md-6">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h3 class="card-title">PLAN DETAILS</h3>
-                    </div>
-                    <div class="card-body p-0">
-                        <table class="table" id="planTable">
-                            <thead>
-                                <tr>
-                                    <th style="width:5px">S.No</th>
-                                    <th>PLAN NAME</th>
-                                    <th>PRICE</th>
-                                    <th>BATCH</th>
-                                    <th>DURATION</th>
-                                    <th>ACTION</th>
-                                </tr>
-                            </thead>
-                            <tbody id="planTableBody">
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!--end::App Content-->
 </main>
+
+
+
+            
 {% endblock content %}
 
 {% include "footer.html" %}

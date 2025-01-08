@@ -7,6 +7,14 @@
     <div class="app-content">
         <div class="container-fluid">
             <h3>{{ status_title }} LEADS</h3>
+                                
+            {% if messages %}
+            <div class="alert alert-info" role="alert">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
             <table id="example1" class="table table-bordered">
                 <thead>
                     <tr>

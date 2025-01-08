@@ -177,7 +177,7 @@
             <td>${plan.batch}</td>
             <td>${plan.duration}</td>
             <td>
-                <a href="#" onclick="editRow('${plan.id}')" class="text-decoration-none">
+                <a href="/edit-plan/<int:plan_id>/" onclick="editRow('${plan.id}')" class="text-decoration-none">
                     <i class="bi bi-pencil-square text-primary"></i>
                 </a>
                 <a href="#" onclick="deleteRow('${plan.id}')" class="text-decoration-none ms-3">
@@ -217,71 +217,71 @@
 
 
     // Add or update a plan
-    document.getElementById("plansubmit").addEventListener("click", (event) => {
-        event.preventDefault();
+    // document.getElementById("plansubmit").addEventListener("click", (event) => {
+    //     event.preventDefault();
 
-        const name = document.getElementById("planInput").value;
-        const price = document.getElementById("priceInput").value;
-        const batch = document.getElementById("batchSelect").value;
-        const duration = document.getElementById("durationInput").value;
+    //     const name = document.getElementById("planInput").value;
+    //     const price = document.getElementById("priceInput").value;
+    //     const batch = document.getElementById("batchSelect").value;
+    //     const duration = document.getElementById("durationInput").value;
 
-        if (name && price && batch && duration) {
-            let plans = loadFromLocalStorage();
+    //     if (name && price && batch && duration) {
+    //         let plans = loadFromLocalStorage();
 
-            if (editingPlanId) {
-                // Update the existing plan
-                const index = plans.findIndex(plan => plan.id === editingPlanId);
-                plans[index] = { id: editingPlanId, name, price, batch, duration };
-                editingPlanId = null;
-                document.getElementById("plansubmit").innerText = "Submit";
-            } else {
-                // Add a new plan
-                const newPlan = {
-                    id: Date.now().toString(), // Use timestamp as a unique ID
-                    name,
-                    price,
-                    batch,
-                    duration
-                };
-                plans.push(newPlan);
-            }
+    //         if (editingPlanId) {
+    //             // Update the existing plan
+    //             const index = plans.findIndex(plan => plan.id === editingPlanId);
+    //             plans[index] = { id: editingPlanId, name, price, batch, duration };
+    //             editingPlanId = null;
+    //             document.getElementById("plansubmit").innerText = "Submit";
+    //         } else {
+    //             // Add a new plan
+    //             const newPlan = {
+    //                 id: Date.now().toString(), // Use timestamp as a unique ID
+    //                 name,
+    //                 price,
+    //                 batch,
+    //                 duration
+    //             };
+    //             plans.push(newPlan);
+    //         }
 
-            saveToLocalStorage(plans);
-            refreshTable();
+    //         saveToLocalStorage(plans);
+    //         refreshTable();
 
-            // Reset the form
-            document.getElementById("planForm").reset();
-        } else {
-            alert("Please fill in all fields.");
-        }
-    });
+    //         // Reset the form
+    //         document.getElementById("planForm").reset();
+    //     } else {
+    //         alert("Please fill in all fields.");
+    //     }
+    // });
 
-    // Edit a plan
-    function editRow(id) {
-        const plans = loadFromLocalStorage();
-        const plan = plans.find(plan => plan.id === id);
+    // // Edit a plan
+    // function editRow(id) {
+    //     const plans = loadFromLocalStorage();
+    //     const plan = plans.find(plan => plan.id === id);
 
-        if (plan) {
-            document.getElementById("planInput").value = plan.name;
-            document.getElementById("priceInput").value = plan.price;
-            document.getElementById("batchSelect").value = plan.batch;
-            document.getElementById("durationInput").value = plan.duration;
+    //     if (plan) {
+    //         document.getElementById("planInput").value = plan.name;
+    //         document.getElementById("priceInput").value = plan.price;
+    //         document.getElementById("batchSelect").value = plan.batch;
+    //         document.getElementById("durationInput").value = plan.duration;
 
-            editingPlanId = id; // Set the plan being edited
-            document.getElementById("plansubmit").innerText = "Update";
-        }
-    }
+    //         editingPlanId = id; // Set the plan being edited
+    //         document.getElementById("plansubmit").innerText = "Update";
+    //     }
+    // }
 
-    // Delete a plan
-    function deleteRow(id) {
-        let plans = loadFromLocalStorage();
-        plans = plans.filter(plan => plan.id !== id);
-        saveToLocalStorage(plans);
-        refreshTable();
-    }
+    // // Delete a plan
+    // function deleteRow(id) {
+    //     let plans = loadFromLocalStorage();
+    //     plans = plans.filter(plan => plan.id !== id);
+    //     saveToLocalStorage(plans);
+    //     refreshTable();
+    // }
 
-    // Initialize table on page load
-    document.addEventListener("DOMContentLoaded", refreshTable);
+    // // Initialize table on page load
+    // document.addEventListener("DOMContentLoaded", refreshTable);
 </script>
 
 {% endblock script %}

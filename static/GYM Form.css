@@ -272,3 +272,8 @@ nav
     background-color: #f8f9fa; /* Light grey */
     font-weight: bold;
   }
+  @media (min-width: 768px) {
+    .form-control {
+      margin-bottom: 20px;
+    }
+}

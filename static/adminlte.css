@@ -15447,3 +15447,66 @@ html.maximized-card {
   background-color: #f1f1f1; /* Light hover background */
   color: #0056b3; /* Darker text on hover */
 }
+
+.info-box {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 10px;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.info-box-icon {
+  flex: 0 0 auto;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+}
+
+.info-box-content {
+  flex: 1;
+  margin-left: 10px;
+}
+
+.info-box-text, .info-box-number {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.col-md-3 {
+  flex: 0 0 auto;
+  width: 35%;
+}
+/* Email Container Styling */
+.email-container p {
+  margin-bottom: 10px;
+}
+
+/* Form Styling */
+.status-form,
+.services-form {
+  display: block;
+  margin-top: 10px;
+}
+
+.services-form select {
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* Table and Column Styling */
+table th, table td {
+  vertical-align: middle;
+  text-align: center;
+}
+
+/* Action Buttons Styling */
+td a {
+  margin-right: 5px;
+}
+
+
