@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Remaining</title>
+    <script>
+        // Function to update the time remaining on the page
+        function updateTimeRemaining() {
+            const timeElement = document.getElementById('time-remaining');
+            const timeRemaining = "{{ time_remaining }}";  // Get the value passed from Django
+
+            // Display the time remaining
+            timeElement.textContent = timeRemaining;
+
+            // Optional: Update the time every second (real-time countdown)
+            setTimeout(updateTimeRemaining, 1000);
+        }
+    </script>
+</head>
+<body onload="updateTimeRemaining()">
+    <h1>Time Remaining:</h1>
+    <p id="time-remaining"></p>
+</body>
+</html>

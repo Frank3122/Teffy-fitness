@@ -94,12 +94,25 @@
                 <nav class="mt-2">
                     <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
                         <li class="nav-item">
+                            <a href="{% url 'main' %}" class="nav-link" >
+                                <i class="nav-icon bi-circle-fill" style="font-size: 12px;"></i>
+                                <p style="font-size: 14px;">DASHBOARD</p>
+                            </a>
+                        <li class="nav-item">
                             <a href="#" class="nav-link" data-bs-toggle="collapse" data-bs-target="#leadsMenu" aria-expanded="false">
                                 <i class="nav-icon bi bi-speedometer" style="font-size: 12px;"></i>
                                 <p style="font-size: 14px;">LEADS <i class="nav-arrow bi bi-chevron-down"></i></p>
                             </a>
                             <div id="leadsMenu" class="collapse">
                                 <ul class="nav nav-treeview">
+
+                                    <li class="nav-item">
+                                        <a href="{% url 'add_leads' %}" class="nav-link">
+                                            <i class="nav-icon bi bi-person-check-fill" style="font-size: 12px;"></i>
+                                            <p style="font-size: 14px;">ADD LEADS</p>
+                                        </a>
+                                    </li>
+
                                     <li class="nav-item">
                                         <a href="{% url 'new_leads' %}" class="nav-link">
                                             <i class="nav-icon bi bi-person-circle" style="font-size: 12px;"></i>
@@ -169,18 +182,18 @@
                                         </a>
                                     </li>
 
-                                    <li class="nav-item">
+                                    <!-- <li class="nav-item">
                                         <a href="/price/" class="nav-link">
                                             <i class="nav-icon bi bi-currency-rupee" style="font-size: 12px;"></i>
                                             <p style="font-size: 14px;">PRICE</p>
                                         </a>
-                                    </li>
-                                    <li class="nav-item">
+                                    </li> -->
+                                    <!-- <li class="nav-item">
                                         <a href="/expense/" class="nav-link">
                                             <i class="nav-icon bi-wallet" style="font-size: 12px;"></i>
                                             <p style="font-size: 14px;">EXPENSE</p>
                                         </a>
-                                    </li>
+                                    </li> -->
                                     <li class="nav-item">
                                         <a href="/work/" class="nav-link">
                                             <i class="nav-icon bi bi-calendar-check" style="font-size: 12px;"></i>
@@ -206,28 +219,28 @@
                             <div id="productsMenu" class="collapse">
                                 <ul class="nav nav-treeview">
                                     <li class="nav-item">
-                                        <a href="" class="nav-link">
+                                        <a href="/purchase/" class="nav-link">
                                             <i class="nav-icon bi bi-list" style="font-size: 12px;"></i>
                                             <p style="font-size: 14px;">PURCHASE</p>
                                         </a>
                                     </li>
 
                                     <li class="nav-item">
-                                        <a href="" class="nav-link">
+                                        <a href="/sales/" class="nav-link">
                                             <i class="nav-icon bi bi-list" style="font-size: 12px;"></i>
                                             <p style="font-size: 14px;">SALES</p>
                                         </a>
                                     </li>
 
                                     <li class="nav-item">
-                                        <a href="" class="nav-link">
+                                        <a href="/stocks/" class="nav-link">
                                             <i class="nav-icon bi bi-list" style="font-size: 12px;"></i>
                                             <p style="font-size: 14px;">STOCK</p>
                                         </a>
                                     </li>
 
                                     <li class="nav-item">
-                                        <a href="" class="nav-link">
+                                        <a href="/returns/" class="nav-link">
                                             <i class="nav-icon bi bi-list" style="font-size: 12px;"></i>
                                             <p style="font-size: 14px;">RETURNS</p>
                                         </a>
@@ -237,9 +250,9 @@
                         </li>
                             
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <a href="/expenses/" class="nav-link">
                                 <i class="nav-icon bi bi-cash-stack" style="font-size: 12px;"></i>
-                                <p style="font-size: 14px;">EXPENSIVE</p>
+                                <p style="font-size: 14px;">EXPENSES</p>
                             </a>
                         </li>
                         <li class="nav-item">

@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}REPORTS{% endblock %}
+
+{% block content %}
+<main class="app-main">
+    <!-- App Content Header -->
+    <div class="app-content-header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-6">
+                    <h3 class="mb-0">REPORTS</h3>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-end">
+                        <li class="breadcrumb-item"><a href="/main/">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Reports</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card mt-4 mx-3 shadow-sm">
+                        <div class="card-body">
+                            <form method="POST">
+                                {% csrf_token %}
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for=" from_date" class="form-label">From Date:</label>
+                                        <input type="date" id=" from_date" name=" from_date" class="form-control">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="to_date " class="form-label">To Date:</label>
+                                        <input type="date" id="to_date" name="to_date" class="form-control">
+                                    </div>
+                                </div>
+                
+                                <div class="mb-3">
+                                    <label for="status" class="form-label">Category:</label>
+                                    <select id="status" class="form-control" name="status">
+                                        <option value="" disabled selected>Select Category</option>
+                                        <option value="new">New Leads</option>
+                                        <option value="converted">Converted Leads</option>
+                                        <option value="not-converted">Not-Converted Leads</option>
+                                        <option value="follow-up">Follow-Up Leads</option>
+                                        <option value="pending">Pending Leads</option>
+                                    </select>
+                                </div>
+                
+                                <div class="text-end">
+                                    <button type="submit"  class="btn btn-success">Download Report</button>
+                                 
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+            
+
+{% endblock content %}
+
+
+{% include "footer.html" %}
+
+{% block script %}
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- DataTables and Bootstrap 5 CSS & JS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+
+<!-- Bootstrap 5 Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- OverlayScrollbars -->
+<script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.3.0/browser/overlayscrollbars.browser.es6.min.js" integrity="sha256-H2VM7BKda+v2Z4+DRy69uknwxjyDRhszjXFhsL4gD3w=" crossorigin="anonymous"></script>
+
+<!-- Popper.js (Required for Bootstrap 5) -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha256-whL0tQWoY1Ku1iskqPFvmZ+CHsvmRWx/PIoEvIeWh4I=" crossorigin="anonymous"></script>
+
+<!-- AdminLTE JS (if needed) -->
+<script src="/static/js/adminlte.js"></script>
+
+<!-- DataTables Additional Features -->
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.colVis.min.js"></script>
+
+<script>
+  
+
+    $(document).ready(function () {
+        // Initialize DataTable with compact spacing
+        $("#example1").DataTable({
+            paging: true,
+            searching: true,
+            ordering: true,
+            lengthChange: false, // Disable length change dropdown
+            pageLength: 10, // Set default number of rows
+            autoWidth: false, // Disable auto-width
+            columnDefs: [
+                { targets: "_all", className: "text-center" } // Center align all columns
+            ],
+            dom: "Bfrtip", // Add additional elements to DataTable
+            responsive: true // Make table responsive
+        });
+
+        // Reduce column spacing using custom styles
+        $("table.dataTable").addClass("table-sm"); // Apply Bootstrap small table class
+    });
+
+    $(document).ready(function () {
+    // Initialize DataTable only once
+    if (!$.fn.dataTable.isDataTable('#example1')) {
+        $("#example1").DataTable({
+            responsive: true,
+            lengthChange: false,
+            autoWidth: false,
+            paging: true,
+            searching: true,
+            ordering: true,
+            buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"], // Enable all buttons
+            dom: "Bfrtip", // Add buttons to the DOM
+            pagingType: 'full_numbers', // Optional: for better pagination display
+            columnDefs: [
+                { targets: "_all", className: "text-center" } // Center align all columns
+            ],
+            pageLength: 10, // Set default number of rows
+        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)'); // Append buttons to container
+
+        // Apply Bootstrap small table class for compact spacing
+        $("table.dataTable").addClass("table-sm");
+    }
+});
+
+
+    
+
+
+</script>
+{% endblock script %}

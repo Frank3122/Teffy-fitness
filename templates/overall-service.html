@@ -33,6 +33,7 @@
                               <th>Client Name</th>
                               <th>Phone Number</th>
                               <th>Service Taken</th>
+                              <th>Payment</th>
                           </tr>
                       </thead>
                       <tbody>
@@ -43,6 +44,9 @@
                               <td>{{ client.name }}</td>
                               <td>{{ client.mobile_number }}</td>
                               <td>{{ client.services.name }}</td>
+                              <td>
+                                <a href="{% url 'payment_page' client.id %}" class="btn btn-primary btn-sm">Pay</a>
+                              </td>
                           </tr>
                           {% endfor %}
                         {% else %}

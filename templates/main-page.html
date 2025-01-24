@@ -1,171 +1,177 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}DASHBOARD{% endblock %}
+
+{% block title %}Dashboard{% endblock %}
 
 {% block content %}
 <main class="app-main"> 
-    <!--begin::App Content Header-->
+    <!-- App Content Header -->
     <div class="app-content-header"> 
-        <!--begin::Container-->
         <div class="container-fluid"> 
-            <!--begin::Row-->
-            <div class="row">
+            <div class="row align-items-center">
                 <div class="col-sm-6">
                     <h3 class="mb-0">Dashboard</h3>
-                    <!-- {% if messages %}
-                    <div class="alert alert-info" role="alert">
-                        {% for message in messages %}
-                            <p>{{ message }}</p>
-                        {% endfor %}
-                    </div>
-                {% endif %} -->
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-end">
                         <li class="breadcrumb-item"><a href="/main/">Home</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">
-                            Dashboard
-                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
                     </ol>
                 </div>
             </div> 
         </div> 
     </div> 
-    <div class="app-content"> 
-        <!--begin::Container-->
-        <div class="container-fluid"> 
-            <!-- Info boxes -->
-            <div class="row">
-                <div class="col-12 col-sm-6 col-md-3">
-                    <div class="info-box">
-                        <span class="info-box-icon text-bg-warning shadow-sm"> 
-                            <i class="bi bi-people-fill"></i> 
-                        </span>
-                        <div class="info-box-content"> 
-                            <span class="info-box-text">Members</span> 
-                            <span class="info-box-number">{{ member_count }}</span> 
-                        </div> 
+
+    <!-- Main Content -->
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="d-flex flex-wrap gap-3">
+                        <!-- Updated Renew Member Button -->
+                        <a class="btn btn-app bg-dark" id="renewMember" data-toggle="modal" data-target="#renewMemberModal" style="color:white;" href="{% url 'renew_member_list' %}">
+                            <i class="fas fa-edit mb-2" style="color: white;"></i>
+                            <span>Renew Service</span>
+                        </a>
+                        <a class="btn btn-app bg-dark" href="{% url 'add_leads' %}" style="color: white;">
+                            <i class="fas fa-plus mb-2" style="color: white;"></i>
+                            <span>Add Members</span>
+                        </a>
                     </div>
                 </div>
-                <div class="col-12 col-sm-6 col-md-3">
+            </div>
+
+            <!-- Info Boxes -->
+            <div class="row">
+                <div class="col-12 col-sm-6 col-md-3 mb-4">
                     <div class="info-box">
-                        <span class="info-box-icon text-bg-success shadow-sm"> 
-                            <i class="bi bi-cart-fill"></i> 
-                        </span>
-                        <div class="info-box-content"> 
-                            <span class="info-box-text">Sales</span> 
-                            <span class="info-box-number">{{ sales }}</span> 
+                        <a href="{% url 'converted_leads' %}" class="info-box-icon text-bg-warning shadow-sm">
+                            <i class="bi bi-people-fill"></i>
+                        </a>
+                        <div class="info-box-content">
+                            <span class="info-box-text">CONVERTED LEADS</span>
+                            <span class="info-box-number">{{ member_count }}</span>
                         </div>
                     </div>
                 </div>
-                <div class="col-12 col-sm-6 col-md-3">
+
+                <div class="col-12 col-sm-6 col-md-3 mb-4">
                     <div class="info-box">
-                        <span class="info-box-icon text-bg-success shadow-sm"> 
-                            <i class="bi bi-bag"></i> 
-                        </span>
-                        <div class="info-box-content"> 
-                            <span class="info-box-text">Purchase</span> 
-                            <span class="info-box-number">{{ purchase }}</span> 
+                        <a href="{% url 'sales' %}" class="info-box-icon text-bg-success shadow-sm">
+                            <i class="bi bi-cart-fill"></i>
+                        </a>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Sales</span>
+                            <span class="info-box-number">{{ sales }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-md-3 mb-4">
+                    <div class="info-box">
+                        <a href="{% url 'purchase' %}" class="info-box-icon text-bg-success shadow-sm">
+                            <i class="bi bi-bag"></i>
+                        </a>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Purchase</span>
+                            <span class="info-box-number">{{ purchase }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-md-3 mb-4">
+                    <div class="info-box">
+                        <a href="{% url 'follow_up_leads' %}" class="info-box-icon text-bg-danger shadow-sm">
+                            <i class="bi bi-person-exclamation"></i>
+                        </a>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Follow-Up</span>
+                            <span class="info-box-number">{{ follow_up }}</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 </main>
+
+<!-- Renew Member Modal -->
+<div class="modal fade" id="renewMemberModal" tabindex="-1" role="dialog" aria-labelledby="renewMemberModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="renewMemberModalLabel">Renew Member</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="member-id" class="col-form-label">Member ID:</label>
+            <input type="text" class="form-control" id="member-id">
+          </div>
+          <div class="form-group">
+            <label for="renewal-date" class="col-form-label">Renewal Date:</label>
+            <input type="date" class="form-control" id="renewal-date">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock content %}
 
 {% include "footer.html" %}
 
 {% block script %}
+<script>
+    (() => {
+        "use strict";
+        const forms = document.querySelectorAll(".needs-validation");
+        Array.from(forms).forEach((form) => {
+            form.addEventListener("submit", (event) => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add("was-validated");
+            }, false);
+        });
+    })();
 
-
-                
-                <!-- JavaScript for Form Validation -->
-                <script>
-                    (() => {
-                        "use strict";
-                
-                        const forms = document.querySelectorAll(".needs-validation");
-                
-                        Array.from(forms).forEach((form) => {
-                            form.addEventListener(
-                                "submit",
-                                (event) => {
-                                    if (!form.checkValidity()) {
-                                        event.preventDefault();
-                                        event.stopPropagation();
-                                    }
-                                    form.classList.add("was-validated");
-                                },
-                                false
-                            );
-                        });
-                    })();
-                </script>
-                
-
-
-  <!-- Page Script to initialize DataTables -->
-  <script>
-    // Example of initializing dropdowns (if needed)
-    document.querySelectorAll('.dropdown-toggle').forEach(dropdown => {
-        dropdown.addEventListener('click', function (e) {
-            e.preventDefault();
-            let menu = this.nextElementSibling;
-            menu.classList.toggle('show');
+    $(function () {
+        $("#example1").DataTable({
+            paging: true,
+            lengthChange: true,
+            searching: true,
+            ordering: true,
+            info: true,
+            autoWidth: false,
+            pageLength: 10
         });
     });
- </script>
-  <script>
-    $(function () {
-      $("#example1").DataTable({
-        "paging": true,       
-        "lengthChange": true,   
-        "searching": true,      
-        "ordering": true,       
-        "info": true,           
-        "autoWidth": false,     
-        "pageLength": 10       
-      });
-    });
-  </script>
-  <script>
+</script>
+<script>
     document.querySelectorAll('input, textarea').forEach(element => {
-  element.addEventListener('click', function() {
-    // Add blinking effect to the element
-    this.classList.add('blinking');
-    
-    // Prevent user from entering value in the input or textarea
-    // this.setAttribute('readonly', true);  // or 'disabled', if you want to prevent interaction entirely
-    
-    // Remove the blinking effect when the user starts typing or leaves the input
-    this.addEventListener('input', () => {
-      this.classList.remove('blinking');
-    //   this.removeAttribute('readonly');
+        element.addEventListener('click', function() {
+            this.classList.add('blinking');
+            this.addEventListener('input', () => {
+                this.classList.remove('blinking');
+            });
+            this.addEventListener('blur', () => {
+                this.classList.remove('blinking');
+            });
+        });
     });
-    
-    this.addEventListener('blur', () => {
-      this.classList.remove('blinking');
-    //   this.removeAttribute('readonly');
-    });
-  });
-});
-
-
-
-
-  </script>
-   <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-KyZXEAg3QhqLMpG8r+8fhAXLRvE5bLz2wEtyxk3Zr8A=" crossorigin="anonymous"></script>
-   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76A4pQc6Ew4aSQkVLFHt3OGFuC4TdohcJaC1a5cDz/UQo0W1E5K6XukvU7B6q40" crossorigin="anonymous"></script>
-
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.3.0/browser/overlayscrollbars.browser.es6.min.js" integrity="sha256-H2VM7BKda+v2Z4+DRy69uknwxjyDRhszjXFhsL4gD3w=" crossorigin="anonymous"></script> <!--end::Third Party Plugin(OverlayScrollbars)--><!--begin::Required Plugin(popperjs for Bootstrap 5)-->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha256-whL0tQWoY1Ku1iskqPFvmZ+CHsvmRWx/PIoEvIeWh4I=" crossorigin="anonymous"></script> <!--end::Required Plugin(popperjs for Bootstrap 5)--><!--begin::Required Plugin(Bootstrap 5)-->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha256-YMa+wAM6QkVyz999odX7lPRxkoYAan8suedu4k2Zur8=" crossorigin="anonymous"></script> <!--end::Required Plugin(Bootstrap 5)--><!--begin::Required Plugin(AdminLTE)-->
-    <script src="/static/js/adminlte.js"></script> 
-    
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.3.0/browser/overlayscrollbars.browser.es6.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+<script src="/static/js/adminlte.js"></script>
 {% endblock script %}
-
-

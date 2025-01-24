@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}SALES{% endblock %}
+
+{% block content %}
+<main class="app-main">
+    <div class="app-content-header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-6">
+                    <h3 class="mb-0">SALES DETAILS</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card card-warning card-outline mb-4">
+                    <form id="salesForm" method="POST">
+                        {% csrf_token %}
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="product_name" class="form-label">PRODUCT NAME</label>
+                                <select id="product_name" class="form-control" name="product_name">
+                                    <option value="" disabled selected>Select product</option>
+                                    {% for product in purchased_products %}
+                                    <option value="{{ product.product_name }}">{{ product.product_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="customer" class="form-label">CUSTOMER</label>
+                                <input type="text" id="customer" class="form-control" name="customer" placeholder="Enter customer name">
+                            </div>
+                            <div class="mb-3">
+                                <label for="quantity" class="form-label">QUANTITY</label>
+                                <input type="number" id="quantity" class="form-control" name="quantity" placeholder="Enter quantity">
+                            </div>
+                            <div class="mb-3">
+                                <label for="sale_price" class="form-label">PRICE</label>
+                                <input type="number" id="sale_price" class="form-control" name="sale_price" placeholder="Enter price">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3 class="card-title">SALES RECORD</h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table" id="salesTable">
+                            <thead>
+                                <tr>
+                                    <th>S.No</th>
+                                    <th>Product Name</th>
+                                    <th>Customer</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="salesTableBody">
+                                {% for sales in sales %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ sales.product.product_name }}</td>
+                                    <td>{{ sales.customer }}</td>
+                                    <td>{{ sales.quantity }}</td>
+                                    <td>{{ sales.sale_price }}</td>
+                                    <td>
+                                        <!-- Edit Icon Button -->
+                                        <a href="{% url 'edit-sales' sales.id %}" class="btn btn-warning btn-sm" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <!-- Delete Icon Button -->
+                                        <a href="{% url 'delete-sales' sales.id %}" class="btn btn-danger btn-sm" title="Delete" onclick="return confirm('Are you sure you want to delete this purchase?')">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+{% endblock content %}
+    
+{% include "footer.html" %}
+
+{% block script %}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.3.0/browser/overlayscrollbars.browser.es6.min.js" crossorigin="anonymous"></script>
+<script src="/static/js/adminlte.js"></script>
+<script>
+      // DataTable Initialization
+      $(function () {
+        // Initialize DataTable for example1 with default pagination
+        $("#example1").DataTable({
+          "paging": true, // Enable pagination
+          "lengthChange": true, // Allow users to change number of rows per page
+          "searching": true, // Enable searching
+          "ordering": true, // Enable column ordering
+          "info": true, // Display information about the table (e.g., "Showing 1 to 10 of 50 entries")
+          "autoWidth": false // Disable auto-width calculation to allow more control over the layout
+        });
+
+      });
+    
+      // OverlayScrollbars Initialization
+      const SELECTOR_SIDEBAR_WRAPPER = ".sidebar-wrapper";
+      
+      const Default = {
+        scrollbarTheme: "os-theme-light",  // Set the scrollbar theme
+        scrollbarAutoHide: "leave",       // Hide the scrollbar when not in use
+        scrollbarClickScroll: true,       // Enable click-to-scroll functionality
+      };
+    
+      // Ensure the script runs after the DOM is loaded
+      document.addEventListener("DOMContentLoaded", function() {
+        const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
+    
+        // Check if the sidebarWrapper element exists and if OverlayScrollbars is available
+        if (
+          sidebarWrapper &&
+          typeof OverlayScrollbarsGlobal?.OverlayScrollbars !== "undefined"
+        ) {
+          // Initialize the custom scrollbar on the sidebarWrapper
+          OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
+            scrollbars: {
+              theme: Default.scrollbarTheme,
+              autoHide: Default.scrollbarAutoHide,
+              clickScroll: Default.scrollbarClickScroll,
+            },
+          });
+        }
+      });
+  
+
+$(document).ready(function () {
+$('#paymentHistory').DataTable({
+  "paging": true,
+  "searching": true,
+  "ordering": true,
+  "info": true,
+  "lengthMenu": [5, 10, 15, 20],  // Customize the number of records per page
+  "responsive": true,  // Make the table responsive on smaller screens
+});
+});
+
+</script>
+{% endblock script %}
+
+
+

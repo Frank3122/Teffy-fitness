@@ -27,21 +27,23 @@
             <div class="col-md-6">
                 <div class="card card-warning card-outline mb-4">
                     <!--begin::Form-->
-                    <form id="planForm" >
+                    <form id="planForm" method="POST" >
+                            {% csrf_token %}
                         <!--begin::Body-->
                         <div class="card-body">
+
                             <div class="mb-3">
-                                <label for="planInput" class="form-label">PLAN</label>
-                                <input type="text" id="planInput" class="form-control" placeholder="Enter plan name">
+                                <label for="plan_name" class="form-label">PLAN</label>
+                                <input type="text" id="plan_name" class="form-control" name="plan_name" placeholder="Enter plan name">
                             </div>
                             <div class="mb-3">
-                                <label for="priceInput" class="form-label">Price</label>
-                                <input type="text" id="priceInput" class="form-control" placeholder="Enter plan price">
+                                <label for="price" class="form-label">Price</label>
+                                <input type="text" id="price" class="form-control" name="price" placeholder="Enter plan price">
                             </div>
 
                             <div class="mb-3">
-                                <label for="batchSelect" class="form-label">Batch</label>
-                                <select id="batchSelect" class="form-control">
+                                <label for="batch" class="form-label">Batch</label>
+                                <select id="batch" class="form-control" name="batch">
                                     <option value="" disabled selected>Select Batch</option>
                                     <option value="morning">Morning Batch</option>
                                     <option value="afternoon">Afternoon Batch</option>
@@ -50,8 +52,8 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="priceInput" class="form-label">Duration</label>
-                                <input type="text" id="durationInput" class="form-control" placeholder="Enter Duration">
+                                <label for="duration" class="form-label">Duration</label>
+                                <input type="text" id="duration" class="form-control" name="duration" placeholder="Enter Duration">
                             </div>
 
                             
@@ -83,6 +85,27 @@
                                 </tr>
                             </thead>
                             <tbody id="planTableBody">
+                                {% for plans in all_plans %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ plans.plan_name }}</td>
+                                    <td>{{ plans.price }}</td>
+                                    <td>{{ plans.batch }}</td>
+                                    <td>{{ plans.duration }}</td>
+                                    <td>
+                                        <!-- Edit Icon Button -->
+                                        <a href="{% url 'edit_plan' plans.id %} " class="btn btn-warning btn-sm" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <!-- Delete Icon Button -->
+                                        <a href="#" class="btn btn-danger btn-sm" title="Delete" onclick="return confirm('Are you sure you want to delete this plan?')">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                               
+                                {% endfor %}
+                                
                             </tbody>
                         </table>
                     </div>
@@ -98,195 +121,70 @@
 
 {% block script %}
 
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.3.0/browser/overlayscrollbars.browser.es6.min.js" crossorigin="anonymous"></script>
+<script src="/static/js/adminlte.js"></script>
 <script>
-    // Example starter JavaScript for disabling form submissions if there are invalid fields
-    (() => {
-        "use strict";
-
-        // Fetch all the forms we want to apply custom Bootstrap validation styles to
-        const forms = document.querySelectorAll(".needs-validation");
-
-        // Loop over them and prevent submission
-        Array.from(forms).forEach((form) => {
-            form.addEventListener(
-                "submit",
-                (event) => {
-                    if (!form.checkValidity()) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
-                    form.classList.add("was-validated");
-                },
-                false
-            );
-        });
-    })();
-</script> <!--end::JavaScript-->
-
-
-
-
-
-<!--begin::Script-->  
-<script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.3.0/browser/overlayscrollbars.browser.es6.min.js" integrity="sha256-H2VM7BKda+v2Z4+DRy69uknwxjyDRhszjXFhsL4gD3w=" crossorigin="anonymous"></script> <!--end::Third Party Plugin(OverlayScrollbars)-->
-
-<!--begin::Required Plugin(popperjs for Bootstrap 5)-->
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha256-whL0tQWoY1Ku1iskqPFvmZ+CHsvmRWx/PIoEvIeWh4I=" crossorigin="anonymous"></script> <!--end::Required Plugin(popperjs for Bootstrap 5)-->
-
-<!--begin::Required Plugin(Bootstrap 5)-->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha256-YMa+wAM6QkVyz999odX7lPRxkoYAan8suedu4k2Zur8=" crossorigin="anonymous"></script> <!--end::Required Plugin(Bootstrap 5)-->
-
-<!--begin::Required Plugin(AdminLTE)-->
-<script src="/static/js/adminlte.js"></script> <!--end::Required Plugin(AdminLTE)-->
-
-<!--begin::OverlayScrollbars Configure-->
-<script>
-    const SELECTOR_SIDEBAR_WRAPPER = ".sidebar-wrapper";
-    const Default = {
-        scrollbarTheme: "os-theme-light",
-        scrollbarAutoHide: "leave",
-        scrollbarClickScroll: true,
-    };
-    document.addEventListener("DOMContentLoaded", function() {
-        const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
-        if (sidebarWrapper && typeof OverlayScrollbarsGlobal?.OverlayScrollbars !== "undefined") {
-            OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
-                scrollbars: {
-                    theme: Default.scrollbarTheme,
-                    autoHide: Default.scrollbarAutoHide,
-                    clickScroll: Default.scrollbarClickScroll,
-                },
+          // DataTable Initialization
+          $(function () {
+            // Initialize DataTable for example1 with default pagination
+            $("#example1").DataTable({
+              "paging": true, // Enable pagination
+              "lengthChange": true, // Allow users to change number of rows per page
+              "searching": true, // Enable searching
+              "ordering": true, // Enable column ordering
+              "info": true, // Display information about the table (e.g., "Showing 1 to 10 of 50 entries")
+              "autoWidth": false // Disable auto-width calculation to allow more control over the layout
             });
-        }
+
+          });
+        
+          // OverlayScrollbars Initialization
+          const SELECTOR_SIDEBAR_WRAPPER = ".sidebar-wrapper";
+          
+          const Default = {
+            scrollbarTheme: "os-theme-light",  // Set the scrollbar theme
+            scrollbarAutoHide: "leave",       // Hide the scrollbar when not in use
+            scrollbarClickScroll: true,       // Enable click-to-scroll functionality
+          };
+        
+          // Ensure the script runs after the DOM is loaded
+          document.addEventListener("DOMContentLoaded", function() {
+            const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
+        
+            // Check if the sidebarWrapper element exists and if OverlayScrollbars is available
+            if (
+              sidebarWrapper &&
+              typeof OverlayScrollbarsGlobal?.OverlayScrollbars !== "undefined"
+            ) {
+              // Initialize the custom scrollbar on the sidebarWrapper
+              OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
+                scrollbars: {
+                  theme: Default.scrollbarTheme,
+                  autoHide: Default.scrollbarAutoHide,
+                  clickScroll: Default.scrollbarClickScroll,
+                },
+              });
+            }
+          });
+      
+
+  $(document).ready(function () {
+    $('#paymentHistory').DataTable({
+      "paging": true,
+      "searching": true,
+      "ordering": true,
+      "info": true,
+      "lengthMenu": [5, 10, 15, 20],  // Customize the number of records per page
+      "responsive": true,  // Make the table responsive on smaller screens
     });
-</script> <!--end::OverlayScrollbars Configure-->
+  });
 
-
-<script>
-    let editingPlanId = null; // Tracks the ID of the plan being edited
-
-    // Function to add a row to the table
-    function addRowToTable(plan, index) {
-        const tableBody = document.getElementById("planTableBody");
-        const newRow = document.createElement("tr");
-        newRow.id = `row-${plan.id}`;
-        newRow.innerHTML = `
-            <td>${index + 1}</td> <!-- S.No is the row index + 1 -->
-            <td>${plan.name}</td>
-            <td>${plan.price}</td>
-            <td>${plan.batch}</td>
-            <td>${plan.duration}</td>
-            <td>
-                <a href="/edit-plan/<int:plan_id>/" onclick="editRow('${plan.id}')" class="text-decoration-none">
-                    <i class="bi bi-pencil-square text-primary"></i>
-                </a>
-                <a href="#" onclick="deleteRow('${plan.id}')" class="text-decoration-none ms-3">
-                    <i class="bi bi-trash text-danger"></i>
-                </a>
-            </td>
-        `;
-        tableBody.appendChild(newRow);
-    }
-
-    // Redirect to edit page
-    function editRow(id) {
-        window.location.href = `edit-plan.html?id=${id}`;
-    }
-
-    // Save plans to localStorage
-    function saveToLocalStorage(plans) {
-        localStorage.setItem("plans", JSON.stringify(plans));
-    }
-
-    // Load plans from localStorage
-    function loadFromLocalStorage() {
-        const data = localStorage.getItem("plans");
-        return data ? JSON.parse(data) : [];
-    }
-
-    // Refresh the table
-    function refreshTable() {
-        const tableBody = document.getElementById("planTableBody");
-        tableBody.innerHTML = ""; // Clear existing rows
-        const plans = loadFromLocalStorage();
-        plans.forEach((plan, index) => addRowToTable(plan, index)); // Pass index to addRowToTable
-    }
-
-    // Initialize table on page load
-    document.addEventListener("DOMContentLoaded", refreshTable);
-
-
-    // Add or update a plan
-    // document.getElementById("plansubmit").addEventListener("click", (event) => {
-    //     event.preventDefault();
-
-    //     const name = document.getElementById("planInput").value;
-    //     const price = document.getElementById("priceInput").value;
-    //     const batch = document.getElementById("batchSelect").value;
-    //     const duration = document.getElementById("durationInput").value;
-
-    //     if (name && price && batch && duration) {
-    //         let plans = loadFromLocalStorage();
-
-    //         if (editingPlanId) {
-    //             // Update the existing plan
-    //             const index = plans.findIndex(plan => plan.id === editingPlanId);
-    //             plans[index] = { id: editingPlanId, name, price, batch, duration };
-    //             editingPlanId = null;
-    //             document.getElementById("plansubmit").innerText = "Submit";
-    //         } else {
-    //             // Add a new plan
-    //             const newPlan = {
-    //                 id: Date.now().toString(), // Use timestamp as a unique ID
-    //                 name,
-    //                 price,
-    //                 batch,
-    //                 duration
-    //             };
-    //             plans.push(newPlan);
-    //         }
-
-    //         saveToLocalStorage(plans);
-    //         refreshTable();
-
-    //         // Reset the form
-    //         document.getElementById("planForm").reset();
-    //     } else {
-    //         alert("Please fill in all fields.");
-    //     }
-    // });
-
-    // // Edit a plan
-    // function editRow(id) {
-    //     const plans = loadFromLocalStorage();
-    //     const plan = plans.find(plan => plan.id === id);
-
-    //     if (plan) {
-    //         document.getElementById("planInput").value = plan.name;
-    //         document.getElementById("priceInput").value = plan.price;
-    //         document.getElementById("batchSelect").value = plan.batch;
-    //         document.getElementById("durationInput").value = plan.duration;
-
-    //         editingPlanId = id; // Set the plan being edited
-    //         document.getElementById("plansubmit").innerText = "Update";
-    //     }
-    // }
-
-    // // Delete a plan
-    // function deleteRow(id) {
-    //     let plans = loadFromLocalStorage();
-    //     plans = plans.filter(plan => plan.id !== id);
-    //     saveToLocalStorage(plans);
-    //     refreshTable();
-    // }
-
-    // // Initialize table on page load
-    // document.addEventListener("DOMContentLoaded", refreshTable);
 </script>
-
 {% endblock script %}
 
-        
-        
-        
-        
+
