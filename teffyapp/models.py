@@ -9,6 +9,8 @@ class Service(models.Model):
     name = models.CharField(max_length=100)
     duration = models.CharField(max_length=50, null=True, blank=True)  
     prices = models.PositiveIntegerField(null=True, blank=True)
+    group = models.CharField(max_length=100, null=True, blank=True)
+    sessions = models.CharField(max_length=100,null=True, blank=True)
 
     
 
@@ -142,7 +144,7 @@ class Plan(models.Model):
 class Expense(models.Model):
     expense_name = models.CharField(max_length=100)
     price = models.PositiveIntegerField(null=True, blank=True)
-    date_spent = models.DateTimeField(default = now  )  
+    date_spent = models.DateField(default = now  )  
     created_date = models.DateField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now_add=True)
 
@@ -175,6 +177,8 @@ class Purchase(models.Model):
     brand = models.CharField(max_length=50, null=True, blank=True)
     quantity = models.IntegerField()
     amount = models.FloatField(null=True, blank=True)
+    purchase_date = models.DateField(auto_now_add=True)
+
 
     def __str__(self):
         return self.product_name
@@ -183,7 +187,10 @@ class Purchase(models.Model):
         return{ "product_name":self.product_name,
                "brand" : self.brand,
                "quantity" : self.quantity,
-               "amount" : self.amount
+               "amount" : self.amount,
+               "purchase_date": self.purchase_date,
+             
+
 
         }
     
@@ -202,7 +209,7 @@ class Sales(models.Model):
     quantity = models.IntegerField()
     sale_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     discount = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    sale_date = models.DateTimeField(auto_now_add=True)
+    sale_date = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return self.product.product_name  
@@ -223,9 +230,71 @@ class Renew(models.Model):
     name = models.ForeignKey(to=PersonalInformation, on_delete=models.SET_NULL,null=True)
     service = models.ForeignKey(to=Service, on_delete=models.SET_NULL, null=True)
     renew_date = models.DateField()
+    expiry_date = models.DateField(null=True, blank=True)
     payment_method = models.CharField(max_length=50, null=True, blank=True)
 
     def __str__(self):
         return self.renew_date
 
+class AddMember(models.Model):
+    name = models.CharField(max_length=45, null=True, blank=True)
+    gender = models.CharField(max_length=10)
+    mobile_number = models.CharField(max_length=12, null=True, blank=True)
+    aadhar_number  = models.CharField(max_length=16, unique=True)
+    uploaded_file = models.FileField(upload_to='member_files/', blank=True, null=True)  # Uploaded file
+    email = models.EmailField()
+    date_of_birth = models.DateField(null=True, blank=True)
+    location = models.CharField(max_length=30, null=True, blank=True)
+    source = models.CharField(max_length=50, null=True, blank=True) #through how they came to gym by ad,facebook or friends
+    occupation = models.CharField(max_length=50,null=True, blank=True)
+    emergency_number = models.CharField(max_length=12, null=True, blank=True)
+    registration_amount = models.FloatField(null=True, blank=True)
+    service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, related_name='service_members')
+    cost_of_plan = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, related_name='cost_of_plan_members')
+    batch = models.ForeignKey(to=Service, on_delete=models.SET_NULL, null=True, related_name='batch_members')
+    cost_of_plan = models.ForeignKey(to=Service, on_delete=models.SET_NULL, null=True, related_name='cost_of_plan_members')
+    total_session = models.ForeignKey(to=Service, on_delete=models.SET_NULL, null=True, related_name='total_session_members')
+    # service = models.ForeignKey(to=Service, on_delete=models.SET_NULL, null=True, related_name='service_members')
+    conveniance_fees = models.FloatField(null=True, blank=True)
+    total_amount = models.FloatField(null=True, blank=True)
+    enrollment_date = models.DateField(null=True, blank=True)
+    activation_date = models.DateField(null=True, blank=True)
+    expiry_date = models.DateField(null=True, blank=True)
+    current_installment_amount = models.FloatField(null=True, blank=True)
+    payment_mode = models.CharField(max_length=50, null=True, blank=True)
+    payment_date = models.DateField(null=True, blank=True)
+    sold_by = models.CharField(max_length=20, null=True, blank=True)
 
+
+    def __str__(self):
+        return self.name
+    
+    def member(self):
+        return{"uploaded_file":self.uploaded_file,
+               "sold_by" : self.sold_by,
+               "payment_date" : self.payment_date,
+               " current_installment_amount" : self.current_installment_amount,
+               "expiry_date":self.expiry_date,
+               "activation_date":self.activation_date,
+               "enrollment_date":self.enrollment_date,
+               "total_amount":self.total_amount,
+               "conveniance_fees": self.conveniance_fees,
+            #    "discount_on_plan":self.discount_on_plan,
+               "total_session":self.total_session,
+               "batch":self.batch,
+               "service":self.service,
+               "registration_amount":self.registration_amount,
+               "emergency_number":self.emergency_number,
+               "occupation":self.occupation,
+               "source":self.source,
+               "location":self.location,
+               "date_of_birth":self.date_of_birth,
+               "email":self.email,
+               "aadhar_number":self.aadhar_number,
+                "mobile_number":self.mobile_number,
+                "gender":self.gender,
+                "name":self.name,
+                "cost_of_plan":self.cost_of_plan,
+ 
+
+        }

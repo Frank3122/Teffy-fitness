@@ -1,0 +1,524 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}ADD LEADS{% endblock %}
+
+{% block content %}
+<main class="app-main">
+    <div class="container py-5">
+        <div class="row mb-4">
+            <div class="col text-center">
+                <h2 class="fw-bold text-primary">Add New Member</h2>
+                
+            </div>
+        </div>
+    <!--end::App Content Header-->
+        <!--begin::App Content-->
+        <!-- <div class="container-fluid">
+            <div class="row">
+         
+                <div class="col-md-12">
+                    <div class="card card-warning card-outline mb-4">
+                        <form id="form" class="mx-2" method="POST" onsubmit="return submitForm();"> -->
+                            <!-- {% csrf_token %} -->
+                            <!-- <section class="content-header">
+                                <div class="container-fluid">
+                                    <div class="row mb-2">
+                                        <div class="col-sm-6">
+                                            <h3>ADD MEMBER</h3>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <ol class="breadcrumb float-sm-right">
+                                                <li class="breadcrumb-item">
+                                                    <a href="#">HOME</a>
+                                                </li>
+                                                <li class="breadcrumb-item active">ADD MEMBER</li>
+                                            </ol>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                            <section class="content">
+                                <div class="container-fluid">
+                                    <div class="row">
+                                        <div class="col-12"> --> 
+                                            <!-- <div class="card card-info card-outline"> -->
+                                                <!-- <div class="card-header">
+                                                    <h3 class="card-title text-bold text-cyan">ADD NEW MEMBER</h3>
+                                                </div> -->
+                                                <div class="card shadow-lg">
+                                                    <div class="card-body">
+                                                        <form id="form" method="POST" onsubmit="return submitForm();">
+                                                            {% csrf_token %}
+                                                <!-- <form action="" class="form-horizontal" method="POST" onsubmit="return amountSum()">
+                                                    {% csrf_token %} -->
+                                                    <div class="card-body">
+                                                        <div class="card mb-4">
+                                                            <!-- <div class="card-header">
+                                                                <h5>MEMBER INFORMATION</h5>
+                                                            </div> -->
+                                                            <div class="mb-4">
+                                                                <h4 class="text-secondary">Member Information</h4>
+                                                                <hr>
+                                                                <div class="row mb-3">
+                                                                    <label for="inputName" class="col-sm-3 col-form-label">Member Name</label>
+                                                                    <div class="col-sm-9">
+                                                                        <input type="text" class="form-control" name="name" id="name" placeholder="Enter Name" required minlength="2">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-3">
+                                                                    <label class="col-sm-3 col-form-label">Gender</label>
+                                                                    <div class="col-sm-9">
+                                                                        <div class="form-check form-check-inline">
+                                                                            <input type="radio" class="form-check-input" name="gender" id="Male" value="Male" checked>
+                                                                            <label class="form-check-label" for="Male">Male</label>
+                                                                        </div>
+                                                                        <div class="form-check form-check-inline">
+                                                                            <input type="radio" class="form-check-input" name="gender" id="Female" value="Female">
+                                                                            <label class="form-check-label" for="Female">Female</label>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-3">
+                                                                    <label for="inputMobile" class="col-sm-3 col-form-label">Mobile Number</label>
+                                                                    <div class="col-sm-5">
+                                                                        <input type="text" class="form-control" name="mobile_number" id="mobile_number" minlength="10" maxlength="10" placeholder="Enter Mobile Number" required>
+                                                                    </div>
+                                                                    <div class="col-sm-4">
+                                                                        <select name="countryCode" id="countryCode"  name="countryCode"  class="form-select">
+                                                                            <option value="91" data-countrycode="IN" selected>India (+91)</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-3">
+                                                                    <label for="aadharnumber" class="col-sm-3 col-form-label">Aadhar Number</label>
+                                                                    <div class="col-sm-9">
+                                                                        <input type="text" class="form-control" name="aadhar_number" id="aadhar_number" minlength="12" maxlength="12" placeholder="Enter Aadhar Number" required>
+                                                                    </div>
+                                                                </div>
+                                                                    
+                                                                <div class="row mb-3">
+                                                                    <label for="aadharcard" class="col-sm-3 col-form-label">Upload Aadhar Card</label>
+                                                                    <div class="col-sm-9">
+                                                                        <input type="file" class="form-control" name="filename" id="filename">
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="row mb-3">
+                                                                    <label for="inputEmail" class="col-sm-3 col-form-label">Email</label>
+                                                                    <div class="col-sm-9">
+                                                                        <input type="email" class="form-control" name="email" id="email" placeholder="Enter Email">
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="row mb-3">
+                                                                    <label class="col-sm-3 col-form-label">Date of Birth</label>
+                                                                    <div class="col-sm-9">
+                                                                        <input type="date" class="form-control" name="date_of_birth" id="date_of_birth">
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="row mb-3">
+                                                                    <label for="location" class="col-sm-3 col-form-label">Location</label>
+                                                                    <div class="col-sm-9">
+                                                                        <input type="text" class="form-control" name="location" id="location" placeholder="Enter Location">
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="row mb-3">
+                                                                    <label class="col-sm-3 col-form-label">Member Source</label>
+                                                                    <div class="col-sm-9">
+                                                                        <select name="source" id="source" class="form-control">
+                                                                            <option value="" selected disabled>Select Source</option>
+                                                                            <option value="Facebook">Facebook</option>
+                                                                            <option value="Friends">Friends</option>
+                                                                            <option value="AD">AD</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="row mb-3">
+                                                                    <label for="inputOccupation" class="col-sm-3 col-form-label">Member Occupation</label>
+                                                                    <div class="col-sm-9">
+                                                                        <input type="text" class="form-control" name="occupation" id="occupation" placeholder="Enter Occupation" autocomplete="off">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-3">
+                                                                    <label class="col-sm-3 col-form-label">Emergency Number</label>
+                                                                    <div class="col-sm-9">
+                                                                        <input type="text" class="form-control" name="emergency_number" id="emergency_number"  placeholder="Enter number">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-3">
+                                                                    <label for="regAmount" class="col-sm-3 col-form-label">Registration Amount</label>
+                                                                    <div class="col-sm-9">
+                                                                        <input type="text" class="form-control" name="reg_amount" id="reg_amount" value="0" placeholder="Enter Amount">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="card">
+                                                            <div class="card-header">
+                                                                <h5>Package Information</h5>
+                                                            </div>
+                                                            <div class="card-body">
+                                                                <div class="row mb-3">
+                                                                    <label for="program" class="col-sm-1 col-form-label">Service</label>
+                                                                    <div class="col-sm-9">
+                                                                        <select name="service" class="form-control" id="service" onchange="updateServiceDetails()">
+                                                                            <option value="" disabled selected>Select a service</option>
+                                                                            {% for service in available_services %}
+                                                                                <option value="{{ service.id }}" {% if data.services and service.id == data.services.id %} selected {% endif %} data-price="{{ service.prices }}" data-sessions="{{ service.sessions }}">
+                                                                                    {{ service.name }}  
+                                                                                </option>
+                                                                            {% endfor %}
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-lg-2 col-12 mt-lg-0 mt-2">
+                                                                        <a class="btn btn-warning btn-sm" href="{% url 'services' %}" aria-controls="staticBackdrop">
+                                                                            Quick Create Package
+                                                                        </a>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-3">
+                                                                    <label for="group" class="col-sm-3 col-form-label">Group</label>
+                                                                    <div class="col-sm-9">
+                                                                        <select name="group" id="group" class="form-control">
+                                                                            <option value="" disabled selected>Select a Group</option>
+                                                                            {% for group in group %}
+                                                                            <option value="{{ group.id }}" {% if data.group and group.id == data.group.id %} selected {% endif %}>
+                                                                                {{ group.group }}
+                                                                            </option>
+                                                                            {% endfor %}
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-3">
+                                                                    <label for="cost_of_plan" class="col-sm-3 col-form-label">Cost of Plan</label>
+                                                                    <div class="col-sm-9">
+                                                                        <input type="text" class="form-control" name="cost_of_plan" id="cost_of_plan" value="{{ cost_of_plan }}" readonly>
+                                                                    </div>
+                                                                </div>
+                                                               
+                                                                <div class="row mb-3">
+                                                                    <label for="sessions" class="col-sm-3 col-form-label">Total Sessions</label>
+                                                                    <div class="col-sm-9">
+                                                                        <input type="text" class="form-control" name="total_sessions" id="total_sessions" value="{{ total_sessions }}" readonly>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="row mb-3">
+                                                                    <label class="col-lg-3 col-12 col-form-label"></label>
+                                                                    <div class="col-lg-9 col-12 d-flex flex-column flex-lg-row">
+                                                                        <!-- Discount in Rupees Radio Button -->
+                                                                        <div class="form-check form-check-inline">
+                                                                            <input type="radio" class="form-check-input" name="discount_type" id="discount_type_money" value="Money" checked onclick="toggleDiscountField()">
+                                                                            <label for="discount_type_money" class="form-check-label">Discount in Rupees</label>
+                                                                        </div>
+                                                                        
+                                                                        <!-- Discount in Percentage Radio Button -->
+                                                                        <div class="form-check form-check-inline mx-lg-5">
+                                                                            <input type="radio" class="form-check-input" name="discount_type" id="discount_type_percentage" value="percentage" onclick="toggleDiscountField()">
+                                                                            <label for="discount_type_percentage" class="form-check-label">Discount in Percentage</label>
+                                                                            <!-- The Discount Percentage input field -->
+                                                                            <input type="text" class="form-check-inline mt-2" name="discountpercentage" id="discountpercentage" min="0" max="100" style="display: none;" placeholder="Enter Discount Percentage">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <div class="row mb-3">
+                                                                    <label for="cost" class="col-sm-3 col-form-label">Discount on Plan</label>
+                                                                    <div class="col-sm-9">
+                                                                        <input type="text" class="form-control" name="discount" id="discount" placeholder="Enter Amount">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-3">
+                                                                    <label for="cost" class="col-sm-3 col-form-label tex-danger">Conveniance Fees</label>
+                                                                    <div class="col-sm-9">
+                                                                        <input type="text" class="form-control" value="0" name="conveniance_fees" id="conveniance_fees" placeholder="Enter Conveniance Amount">
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="row mb-3">
+                                                                    <label for="totalAmount" class="col-sm-3 col-form-label">Total Amount</label>
+                                                                    <div class="col-sm-9">
+                                                                        <input type="text" class="form-control" name="total_amount" id="total_amount" value="{{ total_amount }}" readonly>
+                                                                    </div>
+                                                                </div>
+
+<!-- 
+                                                                <div class="form-group row">
+                                                                    <label class="col-lg-2 col-12 col-form-label"></label>
+                                                                    <div class="col-lg-10 col-12 d-flex flex-column flex-lg-row">
+                                                                        <div class="custom-control custom-radio">
+                                                                            <input type="radio" class="custom-control-input" name="taxType" id="NonGSTbill" value="None" checked="checked">
+                                                                            <label for="NonGSTbill" class="custom-control-label">Non Tax Bill</label>
+                                                                        </div>
+                                                                        <div class="custom-control custom-radio mx-lg-2">
+                                                                            <input type="radio" class="custom-control-input" name="taxType" id="Composition" value="Composition">
+                                                                            <label for="Composition" class="custom-control-label">GST under Composition</label>
+                                                                        </div>
+                                                                        <div class="custom-control custom-radio mx-lg-5">
+                                                                            <input type="radio" class="custom-control-input" name="taxType" id="GSTBill" value="GST">
+                                                                            <label for="GSTBill" class="custom-control-label">GST BILL</label>
+                                                                        </div>
+                                                                        <div class="custom-control custom-radio">
+                                                                            <input type="radio" class="custom-control-input" name="taxType" id="VATBill" value="VAT">
+                                                                            <label for="VATBill" class="custom-control-label">VAT Bill
+                            
+                                                                            </label>
+                                                                        </div>
+                                                                    </div>
+                                                                </div> -->
+                                                                <div class="row mb-3" style="display: none;">
+                                                                    <label for="taxAmount" class="col-sm-2 col-form-label">GST/VAT Amount</label>
+                                                                    <div class="col-sm-10">
+                                                                        <input type="text" class="form-control" name="taxAmount" id="taxAmount" placeholder="Enter Amount">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-3 " style="display: none;">
+                                                                    <label for="col-sm-3 col-form-label" for="totalPayable">Total Payable Amount</label>
+                                                                    <div class="col-sm-9">
+                                                                        <input type="text" class="form-control" name="totalPayable" id="totalPayable" placeholder="Enter Amount">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group row" style="display: none;">
+                                                                    <label for="paid" class="col-sm-2 col-form-label">Earlier Paid Amount</label>
+                                                                    <div class="col-sm-10">
+                                                                        <input type="text" class="form-control" name="paid" id="paid" placeholder="Enter Amount">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-3">
+                                                                    <label for="EnrollmentDate" class="col-sm-3 col-form-label">Enrollment Date</label>
+                                                                    <div class="col-sm-9">
+                                                                        <div class="input-group date" data-target-input="nearest">
+                                                                            <input type="date" class="from-control hasDatepicker" name="enrollment_date" id="enrollment_date" placeholder="Enter Date" readonly>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-3">
+                                                                    <label f class="col-sm-3 col-form-label">Activation Date</label>
+                                                                    <div class="col-sm-9">
+                                                                        <div class="input-group date" data-target-input="nearest">
+                                                                            <input type="date" class="form-control hasDatepicker" name="activation_date" id="activation_date" placeholder="Enter Date" readonly>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-3">
+                                                                    <label class="col-sm-3 col-form-label" for="expirydate">Expiry Date</label>
+                                                                    <div class="col-sm-9">
+                                                                        <input type="text" class="form-control" name="expiry_date" id="expiry_date" placeholder="Enter Date" readonly>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="card">
+                                                            <div class="card-header">
+                                                                <h5>Payment Information</h5>
+                                                            </div>
+                                                            <div class="card-body">
+                                                                <div class="row mb-3">
+                                                                    <label f class="col-sm-3 col-form-label" for="currentInstallment">Current Installment Amount</label>
+                                                                    <div class="col-sm-9">
+                                                                        <input type="text" class="form-control" name="current_installment_amount" id="current_installment_amount" placeholder="Enter Amount">
+                                                                        <br>
+                                                                        <span id="pendingSpan">
+                                                                            <!-- Pending Amount -->
+                                                                            <b id="pending" style="color: red;"></b>
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+     
+                                                                <div class="row mb-3">
+                                                                    <label for="group" class="col-sm-3 col-form-label">Select Online Payment Method</label>
+                                                                    <div class="col-sm-9">
+                                                                        <select id="payment_mode" class="form-control" name="payment_mode">
+                                                                            <option value=""disabled selected>Select Payment Option</option>
+                                                                            <option value="cash">CASH</option>
+                                                                            <option value="GPAY">GPAY</option>
+                                                                            <option value="PhonePe">PhonePe</option>
+                                                                            <option value="Netbanking">NetBanking</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-3">
+                                                                    <label for="paymentDate" class="col-sm-3 col-form-label">Payment Date</label>
+                                                                    <div class="col-sm-9">
+                                                                        <div class="input-group date" data-target-input="nearest">
+                                                                            <input type="date" class="form-control hasDatepicker" name="payment_date" id="payment_date" placeholder="Payment Date">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mb-3">
+                                                                    <label for="group" class="col-sm-3 col-form-label">SOLD BY</label>
+                                                                    <div class="col-sm-9">
+                                                                        <select name="sold_by" id="sold_by" class="form-control select2" style="width: 100%;">
+                                                                            <option value="">Select staff</option>
+                                                                            <option value="">Frank</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                            
+                                                                <div class="card-footer text-center">
+                                                                    <button type="submit" class="btn btn-info" id="enrollment">ENROLL</button>
+                                                                    <br>
+                                                                    <span style="color: #f00;font-weight: bold;"></span>
+                                                                   
+                                                                </div>
+                            
+                                                      
+                                                                
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                            {% endblock content %}
+                            
+                                
+                            {% include "footer.html" %}
+                            
+                            {% block script %}
+                            
+                            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                            <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+                            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
+                            <script src="https://cdn.jsdelivr.net/npm/datatables.net/js/jquery.dataTables.min.js"></script>
+                            <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.3.0/browser/overlayscrollbars.browser.es6.min.js" crossorigin="anonymous"></script>
+                            <script src="/static/js/adminlte.js"></script>
+                            <script>
+                                // DataTable Initialization for Sales Table
+                                $(document).ready(function () {
+                                    $('#salesTable').DataTable({
+                                        "paging": true,  // Enable pagination
+                                        "searching": true,  // Enable searching
+                                        "ordering": true,  // Enable ordering
+                                        "info": true,  // Display information like "Showing 1 to 10 of 50 entries"
+                                        "lengthMenu": [5, 10, 15, 20],  // Customize records per page options
+                                        "responsive": true,  // Make the table responsive on smaller screens
+                                    });
+                                });
+                            
+                                // OverlayScrollbars Initialization
+                                const SELECTOR_SIDEBAR_WRAPPER = ".sidebar-wrapper";
+                                const Default = {
+                                    scrollbarTheme: "os-theme-light",  
+                                    scrollbarAutoHide: "leave",       
+                                    scrollbarClickScroll: true,       
+                                };
+                                
+                                function formatDate(date) {
+    var options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return new Date(date).toLocaleDateString('en-GB', options); // Display in "DD MMM YYYY" format
+}
+                                
+                                function updateServiceDetails() {
+    var serviceSelect = document.getElementById('service');
+    var selectedService = serviceSelect.options[serviceSelect.selectedIndex];
+    var price = selectedService.getAttribute('data-price');
+    var sessions = selectedService.getAttribute('data-sessions');
+    var activation_date = document.getElementById('activation_date');
+    var expiry_date = document.getElementById('expiry_date');
+    
+    // Set the enrollment and activation date to the current date
+    var currentDate = new Date();
+    var formattedDate = currentDate.toISOString().split('T')[0]; // Format date as YYYY-MM-DD
+    activation_date.value = formattedDate; // Set activation date to today's date
+    document.getElementById('enrollment_date').value = formattedDate; // Set enrollment date to today's date
+    
+    // Update cost of plan and total sessions fields
+    document.getElementById('cost_of_plan').value = price;
+    document.getElementById('total_sessions').value = sessions;
+    
+    // Calculate and display the expiry date based on the selected plan's total sessions
+    calculateExpiryDate(sessions, currentDate);
+
+    // Recalculate the total amount (initially without discount)
+    calculateTotalAmount();
+}
+
+// Function to calculate expiry date based on sessions (assuming 1 session per day)
+function calculateExpiryDate(sessions, startDate) {
+    var expiryDate = new Date(startDate);
+    expiryDate.setDate(startDate.getDate() + parseInt(sessions) - 1); // Add sessions to current date
+    
+    var expiryFormattedDate = expiryDate.toISOString().split('T')[0]; // Format expiry date as YYYY-MM-DD
+    document.getElementById('expiry_date').value = expiryFormattedDate; // Set expiry date
+}
+
+// Function to toggle discount input visibility based on selected discount type
+function toggleDiscountField() {
+    var discountTypeMoney = document.getElementById('discount_type_money');
+    var discountPercentageField = document.getElementById('discountpercentage');
+    
+    // Show or hide the discount percentage input field based on the selected discount type
+    if (discountTypeMoney.checked) {
+        discountPercentageField.style.display = 'none'; // Hide discount percentage input
+    } else {
+        discountPercentageField.style.display = 'inline-block'; // Show discount percentage input
+    }
+
+    // Recalculate total amount whenever the discount type is changed
+    calculateTotalAmount();
+}
+
+// Function to calculate and update the total amount
+function calculateTotalAmount() {
+    var costOfPlan = parseFloat(document.getElementById('cost_of_plan').value) || 0;
+    var discountTypeMoney = document.getElementById('discount_type_money');
+    var discountTypePercentage = document.getElementById('discount_type_percentage');
+    var discountAmount = parseFloat(document.getElementById('discount').value) || 0;
+    var discountPercentage = parseFloat(document.getElementById('discountpercentage').value) || 0;
+    var convenienceFees = parseFloat(document.getElementById('conveniance_fees').value) || 0;
+    var registrationFees = parseFloat(document.getElementById('reg_amount').value) || 0; // Include registration fees
+    var totalAmount = costOfPlan;
+
+    // Apply discount based on selected type
+    if (discountTypeMoney.checked) {
+        totalAmount -= discountAmount;
+    } else if (discountTypePercentage.checked) {
+        totalAmount -= (costOfPlan * discountPercentage) / 100;
+    }
+
+    // Add convenience fees to the total amount
+    totalAmount += convenienceFees+registrationFees;
+
+    // Update the total amount field
+    document.getElementById('total_amount').value = totalAmount.toFixed(2);
+
+    // **Update the Current Installment Amount field as well**
+    var currentInstallmentAmount = totalAmount;
+    document.getElementById('current_installment_amount').value = totalAmount.toFixed(2);
+}
+
+// Event listeners to trigger total amount calculation on user input
+document.getElementById('discount').addEventListener('input', calculateTotalAmount);
+document.getElementById('discountpercentage').addEventListener('input', calculateTotalAmount);
+document.getElementById('conveniance_fees').addEventListener('input', calculateTotalAmount);
+document.getElementById('service').addEventListener('change', updateServiceDetails);
+document.getElementById('discount_type_money').addEventListener('change', toggleDiscountField);
+document.getElementById('discount_type_percentage').addEventListener('change', toggleDiscountField);
+// document.getElementById('total_amount').value = totalAmount.toFixed(2); // Round to 2 decimal places
+
+// // Also update the Current Installment Amount field
+// document.getElementById('current_installment_amount').value = totalAmount.toFixed(2);
+                                
+                                document.addEventListener("DOMContentLoaded", function() {
+                                    const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
+                                    if (sidebarWrapper && typeof OverlayScrollbarsGlobal?.OverlayScrollbars !== "undefined") {
+                                        OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
+                                            scrollbars: {
+                                                theme: Default.scrollbarTheme,
+                                                autoHide: Default.scrollbarAutoHide,
+                                                clickScroll: Default.scrollbarClickScroll,
+                                            },
+                                        });
+                                    }
+                                });
+                            </script>
+                            {% endblock script %}
+                            

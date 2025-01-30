@@ -1,32 +1,23 @@
 {% extends "base.html" %}
-{% block title %}Renew Member{% endblock %}
+{% block title %}Renew Member List{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
     <div class="card shadow-sm">
         <div class="card-header text-center">
-            <h2 class="mb-0">Renew Member</h2>
+            <h2>Renew Member List</h2>
         </div>
         <div class="card-body">
-<!--       
-            {% if success %}
-            <div class="alert alert-success d-flex align-items-center" role="alert">
-                <i class="fas fa-check-circle me-2"></i>
-                <div>
-                    {{ message }}
-                </div>
-            </div>
-             {% elif not success %}
-            <div class="alert alert-danger d-flex align-items-center" role="alert">
-                <i class="fas fa-times-circle me-2"></i>
-                <div>
-                    {{ message }}
-                </div>
-            </div>
-            {% endif %} --> 
-
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
             <div class="table-responsive">
-                <table id="salesTable" class="table table-striped table-hover table-bordered">
+                <table id="memberTable" class="table table-striped table-hover">
                     <thead class="table-light">
                         <tr>
                             <th>S.No</th>
@@ -35,7 +26,7 @@
                             <th>Service Taken</th>
                             <th>Assigned Date</th>
                             <th>Renewal Date</th>
-                            <th>Renew</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -44,18 +35,20 @@
                             <td>{{ forloop.counter }}</td>
                             <td>{{ client.id }}</td>
                             <td>{{ client.name }}</td>
-                            <td>{% if client.services %}{{ client.services.name }}{% else %}No service assigned{% endif %}</td>
+                            <td>{% if client.services %}{{ client.services.name }}{% else %}No Service{% endif %}</td>
                             <td>{{ client.assigned_date|date:"d-m-Y" }}</td>
                             <td>
-                                {% if client.renew_set.all %}
-                                    {{ client.renew_set.last.renew_date|date:"d-m-Y" }}
-                                {% else %}
-                                    No renewal yet
-                                {% endif %}
-                            </td> 
+                                {% with client.renew_set.last as last_renew %}
+                                    {% if last_renew %}
+                                        {{ last_renew.expiry_date|date:"d-m-Y" }}
+                                    {% else %}
+                                        No Renewal Yet
+                                    {% endif %}
+                                {% endwith %}
+                            </td>
                             <td>
-                                <a href="{% url 'renew_member_page' client.id %}" class="btn btn-success btn-sm">
-                                    <i class="fas fa-refresh"></i> Renew
+                                <a href="{% url 'renew_member_page' client.id %}" class="btn btn-primary btn-sm">
+                                    Renew
                                 </a>
                             </td>
                         </tr>
@@ -70,22 +63,10 @@
 
 {% block script %}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/datatables.net/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.3.0/browser/overlayscrollbars.browser.es6.min.js" crossorigin="anonymous"></script>
-<script src="/static/js/adminlte.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 <script>
-$(function () {
-    $("#salesTable").DataTable({
-        paging: true,
-        lengthChange: true,
-        searching: true,
-        ordering: true,
-        info: true,
-        autoWidth: false
+    $(document).ready(function () {
+        $('#memberTable').DataTable();
     });
-});
 </script>
 {% endblock script %}

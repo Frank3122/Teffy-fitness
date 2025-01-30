@@ -17,7 +17,7 @@
 
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-5">
                 <div class="card card-warning card-outline mb-4">
                     <form id="salesForm" method="POST">
                         {% csrf_token %}
@@ -43,12 +43,17 @@
                                 <label for="sale_price" class="form-label">PRICE</label>
                                 <input type="number" id="sale_price" class="form-control" name="sale_price" placeholder="Enter price">
                             </div>
+                            <div class="mb-3">
+                                <label for="sale_date" class="form-label">SALE DATE</label>
+                                <input type="date" id="sale_date" class="form-control" name="sale_date" placeholder="Enter Date" required>
+                            </div>
+
                             <button type="submit" class="btn btn-primary">Submit</button>
                         </div>
                     </form>
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-7">
                 <div class="card mb-4">
                     <div class="card-header">
                         <h3 class="card-title">SALES RECORD</h3>
@@ -62,6 +67,7 @@
                                     <th>Customer</th>
                                     <th>Quantity</th>
                                     <th>Price</th>
+                                    <th>DATE</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -73,6 +79,7 @@
                                     <td>{{ sales.customer }}</td>
                                     <td>{{ sales.quantity }}</td>
                                     <td>{{ sales.sale_price }}</td>
+                                    <td>{{ sales.sale_date }}</td>
                                     <td>
                                         <!-- Edit Icon Button -->
                                         <a href="{% url 'edit-sales' sales.id %}" class="btn btn-warning btn-sm" title="Edit">
@@ -107,63 +114,37 @@
 <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.3.0/browser/overlayscrollbars.browser.es6.min.js" crossorigin="anonymous"></script>
 <script src="/static/js/adminlte.js"></script>
 <script>
-      // DataTable Initialization
-      $(function () {
-        // Initialize DataTable for example1 with default pagination
-        $("#example1").DataTable({
-          "paging": true, // Enable pagination
-          "lengthChange": true, // Allow users to change number of rows per page
-          "searching": true, // Enable searching
-          "ordering": true, // Enable column ordering
-          "info": true, // Display information about the table (e.g., "Showing 1 to 10 of 50 entries")
-          "autoWidth": false // Disable auto-width calculation to allow more control over the layout
+    // DataTable Initialization for Sales Table
+    $(document).ready(function () {
+        $('#salesTable').DataTable({
+            "paging": true,  // Enable pagination
+            "searching": true,  // Enable searching
+            "ordering": true,  // Enable ordering
+            "info": true,  // Display information like "Showing 1 to 10 of 50 entries"
+            "lengthMenu": [5, 10, 15, 20],  // Customize records per page options
+            "responsive": true,  // Make the table responsive on smaller screens
         });
+    });
 
-      });
+    // OverlayScrollbars Initialization
+    const SELECTOR_SIDEBAR_WRAPPER = ".sidebar-wrapper";
+    const Default = {
+        scrollbarTheme: "os-theme-light",  
+        scrollbarAutoHide: "leave",       
+        scrollbarClickScroll: true,       
+    };
     
-      // OverlayScrollbars Initialization
-      const SELECTOR_SIDEBAR_WRAPPER = ".sidebar-wrapper";
-      
-      const Default = {
-        scrollbarTheme: "os-theme-light",  // Set the scrollbar theme
-        scrollbarAutoHide: "leave",       // Hide the scrollbar when not in use
-        scrollbarClickScroll: true,       // Enable click-to-scroll functionality
-      };
-    
-      // Ensure the script runs after the DOM is loaded
-      document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function() {
         const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
-    
-        // Check if the sidebarWrapper element exists and if OverlayScrollbars is available
-        if (
-          sidebarWrapper &&
-          typeof OverlayScrollbarsGlobal?.OverlayScrollbars !== "undefined"
-        ) {
-          // Initialize the custom scrollbar on the sidebarWrapper
-          OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
-            scrollbars: {
-              theme: Default.scrollbarTheme,
-              autoHide: Default.scrollbarAutoHide,
-              clickScroll: Default.scrollbarClickScroll,
-            },
-          });
+        if (sidebarWrapper && typeof OverlayScrollbarsGlobal?.OverlayScrollbars !== "undefined") {
+            OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
+                scrollbars: {
+                    theme: Default.scrollbarTheme,
+                    autoHide: Default.scrollbarAutoHide,
+                    clickScroll: Default.scrollbarClickScroll,
+                },
+            });
         }
-      });
-  
-
-$(document).ready(function () {
-$('#paymentHistory').DataTable({
-  "paging": true,
-  "searching": true,
-  "ordering": true,
-  "info": true,
-  "lengthMenu": [5, 10, 15, 20],  // Customize the number of records per page
-  "responsive": true,  // Make the table responsive on smaller screens
-});
-});
-
+    });
 </script>
 {% endblock script %}
-
-
-

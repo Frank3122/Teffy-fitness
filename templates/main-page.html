@@ -4,6 +4,7 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
+
 <main class="app-main"> 
     <!-- App Content Header -->
     <div class="app-content-header"> 
@@ -21,19 +22,40 @@
             </div> 
         </div> 
     </div> 
+    {% if messages %}
+    {% for message in messages %}
+        <div class="custom-alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle"></i> <!-- Use FontAwesome for icons -->
+            <span>{{ message }}</span>
+            <!-- <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> -->
+        </div>
+    {% endfor %}
+{% endif %}
 
     <!-- Main Content -->
+
     <section class="content">
         <div class="container-fluid">
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="d-flex flex-wrap gap-3">
-                        <!-- Updated Renew Member Button -->
-                        <a class="btn btn-app bg-dark" id="renewMember" data-toggle="modal" data-target="#renewMemberModal" style="color:white;" href="{% url 'renew_member_list' %}">
+                        <!-- Renew Member Button -->
+                        <a 
+                            class="btn btn-app bg-dark" 
+                            id="renewMember" 
+                            data-toggle="modal" 
+                            data-target="#renewMemberModal" 
+                            style="color:white;" 
+                            href="{% url 'renew_member_list' %}"
+                        >
                             <i class="fas fa-edit mb-2" style="color: white;"></i>
                             <span>Renew Service</span>
                         </a>
-                        <a class="btn btn-app bg-dark" href="{% url 'add_leads' %}" style="color: white;">
+                        <a 
+                            class="btn btn-app bg-dark" 
+                            href="{% url 'add_member' %}" 
+                            style="color: white;"
+                        >
                             <i class="fas fa-plus mb-2" style="color: white;"></i>
                             <span>Add Members</span>
                         </a>
@@ -45,24 +67,24 @@
             <div class="row">
                 <div class="col-12 col-sm-6 col-md-3 mb-4">
                     <div class="info-box">
-                        <a href="{% url 'converted_leads' %}" class="info-box-icon text-bg-warning shadow-sm">
+                        <a href="{% url 'new_leads' %}" class="info-box-icon text-bg-secondary shadow-sm">
                             <i class="bi bi-people-fill"></i>
                         </a>
                         <div class="info-box-content">
-                            <span class="info-box-text">CONVERTED LEADS</span>
-                            <span class="info-box-number">{{ member_count }}</span>
+                            <span class="info-box-text">ALL MEMBERS</span>
+                            <span class="info-box-number">{{ all_member_count }}</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="col-12 col-sm-6 col-md-3 mb-4">
                     <div class="info-box">
-                        <a href="{% url 'sales' %}" class="info-box-icon text-bg-success shadow-sm">
-                            <i class="bi bi-cart-fill"></i>
+                        <a href="{% url 'converted_leads' %}" class="info-box-icon text-bg-warning shadow-sm">
+                            <i class="bi bi-people-fill"></i>
                         </a>
                         <div class="info-box-content">
-                            <span class="info-box-text">Sales</span>
-                            <span class="info-box-number">{{ sales }}</span>
+                            <span class="info-box-text">CONVERTED LEADS</span>
+                            <span class="info-box-number">{{ member_count }}</span>
                         </div>
                     </div>
                 </div>
@@ -81,6 +103,18 @@
 
                 <div class="col-12 col-sm-6 col-md-3 mb-4">
                     <div class="info-box">
+                        <a href="{% url 'sales' %}" class="info-box-icon text-bg-success shadow-sm">
+                            <i class="bi bi-cart-fill"></i>
+                        </a>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Sales</span>
+                            <span class="info-box-number">{{ sales }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-md-3 mb-4">
+                    <div class="info-box">
                         <a href="{% url 'follow_up_leads' %}" class="info-box-icon text-bg-danger shadow-sm">
                             <i class="bi bi-person-exclamation"></i>
                         </a>
@@ -92,86 +126,385 @@
                 </div>
             </div>
         </div>
+
+        <!-- This Month Stats -->
+        <div class="row">
+            <div class="col-lg-3 col-12">
+                <div class="card tip-tool" data-tippy-content="Click me for details" data-tippy-placement="top-end">
+                    <div class="card-header" style="border: none;">
+                        <h5 class="card-title">THIS MONTH STATS</h5>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus" onclick="toggleCardContent()"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-2" style="background: #EFEFEF;">
+                        <div class="row">
+                            <div class="col-12">
+                                <a href="{% url 'converted_leads' %}" class="thismonthenrollment">
+                                    <div class="info-box mb-2 position-relative">
+                                        <span class="info-box-icon">
+                                            <i class="fas fa-user-plus text-accent"></i>
+                                        </span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">ENROLLMENTS</span>
+                                            <span class="info-box-number" id="enrollments">{{ enrollments }}</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-12">
+                                <a href="#" class="thismonthrenewals">
+                                    <div class="info-box mb-2">
+                                        <span class="info-box-icon">
+                                            <i class="fas fa-user-check text-success"></i>
+                                        </span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">Renewals</span>
+                                            <span class="info-box-number" id="renewals">{{ renewals }}</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-12">
+                                <a href="#" class="thismonthrenewals">
+                                    <div class="info-box mb-2">
+                                        <span class="info-box-icon">
+                                            <i class="fas fa-bolt text-danger"></i>
+                                        </span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">EXPIRES</span>
+                                            <span class="info-box-number" id="renewals">{{ 0 }}</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <div class="col-12">
+                                <a href="{% url 'purchase' %}" class="thismonthrenewals">
+                                    <div class="info-box mb-2">
+                                        <span class="info-box-icon">
+                                            <i class="fa-solid fa-bag-shopping"></i>
+                                        </span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">PURCHASE</span>
+                                            <span class="info-box-number" id="renewals">{{ purchase }}</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <div class="col-12">
+                                <a href="{% url 'sales' %}" class="thismonthrenewals">
+                                    <div class="info-box mb-2">
+                                        <span class="info-box-icon">
+                                            <i class="fa-solid fa-cart-plus"></i>
+                                        </span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">SALES</span>
+                                            <span class="info-box-number" id="renewals">{{ sales }}</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+
+                           
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Today's Stats -->
+            <div class="col-lg-9 col-12">
+                <div class="card tip-tool" data-tippy-content="Click me for details" data-tippy-placement="top-end">
+                    <div class="card-header" style="border: none;">
+                        <h5 class="card-title">TODAY'S STATS</h5>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-2" style="background: #EFEFEF;">
+                        <div class="row">
+                            <div class="col-lg-6 col-xl-4 col-12">
+                                <a href="{% url 'converted_leads' %}" class="todaysenrollment">
+                                    <div class="info-box mb-2">
+                                        <span class="info-box-icon">
+                                            <i class="fas fa-user-plus text-accent"></i>
+                                        </span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">ENROLLMENTS</span>
+                                            <span class="info-box-number">{{ today_enrollments }}</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-lg-6 col-xl-4 col-12">
+                                <a href="" class="todaysrenewalsblock">
+                                    <div class="info-box mb-2">
+                                        <span class="info-box-icon">
+                                            <i class="fas fa-user-check text-success"></i>
+                                        </span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">RENEWALS</span>
+                                            <span class="info-box-number" id="trenewal">{{ today_renewals }}</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <div class="col-lg-6 col-xl-4 col-12">
+                                <a href="" class="todaysexpiry">
+                                    <div class="info-box mb-2">
+                                        <span class="info-box-icon">
+                                            <i class="fas fa-bolt text-danger"></i>
+                                        </span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">EXPIRIES</span>
+                                            <span class="info-box-number" id="trenewal"></span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <!-- <div class="col-lg-6 col-xl-4 col-12">
+                                <a href="" class="thismonthexpiry">
+                                    <div class="info-box mb-2">
+                                        <span class="info-box-icon">
+                                            <i class="fas fa-user-tag text-success"></i>
+                                        </span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">LEAD FOLLOWUPS</span>
+                                            <span class="info-box-number" id="leadFollowups"></span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div> -->
+
+                            <div class="col-lg-6 col-xl-4 col-12">
+                                <a href="{% url 'purchase' %}" class="thismonthexpiry">
+                                    <div class="info-box mb-2">
+                                        <span class="info-box-icon">
+                                            <i class="fa-solid fa-bag-shopping"></i>
+                                        </span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">TODAY PURCHASES</span>
+                                            <span class="info-box-number" id="leadFollowups">{{ today_purchase }}</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <div class="col-lg-6 col-xl-4 col-12">
+                                <a href="{% url 'sales' %}" class="thismonthexpiry">
+                                    <div class="info-box mb-2">
+                                        <span class="info-box-icon">
+                                            <i class="fa-solid fa-cart-plus"></i>
+                                        </span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">TODAY SALES</span>
+                                            <span class="info-box-number" id="leadFollowups">{{ today_sales }}</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <div class="col-lg-6 col-xl-4 col-12">
+                                <a href="{% url 'follow_up_leads' %}" class="todaysrenewalsblock">
+                                    <div class="info-box mb-2">
+                                        <span class="info-box-icon">
+                                            <i class="fa-solid fa-user-xmark"></i>
+                                        </span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">TODAY FOLLOWUP </span>
+                                            <span class="info-box-number" id="trenewal">{{ today_follow_up }}</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+
+                        
+                            
+
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
     </section>
 </main>
 
-<!-- Renew Member Modal -->
+<!-- Renew Member Modal
 <div class="modal fade" id="renewMemberModal" tabindex="-1" role="dialog" aria-labelledby="renewMemberModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="renewMemberModalLabel">Renew Member</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form>
-          <div class="form-group">
-            <label for="member-id" class="col-form-label">Member ID:</label>
-            <input type="text" class="form-control" id="member-id">
-          </div>
-          <div class="form-group">
-            <label for="renewal-date" class="col-form-label">Renewal Date:</label>
-            <input type="date" class="form-control" id="renewal-date">
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Submit</button>
-      </div>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="renewMemberModalLabel">Renew Member</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="member-id" class="col-form-label">Member ID:</label>
+                        <input type="text" class="form-control" id="member-id">
+                    </div>
+                    <div class="form-group">
+                        <label for="renewal-date" class="col-form-label">Renewal Date:</label>
+                        <input type="date" class="form-control" id="renewal-date">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
+</div> -->
 {% endblock content %}
 
 {% include "footer.html" %}
-
 {% block script %}
-<script>
-    (() => {
-        "use strict";
-        const forms = document.querySelectorAll(".needs-validation");
-        Array.from(forms).forEach((form) => {
-            form.addEventListener("submit", (event) => {
-                if (!form.checkValidity()) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-                form.classList.add("was-validated");
-            }, false);
-        });
-    })();
-
-    $(function () {
-        $("#example1").DataTable({
-            paging: true,
-            lengthChange: true,
-            searching: true,
-            ordering: true,
-            info: true,
-            autoWidth: false,
-            pageLength: 10
-        });
-    });
-</script>
-<script>
-    document.querySelectorAll('input, textarea').forEach(element => {
-        element.addEventListener('click', function() {
-            this.classList.add('blinking');
-            this.addEventListener('input', () => {
-                this.classList.remove('blinking');
-            });
-            this.addEventListener('blur', () => {
-                this.classList.remove('blinking');
-            });
-        });
-    });
-</script>
+<!-- Include FontAwesome for Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha256-whL0tQWoY1Ku1iskqPFvmZ+CHsvmRWx/PIoEvIeWh4I=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha256-YMa+wAM6QkVyz999odX7lPRxkoYAan8suedu4k2Zur8=" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.jsdelivr.net/npm/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>     
+<script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.3.0/browser/overlayscrollbars.browser.es6.min.js" integrity="sha256-H2VM7BKda+v2Z4+DRy69uknwxjyDRhszjXFhsL4gD3w=" crossorigin="anonymous"></script> <!--end::Third Party Plugin(OverlayScrollbars)--><!--begin::Required Plugin(popperjs for Bootstrap 5)-->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha256-whL0tQWoY1Ku1iskqPFvmZ+CHsvmRWx/PIoEvIeWh4I=" crossorigin="anonymous"></script> <!--end::Required Plugin(popperjs for Bootstrap 5)--><!--begin::Required Plugin(Bootstrap 5)-->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha256-YMa+wAM6QkVyz999odX7lPRxkoYAan8suedu4k2Zur8=" crossorigin="anonymous"></script> <!--end::Required Plugin(Bootstrap 5)--><!--begin::Required Plugin(AdminLTE)-->
+<script src="/static/js/adminlte.js"></script> <!--end::Required Plugin(AdminLTE)--><!--begin::OverlayScrollbars Configure-->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.3.0/browser/overlayscrollbars.browser.es6.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-<script src="/static/js/adminlte.js"></script>
+<script src="/static/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+<script src="/static/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+<script src="/static/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+<script src="/static/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+<script src="/static/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+<script src="/static/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="/static/dist/js/pages/dashboard.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+<style>
+    .card-content {
+    display: block;
+    transition: all 0.5s ease; /* Smooth transition for hiding */
+}
+
+/* Add a class to hide the content */
+.card-content.collapsed {
+    display: none;
+}
+.custom-alert {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease-in-out;
+}
+
+.custom-alert i {
+    font-size: 1.5rem;
+    margin-right: 10px;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+</style>
+
+
+  <script>
+    function toggleCardContent() {
+    var cardContent = document.querySelector("#stats-card .card-content"); // Select the content
+    cardContent.classList.toggle("collapsed"); // Toggle the 'collapsed' class to hide/show the content
+}
+    // DataTable Initialization
+    $(function () {
+      // Initialize DataTable for example1 with default pagination
+      $("#example1").DataTable({
+        "paging": true, // Enable pagination
+        "lengthChange": true, // Allow users to change number of rows per page
+        "searching": true, // Enable searching
+        "ordering": true, // Enable column ordering
+        "info": true, // Display information about the table (e.g., "Showing 1 to 10 of 50 entries")
+        "autoWidth": false // Disable auto-width calculation to allow more control over the layout
+      });
+
+    });
+  
+    // OverlayScrollbars Initialization
+    const SELECTOR_SIDEBAR_WRAPPER = ".sidebar-wrapper";
+    
+    const Default = {
+      scrollbarTheme: "os-theme-light",  // Set the scrollbar theme
+      scrollbarAutoHide: "leave",       // Hide the scrollbar when not in use
+      scrollbarClickScroll: true,       // Enable click-to-scroll functionality
+    };
+  
+    // Ensure the script runs after the DOM is loaded
+    document.addEventListener("DOMContentLoaded", function() {
+      const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
+  
+      // Check if the sidebarWrapper element exists and if OverlayScrollbars is available
+      if (
+        sidebarWrapper &&
+        typeof OverlayScrollbarsGlobal?.OverlayScrollbars !== "undefined"
+      ) {
+        // Initialize the custom scrollbar on the sidebarWrapper
+        OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
+          scrollbars: {
+            theme: Default.scrollbarTheme,
+            autoHide: Default.scrollbarAutoHide,
+            clickScroll: Default.scrollbarClickScroll,
+          },
+        });
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+    const alerts = document.querySelectorAll(".custom-alert");
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            alert.classList.add("animate__fadeOutUp"); // Add fade-out animation
+            alert.addEventListener("animationend", () => alert.remove()); // Remove after animation
+        }, 1500); // 5 seconds
+    });
+});
+
+  </script>
+        
 {% endblock script %}
+                                

@@ -59,5 +59,8 @@ urlpatterns = [
     path("renew-member/", renew_member_list, name="renew_member_list"),
     path("renew-member/<int:member_id>/", renew_member_page, name="renew_member_page"),
 
+    # path("add-members/", add_members, name="add_members"),
+    # path('add-member/',add_member,name="add_member"),
+    path('add-member/',add_member, name="add_member"),
 
 ]

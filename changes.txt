@@ -1,0 +1,12 @@
+#1 
+Made the enquriy form as responsive 
+Created a leads section to track the status of leads 
+Created crm admin which is also responsive
+Added menus in the admin panel 
+Created expenses menu, purchase, sales, stocks, returns menus
+Created services page 
+Created Payement page 
+Created a function to renew membership 
+Created a function to add new members who comes through walk-in 
+Created reports section to downlaod the overall reports 
+
