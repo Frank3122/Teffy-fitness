@@ -4,7 +4,7 @@
 
 {% block content %}
 <main class="app-main">
-    <div class="container py-5">
+    <div class="container py-3">
         <div class="row mb-4">
             <div class="col text-center">
                 <h2 class="fw-bold text-primary">Add New Member</h2>
@@ -145,7 +145,7 @@
                                                                 <div class="row mb-3">
                                                                     <label class="col-sm-3 col-form-label">Emergency Number</label>
                                                                     <div class="col-sm-9">
-                                                                        <input type="text" class="form-control" name="emergency_number" id="emergency_number"  placeholder="Enter number">
+                                                                        <input type="text" class="form-control" name="emergency_number" id="emergency_number"  placeholder="Enter number" minlength="2" maxlength="10">
                                                                     </div>
                                                                 </div>
                                                                 <div class="row mb-3">
@@ -195,14 +195,14 @@
                                                                 <div class="row mb-3">
                                                                     <label for="cost_of_plan" class="col-sm-3 col-form-label">Cost of Plan</label>
                                                                     <div class="col-sm-9">
-                                                                        <input type="text" class="form-control" name="cost_of_plan" id="cost_of_plan" value="{{ cost_of_plan }}" readonly>
+                                                                        <input type="text" class="form-control" name="cost_of_plan" id="cost_of_plan" value="" readonly>
                                                                     </div>
                                                                 </div>
                                                                
                                                                 <div class="row mb-3">
                                                                     <label for="sessions" class="col-sm-3 col-form-label">Total Sessions</label>
                                                                     <div class="col-sm-9">
-                                                                        <input type="text" class="form-control" name="total_sessions" id="total_sessions" value="{{ total_sessions }}" readonly>
+                                                                        <input type="text" class="form-control" name="total_sessions" id="total_sessions" value="{{ total_session }}" readonly>
                                                                     </div>
                                                                 </div>
 
@@ -352,9 +352,13 @@
                                                                 <div class="row mb-3">
                                                                     <label for="group" class="col-sm-3 col-form-label">SOLD BY</label>
                                                                     <div class="col-sm-9">
-                                                                        <select name="sold_by" id="sold_by" class="form-control select2" style="width: 100%;">
-                                                                            <option value="">Select staff</option>
-                                                                            <option value="">Frank</option>
+                                                                        <select name="sold_by" id="sold_by" class="form-control" style="width: 100%;">
+                                                                            <option value="" disabled selected>SOLD BY</option>
+                                                                            {% for seller in sale_by %}
+                                                                                <option value="{{ seller.id }}">{{ seller.user.username }}</option>
+                                                                            {% endfor %}
+                                                                            
+                                                                          
                                                                         </select>
                                                                     </div>
                                                                 </div>
@@ -365,18 +369,18 @@
                                                                     <span style="color: #f00;font-weight: bold;"></span>
                                                                    
                                                                 </div>
-                            
-                                                      
-                                                                
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
+                                                        </form>
+                                                    </div>
+                                                </div>
+    </div>
+</main>
+
+                            
+           
+
                             {% endblock content %}
                             
                                 
@@ -410,13 +414,14 @@
                                     scrollbarAutoHide: "leave",       
                                     scrollbarClickScroll: true,       
                                 };
-                                
-                                function formatDate(date) {
+                                // Function to format date as "DD MMM YYYY"
+function formatDate(date) {
     var options = { year: 'numeric', month: 'short', day: 'numeric' };
     return new Date(date).toLocaleDateString('en-GB', options); // Display in "DD MMM YYYY" format
 }
-                                
-                                function updateServiceDetails() {
+
+// Function to update service details (cost of plan, total sessions, etc.)
+function updateServiceDetails() {
     var serviceSelect = document.getElementById('service');
     var selectedService = serviceSelect.options[serviceSelect.selectedIndex];
     var price = selectedService.getAttribute('data-price');
@@ -455,6 +460,10 @@ function toggleDiscountField() {
     var discountTypeMoney = document.getElementById('discount_type_money');
     var discountPercentageField = document.getElementById('discountpercentage');
     
+    // Reset the values when discount type changes
+    document.getElementById('discount').value = '';
+    discountPercentageField.value = '';
+    
     // Show or hide the discount percentage input field based on the selected discount type
     if (discountTypeMoney.checked) {
         discountPercentageField.style.display = 'none'; // Hide discount percentage input
@@ -484,13 +493,13 @@ function calculateTotalAmount() {
         totalAmount -= (costOfPlan * discountPercentage) / 100;
     }
 
-    // Add convenience fees to the total amount
-    totalAmount += convenienceFees+registrationFees;
+    // Add convenience fees and registration fees to the total amount
+    totalAmount += convenienceFees + registrationFees;
 
     // Update the total amount field
     document.getElementById('total_amount').value = totalAmount.toFixed(2);
 
-    // **Update the Current Installment Amount field as well**
+    // Update the Current Installment Amount field as well
     var currentInstallmentAmount = totalAmount;
     document.getElementById('current_installment_amount').value = totalAmount.toFixed(2);
 }
@@ -502,10 +511,16 @@ document.getElementById('conveniance_fees').addEventListener('input', calculateT
 document.getElementById('service').addEventListener('change', updateServiceDetails);
 document.getElementById('discount_type_money').addEventListener('change', toggleDiscountField);
 document.getElementById('discount_type_percentage').addEventListener('change', toggleDiscountField);
-// document.getElementById('total_amount').value = totalAmount.toFixed(2); // Round to 2 decimal places
 
-// // Also update the Current Installment Amount field
-// document.getElementById('current_installment_amount').value = totalAmount.toFixed(2);
+// Trigger updateServiceDetails when the page loads if a default service is selected
+window.onload = function() {
+    if (document.getElementById('service').value) {
+        updateServiceDetails();
+    }
+};
+
+                                
+               
                                 
                                 document.addEventListener("DOMContentLoaded", function() {
                                     const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);

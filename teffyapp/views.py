@@ -461,8 +461,8 @@ def update_status(request, id):
 
 def new_leads(request):
     all_data = PersonalInformation.objects.filter(status='new') 
-    add_members = AddMember.objects.all()
-    return render(request, 'new-leads.html', {'all_data': all_data, 'status_title': 'New', 'add_members':add_members})
+    # add_members = AddMember.objects.all()
+    return render(request, 'new-leads.html', {'all_data': all_data, 'status_title': 'New',})
 
 def converted_leads(request):
     if request.method == "POST":
@@ -923,6 +923,12 @@ def renew_member_list(request):
 
 
 
+import calendar
+from datetime import date
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from .models import PersonalInformation, Renew
+
 def renew_member_page(request, member_id):
     # Fetch the member's details using their ID
     member = get_object_or_404(PersonalInformation, id=member_id)
@@ -944,13 +950,14 @@ def renew_member_page(request, member_id):
     # Get the renewal date (either from the last renewal or assigned date)
     renew_date = member.renew_set.last().renew_date if member.renew_set.exists() else member.assigned_date
 
-    # Add the service duration to the renewal date month
+    # Calculate the new expiry date
     new_month = renew_date.month + duration_months
     new_year = renew_date.year + (new_month - 1) // 12  # Adjust year if month exceeds 12
-    new_month = (new_month - 1) % 12 + 1  # Keep the month between 1 and 12
+    new_month = (new_month - 1) % 12 + 1  # Keep month between 1-12
 
-    # Use the same day as the renewal date
-    new_day = renew_date.day
+    # Get the last valid day of the new month
+    last_day_of_month = calendar.monthrange(new_year, new_month)[1]
+    new_day = min(renew_date.day, last_day_of_month)  # Adjust if the day is out of range
 
     # Create the new expiry date
     expiry_date = date(new_year, new_month, new_day)
@@ -995,15 +1002,8 @@ def save_renewal_date(request, client_id):
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Service, AddMember
-
 def add_member(request):
-    # Initialize variables
-    total_sessions = None
-    total_amount = None
-    conveniance_fees = None
-
     if request.method == 'POST':
-        # Extract form data
         name = request.POST.get('name')
         gender = request.POST.get('gender')
         mobile_number = request.POST.get('mobile_number')
@@ -1018,9 +1018,9 @@ def add_member(request):
         registration_amount = request.POST.get('reg_amount')
         service_id = request.POST.get('service')
         batch_id = request.POST.get('group')
-        cost_of_plan_id = request.POST.get('cost_of_plan')  # Get the Service ID for cost_of_plan
-        total_sessions_id = request.POST.get('total_sessions')  # Get the Service ID for total_sessions
-        conveniance_fees = request.POST.get('conveniance_fees')
+        cost_of_plan_id = request.POST.get('cost_of_plan')
+        total_session_id = request.POST.get('total_session')
+        conveniance_fees = float(request.POST.get('conveniance_fees', 0))
         total_amount = request.POST.get('total_amount')
         enrollment_date = request.POST.get('enrollment_date')
         activation_date = request.POST.get('activation_date')
@@ -1028,44 +1028,36 @@ def add_member(request):
         current_installment_amount = request.POST.get('current_installment_amount')
         payment_mode = request.POST.get('payment_mode')
         payment_date = request.POST.get('payment_date')
-        sold_by = request.POST.get('sold_by')
+        sold_by_id = request.POST.get('sold_by')  # Get the ID of the UserProfile
+        
+        # Handle discount field: If it's empty, set it to 0
         discount = request.POST.get('discount')
+        if discount == '':
+            discount = 0.0
+        else:
+            discount = float(discount)  # Ensure it's a float
+
         discount_type = request.POST.get('discount_type')
 
-        # Fetch related service and group details
-        service = Service.objects.filter(id=service_id).first()
-        batch = Service.objects.filter(id=batch_id).first()
-        cost_of_plan = Service.objects.filter(id=cost_of_plan_id).first()  # Fetch the correct Service instance for cost_of_plan
-        total_sessions = Service.objects.filter(id=total_sessions_id).first()  # Fetch the correct Service instance for total_sessions
+        # Convert IDs to objects
+        service = Service.objects.filter(id=int(service_id)).first() if service_id else None
+        batch = Service.objects.filter(id=int(batch_id)).first() if batch_id else None
+        cost_of_plan = Service.objects.filter(id=int(cost_of_plan_id)).first() if cost_of_plan_id else None
+        total_session = Service.objects.filter(id=int(total_session_id)).first() if total_session_id else None
+        
+        # Get the UserProfile object for sold_by
+        sold_by = UserProfile.objects.filter(id=int(sold_by_id)).first() if sold_by_id else None
 
-        # if service and cost_of_plan and total_sessions:
-        #     total_amount = cost_of_plan.prices  # Initialize total amount with cost of plan
-
-        # # Apply discount if present
-        # if discount and total_amount:
-        #     try:
-        #         discount_value = float(discount)
-        #         if discount_type == 'Money':  # Discount in Rupees
-        #             total_amount -= discount_value
-        #         elif discount_type == 'percentage':  # Discount in Percentage
-        #             total_amount -= (total_amount * discount_value / 100)
-        #     except ValueError:
-        #         messages.error(request, "Invalid discount value")
-
-        # # Apply convenience fees if present
-        # if conveniance_fees:
-        #     try:
-        #         conveniance_fees_value = float(conveniance_fees)
-        #         # total_amount += conveniance_fees_value
-        #     except ValueError:
-        #         messages.error(request, "Invalid convenience fees value")
-
-        # Ensure required fields are present
+        # Validate required fields
         if not name or not gender or not mobile_number or not aadhar_number or not email:
             messages.error(request, "Required fields are missing")
             return redirect('add_member')
 
-        # Save member data
+        if not sold_by:
+            messages.error(request, "Sold By field is required")
+            return redirect('add_member')
+
+        # Save the member
         member = AddMember(
             name=name,
             gender=gender,
@@ -1079,10 +1071,11 @@ def add_member(request):
             occupation=occupation,
             emergency_number=emergency_number,
             registration_amount=registration_amount,
+            service=service,
             batch=batch,
-            cost_of_plan=cost_of_plan,  # Pass the actual Service instance here
-            total_session=total_sessions,  # Pass the actual Service instance for total_sessions
-            conveniance_fees=conveniance_fees if conveniance_fees else 0,
+            cost_of_plan=cost_of_plan,
+            total_session=total_session,
+            conveniance_fees=conveniance_fees,
             total_amount=total_amount,
             enrollment_date=enrollment_date,
             activation_date=activation_date,
@@ -1091,17 +1084,84 @@ def add_member(request):
             payment_mode=payment_mode,
             payment_date=payment_date,
             sold_by=sold_by,
+            discount=discount,
+            discount_type=discount_type,
         )
 
         member.save()
         messages.success(request, "Member added successfully!")
-        return redirect('new_leads')
+        return redirect('display_add_members')
 
-    # If GET request, render the form with existing services and groups
     available_services = Service.objects.all()
     group = Service.objects.all()
+    sale_by = UserProfile.objects.all()  # Query for the list of salespeople
+    print(UserProfile.objects.all()) 
 
     return render(request, 'add-members.html', {
         'available_services': available_services,
         'group': group,
+        'sale_by': sale_by
     })
+
+
+
+def display_add_members(request):
+    add_members = AddMember.objects.all()
+    return render(request,"display-all-add-members.html", {"add_members":add_members})
+
+
+def view_add_members(request, id):
+    obj = get_object_or_404(AddMember, id=id)  # Ensures a 404 if not found
+    # member = AddMember.objects.get(id=1)  # Replace with actual ID
+    # print(member.cost_of_plan)  # Should return a Service object or None
+    # print(member.cost_of_plan.name if member.cost_of_plan else "No Plan Assigned")
+    # service = Service.objects.first()  # Get a valid service
+    # member.cost_of_plan = service
+    # member.save()
+
+    if request.method == "POST":
+        obj.name = request.POST.get('name', obj.name)
+        obj.gender = request.POST.get('gender', obj.gender)
+        obj.mobile_number = request.POST.get('mobile_number', obj.mobile_number)
+        obj.aadhar_number = request.POST.get('aadhar_number', obj.aadhar_number)
+        obj.email = request.POST.get('email', obj.email)
+        obj.date_of_birth = request.POST.get('date_of_birth', obj.date_of_birth)
+        obj.location = request.POST.get('location', obj.location)
+        obj.source = request.POST.get('source', obj.source)
+        obj.occupation = request.POST.get('occupation', obj.occupation)
+        obj.emergency_number = request.POST.get('emergency_number', obj.emergency_number)
+        obj.registration_amount = request.POST.get('reg_amount', obj.registration_amount)
+        obj.service = request.POST.get('service', obj.service)
+        obj.batch = request.POST.get('group', obj.batch)
+        obj.cost_of_plan = request.POST.get('cost_of_plan', obj.cost_of_plan)
+        obj.total_session = request.POST.get('total_session', obj.total_session)
+        obj.conveniance_fees = request.POST.get('conveniance_fees', obj.conveniance_fees)
+        obj.total_amount = request.POST.get('total_amount', obj.total_amount)
+        obj.enrollment_date = request.POST.get('enrollment_date', obj.enrollment_date)
+        obj.activation_date = request.POST.get('activation_date', obj.activation_date)
+        obj.expiry_date = request.POST.get('expiry_date', obj.expiry_date)
+        obj.current_installment_amount = request.POST.get('current_installment_amount', obj.current_installment_amount)
+        obj.payment_mode = request.POST.get('payment_mode', obj.payment_mode)
+        obj.payment_date = request.POST.get('payment_date', obj.payment_date)
+        obj.sold_by = request.POST.get('sold_by', obj.sold_by)
+        obj.discount = request.POST.get('discount', obj.discount)
+        obj.discount_type = request.POST.get('discount_type', obj.discount_type)
+
+        # File Upload
+        uploaded_file = request.FILES.get('filename')
+        if uploaded_file:
+            obj.uploaded_file = uploaded_file
+
+        obj.save()
+        messages.success(request, "Data updated successfully")
+        return redirect(f'/display_add_members/{obj.id}/')
+
+    return render(request, "view-each-add-members.html", {"member": obj})
+
+def delete_added_members(request,id):
+    delete_added_members = AddMember.objects.get(id=id)
+    delete_added_members.delete()
+    return redirect('display_add_members')
+
+def bill(request):
+    return render(request,"bill.html")

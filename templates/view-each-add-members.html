@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}ADDED MEMBER DETAILS{% endblock %}
+
+{% block content %}
+<main class="app-main">
+    <div class="app-content-header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-6">
+                    <h3 class="mb-0">MEMBER DETAILS</h3>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-end">
+                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">MEMBER DETAILS</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="app-content">
+        <div class="container-fluid">
+            <div class="row g-4">
+                <div class="col-12">
+                    <div class="card card-warning card-outline mb-4">
+                        <div class="card-body">
+                            <table id="memberTable" class="table table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Member Name</th>
+                                        <th>Gender</th>
+                                        <th>Mobile Number</th>
+                                        <th>Email</th>
+                                        <th>Date of Birth</th>
+                                        <th>Location</th>
+                                        <th>Service</th>
+                                        <!-- <th>Cost of Plan</th> -->
+                                        <th>Total Amount</th>
+                                        <th>Enrollment Date</th>
+                                        <th>Expiry Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>{{ member.name }}</td>
+                                        <td>{{ member.gender }}</td>
+                                        <td>{{ member.mobile_number }}</td>
+                                        <td>{{ member.email }}</td>
+                                        <td>{{ member.date_of_birth|date:'Y-m-d' }}</td>
+                                        <td>{{ member.location }}</td>
+                                        <td>{{ member.service }}</td>
+                                        <!-- <td>{{ member.cost_of_plan }}</td> -->
+                                        <td>{{ member.total_amount }}</td>
+                                        <td>{{ member.enrollment_date|date:'Y-m-d' }}</td>
+                                        <td>{{ member.expiry_date|date:'Y-m-d' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- DataTables Scripts -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#memberTable').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                'copy', 'csv', 'excel', 'pdf', 'print'
+            ]
+        });
+    });
+</script>
+{% endblock content %}

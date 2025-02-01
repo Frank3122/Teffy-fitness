@@ -241,20 +241,18 @@ class AddMember(models.Model):
     gender = models.CharField(max_length=10)
     mobile_number = models.CharField(max_length=12, null=True, blank=True)
     aadhar_number  = models.CharField(max_length=16, unique=True)
-    uploaded_file = models.FileField(upload_to='member_files/', blank=True, null=True)  # Uploaded file
+    uploaded_file = models.FileField(upload_to='member_files/', blank=True, null=True)
     email = models.EmailField()
     date_of_birth = models.DateField(null=True, blank=True)
     location = models.CharField(max_length=30, null=True, blank=True)
-    source = models.CharField(max_length=50, null=True, blank=True) #through how they came to gym by ad,facebook or friends
-    occupation = models.CharField(max_length=50,null=True, blank=True)
+    source = models.CharField(max_length=50, null=True, blank=True)
+    occupation = models.CharField(max_length=50, null=True, blank=True)
     emergency_number = models.CharField(max_length=12, null=True, blank=True)
     registration_amount = models.FloatField(null=True, blank=True)
-    service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, related_name='service_members')
+    service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, related_name='members_by_service')
+    batch = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, related_name='batch_members')
     cost_of_plan = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, related_name='cost_of_plan_members')
-    batch = models.ForeignKey(to=Service, on_delete=models.SET_NULL, null=True, related_name='batch_members')
-    cost_of_plan = models.ForeignKey(to=Service, on_delete=models.SET_NULL, null=True, related_name='cost_of_plan_members')
-    total_session = models.ForeignKey(to=Service, on_delete=models.SET_NULL, null=True, related_name='total_session_members')
-    # service = models.ForeignKey(to=Service, on_delete=models.SET_NULL, null=True, related_name='service_members')
+    total_session = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, related_name='total_session_members')
     conveniance_fees = models.FloatField(null=True, blank=True)
     total_amount = models.FloatField(null=True, blank=True)
     enrollment_date = models.DateField(null=True, blank=True)
@@ -263,14 +261,17 @@ class AddMember(models.Model):
     current_installment_amount = models.FloatField(null=True, blank=True)
     payment_mode = models.CharField(max_length=50, null=True, blank=True)
     payment_date = models.DateField(null=True, blank=True)
-    sold_by = models.CharField(max_length=20, null=True, blank=True)
-
+    sold_by = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, blank=True)
+    discount = models.FloatField(null=True, blank=True)  
+    discount_type = models.CharField(max_length=50, null=True, blank=True)  
 
     def __str__(self):
         return self.name
     
     def member(self):
         return{"uploaded_file":self.uploaded_file,
+               "discount":self.discount,
+               "discount_type": self.discount_type,
                "sold_by" : self.sold_by,
                "payment_date" : self.payment_date,
                " current_installment_amount" : self.current_installment_amount,

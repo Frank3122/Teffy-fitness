@@ -59,8 +59,13 @@ urlpatterns = [
     path("renew-member/", renew_member_list, name="renew_member_list"),
     path("renew-member/<int:member_id>/", renew_member_page, name="renew_member_page"),
 
-    # path("add-members/", add_members, name="add_members"),
-    # path('add-member/',add_member,name="add_member"),
     path('add-member/',add_member, name="add_member"),
+
+    path('display-add-members/',display_add_members, name='display_add_members'),
+    path('display_add_members/<int:id>/',view_add_members, name="view_add_members"),
+    path('delete_added_members/<int:id>/', delete_added_members, name="delete_added_members"),
+    path('bill/', bill, name="bill"),
+
+
 
 ]

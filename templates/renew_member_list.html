@@ -35,16 +35,18 @@
                             <td>{{ forloop.counter }}</td>
                             <td>{{ client.id }}</td>
                             <td>{{ client.name }}</td>
-                            <td>{% if client.services %}{{ client.services.name }}{% else %}No Service{% endif %}</td>
-                            <td>{{ client.assigned_date|date:"d-m-Y" }}</td>
                             <td>
-                                {% with client.renew_set.last as last_renew %}
-                                    {% if last_renew %}
-                                        {{ last_renew.expiry_date|date:"d-m-Y" }}
-                                    {% else %}
-                                        No Renewal Yet
-                                    {% endif %}
-                                {% endwith %}
+                                {% if client.services %}
+                                    <span class="service-duration" data-duration="{{ client.services.duration }}">{{ client.services.name }}</span>
+                                {% else %}
+                                    No Service
+                                {% endif %}
+                            </td>
+                            <td class="assigned-date" data-date="{{ client.assigned_date|date:'Y-m-d' }}">
+                                {{ client.assigned_date|date:"d-m-Y" }}
+                            </td>
+                            <td class="renewal-date">
+                                <!-- This will be updated dynamically using JS -->
                             </td>
                             <td>
                                 <a href="{% url 'renew_member_page' client.id %}" class="btn btn-primary btn-sm">
@@ -62,11 +64,50 @@
 {% endblock content %}
 
 {% block script %}
+<!-- Add DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<!-- Add DataTables JavaScript -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+<script src="/static/js/adminlte.js"></script>
 <script>
     $(document).ready(function () {
         $('#memberTable').DataTable();
+
+        // Function to calculate the renewal date
+        function calculateRenewalDate(assignedDate, durationMonths) {
+            let dateObj = new Date(assignedDate);
+            if (isNaN(dateObj.getTime()) || !durationMonths) {
+                return "Invalid Date";
+            }
+
+            // Add months to assigned date
+            dateObj.setMonth(dateObj.getMonth() + parseInt(durationMonths));
+
+            // Adjust day to last day of month if needed
+            let lastDay = new Date(dateObj.getFullYear(), dateObj.getMonth() + 1, 0).getDate();
+            if (dateObj.getDate() > lastDay) {
+                dateObj.setDate(lastDay);
+            }
+
+            // Format date as dd-mm-yyyy
+            let day = String(dateObj.getDate()).padStart(2, "0");
+            let month = String(dateObj.getMonth() + 1).padStart(2, "0");
+            let year = dateObj.getFullYear();
+            return `${day}-${month}-${year}`;
+        }
+
+        // Loop through all rows and update renewal date
+        $("tr").each(function () {
+            let assignedDate = $(this).find(".assigned-date").data("date");
+            let duration = $(this).find(".service-duration").data("duration");
+
+            if (assignedDate && duration) {
+                let renewalDate = calculateRenewalDate(assignedDate, duration.split(" ")[0]);
+                $(this).find(".renewal-date").text(renewalDate);
+            }
+        });
     });
 </script>
 {% endblock script %}

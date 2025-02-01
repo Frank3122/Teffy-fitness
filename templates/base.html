@@ -85,7 +85,7 @@
         <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
             <div class="sidebar-brand">
                 <a href="/main/" class="brand-link">
-                    <img src="/static/image/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image opacity-75 shadow">
+                    <img src="/static/image/Mask group (2).png" alt="AdminLTE Logo" class="brand-image">
                     <span class="brand-text fw-light">TEFFY FITNESS</span>
                 </a>
             </div>
@@ -145,7 +145,8 @@
                                     </li>
                                 </ul>
                             </div>
-                        </li>       
+                        </li>   
+                            
                         <li class="nav-item">
                             <a href="#" class="nav-link" data-bs-toggle="collapse" data-bs-target="#masterMenu" aria-expanded="false">
                                 <i class="nav-icon bi bi-person-standing"></i>
@@ -261,6 +262,26 @@
                                 <p style="font-size: 14px;">SERVICE</p>
                             </a>
                         </li>
+
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="collapse" data-bs-target="#productsMenu" aria-expanded="false">
+                                <i class="nav-icon bi bi-person-arms-up" style="font-size: 12px;"></i>
+                                <p style="font-size: 14px;">MEMBERS<i class="nav-arrow bi bi-chevron-down"></i></p>
+                            </a>
+                            <div id="productsMenu" class="collapse">
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="{% url 'display_add_members' %}" class="nav-link">
+                                            <i class="nav-icon bi bi-person-square" style="font-size: 12px;"></i>
+                                            <p style="font-size: 14px;">ALL MEMBERS</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{% url 'add_member' %}" class="nav-link">
+                                            <i class="nav-icon bi bi-person-plus" style="font-size: 12px;"></i>
+                                            <p style="font-size: 14px;">ADD MEMBERS</p>
+                                        </a>
+                                    </li>
                         
                     </ul>
                 </nav>
