@@ -695,29 +695,39 @@ def payment(request, client_id):
         }
     )
 
+
 def expenses(request):
-    if request.method == "POST":
-        expense_name = request.POST.get('expense_name')
-        price = request.POST.get('price')
-        date_spent = request.POST.get('date_spent')
+    current_year = datetime.now().year
+    current_month = datetime.now().month
 
-        if expense_name and price and date_spent:  
-            Expense.objects.create(expense_name=expense_name, price=price, date_spent=date_spent)
-            return redirect('expenses')  
+    years = list(range(current_year - 5, current_year + 1))
 
-    now = datetime.now()
-    current_month = now.month
-    current_year = now.year
-    monthly_expenses = Expense.objects.filter(date_spent__month=current_month,date_spent__year=current_year)
-    total_monthly_expenses = monthly_expenses.aggregate(Sum('price'))['price__sum'] or 0
-    return render(request, 'new-expense.html', {'expenses': monthly_expenses,'total_monthly_expenses': total_monthly_expenses,})
+    months = {
+        1: "January", 2: "February", 3: "March", 4: "April",
+        5: "May", 6: "June", 7: "July", 8: "August",
+        9: "September", 10: "October", 11: "November", 12: "December"
+    }
+
+    selected_year = int(request.GET.get("year", current_year))
+    selected_month = int(request.GET.get("month", current_month))
+
+    expenses = Expense.objects.filter(date_spent__year=selected_year, date_spent__month=selected_month)
+    total_monthly_expenses = expenses.aggregate(Sum("price"))["price__sum"] or 0
+
+    return render(request, "new-expense.html", {
+        "expenses": expenses,
+        "total_monthly_expenses": total_monthly_expenses,
+        "years": years,
+        "months": months,
+        "selected_year": selected_year,
+        "selected_month": selected_month,
+    })
 
 
 def delete_expense(request, expense_id):
     expense = Expense.objects.get(id=expense_id)
     expense.delete()
     return redirect('expenses')
-
 
 def view_expense(request,expense_id):
     obj = Expense.objects.get(id=expense_id)
