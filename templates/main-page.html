@@ -67,7 +67,7 @@
             <div class="row">
                 <div class="col-12 col-sm-6 col-md-3 mb-4">
                     <div class="info-box">
-                        <a href="{% url 'new_leads' %}" class="info-box-icon text-bg-secondary shadow-sm">
+                        <a href="{% url 'view_all_clients' %}" class="info-box-icon text-bg-secondary shadow-sm">
                             <i class="bi bi-people-fill"></i>
                         </a>
                         <div class="info-box-content">
@@ -175,7 +175,7 @@
                                         </span>
                                         <div class="info-box-content">
                                             <span class="info-box-text">EXPIRES</span>
-                                            <span class="info-box-number" id="renewals">{{ 0 }}</span>
+                                            <span class="info-box-number" id="renewals">{{ expiry_date }}</span>
                                         </div>
                                     </div>
                                 </a>
@@ -265,7 +265,7 @@
                                         </span>
                                         <div class="info-box-content">
                                             <span class="info-box-text">EXPIRIES</span>
-                                            <span class="info-box-number" id="trenewal"></span>
+                                            <span class="info-box-number" id="trenewal">{{ today_expiry_date }}</span>
                                         </div>
                                     </div>
                                 </a>

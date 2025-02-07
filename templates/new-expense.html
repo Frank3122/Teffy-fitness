@@ -7,9 +7,9 @@
     <div class="app-content-header">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-12 text-center">
+                <!-- <div class="col-12 text-center">
                     <h3 class="mb-4">EXPENSES</h3>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
@@ -23,7 +23,7 @@
                         <h5 class="card-title mb-0">Add Expense</h5>
                     </div>
                     <div class="card-body">
-                        <form method="POST" action="">
+                        <form method="POST" action="{% url 'add_expense' %}">
                             {% csrf_token %}
                             <div class="mb-3">
                                 <label for="expense_name" class="form-label">Expense Name</label>
@@ -34,34 +34,38 @@
                                 <input type="number" name="price" id="price" class="form-control" placeholder="Enter price" required>
                             </div>
                             <div class="mb-3">
+                                <label for="quantity" class="form-label">Quantity</label>
+                                <input type="number" name="quantity" id="quantity" class="form-control" placeholder="Enter quantity" required>
+                            </div>
+                            <div class="mb-3">
                                 <label for="date_spent" class="form-label">Date</label>
                                 <input type="date" name="date_spent" id="date_spent" class="form-control" required>
                             </div>
-                            <button type="submit" class="btn btn-success w-100">Add Expense</button>
+                            <button type="submit" class="btn btn-success w-10">Add Expense</button>
                         </form>
                     </div>
                 </div>
             </div>
 
-            <!-- Filters for Year and Month -->
-            <div class="col-12 col-md-6 mb-4">
+            <!-- Filters for Year and Month (Compact Layout) -->
+            <div class="col-12 col-md-4 mb-4">
                 <div class="card card-primary card-outline">
                     <div class="card-header">
                         <h5 class="card-title mb-0">Filter Expenses</h5>
                     </div>
                     <div class="card-body">
                         <form method="GET" action="{% url 'expenses' %}">
-                            <div class="row">
-                                <div class="col-12 col-md-6 mb-3">
-                                    <label for="year">Select Year:</label>
+                            <div class="d-flex justify-content-between">
+                                <div class="mb-3 mr-2" style="flex: 1;">
+                                    <label for="year" class="form-label">Select Year:</label>
                                     <select name="year" id="year" class="form-control">
                                         {% for year in years %}
                                             <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>{{ year }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
-                                <div class="col-12 col-md-6 mb-3">
-                                    <label for="month">Select Month:</label>
+                                <div class="mb-3" style="flex: 1;">
+                                    <label for="month" class="form-label">Select Month:</label>
                                     <select name="month" id="month" class="form-control">
                                         {% for num, month in months.items %}
                                             <option value="{{ num }}" {% if num == selected_month %}selected{% endif %}>{{ month }}</option>
@@ -69,7 +73,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-primary w-100">Filter</button>
+                            <button type="submit" class="btn btn-primary w-10">Filter</button>
                         </form>
                     </div>
                 </div>
@@ -83,12 +87,13 @@
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table table-hover" id="example1">
-                                <thead>
+                            <table class="table table-hover table-striped" id="example1">
+                                <thead class="thead-light">
                                     <tr>
                                         <th>S.No</th>
                                         <th>Expense Name</th>
                                         <th>Price</th>
+                                        <th>Quantity</th>
                                         <th>Date</th>
                                         <th>Action</th>
                                     </tr>
@@ -99,6 +104,7 @@
                                         <td>{{ forloop.counter }}</td>
                                         <td>{{ expense.expense_name }}</td>
                                         <td>Rs.{{ expense.price }}</td>
+                                        <td>{{ expense.quantity}}</td>
                                         <td>{{ expense.date_spent }}</td>
                                         <td>
                                             <a href="{% url 'view_expense' expense.id %}" class="btn btn-sm btn-primary">
@@ -111,7 +117,7 @@
                                     </tr>
                                     {% empty %}
                                     <tr>
-                                        <td colspan="5" class="text-center">No expenses available.</td>
+                                        <td colspan="6" class="text-center">No expenses available.</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
@@ -122,7 +128,7 @@
             </div>
 
             <!-- Total Monthly Expenses -->
-            <div class="col-12 col-md-6 mb-4">
+            <div class="col-12 col-md-4 mb-4">
                 <div class="card card-warning card-outline">
                     <div class="card-header">
                         <h5 class="card-title mb-0">Total Monthly Expenses</h5>
@@ -144,6 +150,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="/static/js/adminlte.js"></script>
+
 <script>
     $(function () {
         $("#example1").DataTable({
@@ -156,4 +164,4 @@
         });
     });
 </script>
-{% endblock script %}
+{% endblock %}

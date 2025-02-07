@@ -145,6 +145,7 @@ class Expense(models.Model):
     expense_name = models.CharField(max_length=100)
     price = models.PositiveIntegerField(null=True, blank=True)
     date_spent = models.DateField(default = now  )  
+    quantity = models.PositiveIntegerField(null=True, blank=True)
     created_date = models.DateField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now_add=True)
 

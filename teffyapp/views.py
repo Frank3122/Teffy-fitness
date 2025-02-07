@@ -214,7 +214,8 @@ def main(request):
     member_count = PersonalInformation.objects.filter(status='converted').count()
 
     # Count of all members (all leads)
-    all_member_count = PersonalInformation.objects.all().count()
+    all_member_count = PersonalInformation.objects.count() + AddMember.objects.count()
+
 
     # Count of sales records
     sales = Sales.objects.filter(
@@ -270,6 +271,17 @@ def main(request):
         renew_date__month=today.month
     ).count()
 
+    expiry_date = Renew.objects.filter(
+        expiry_date__year = today.year,
+        expiry_date__month=today.month
+    ).count()
+
+    today_expiry_date = Renew.objects.filter(
+        expiry_date__year=today.year,
+        expiry_date__month=today.month,
+        expiry_date__day=today.day
+    ).count()
+
     # Display success message
     messages.success(request, "WELCOME TO TEFFY FITNESS ")
 
@@ -287,6 +299,8 @@ def main(request):
         'today_sales' : today_sales,
         'today_purchase':today_purchase,
         'today_follow_up':today_follow_up,
+        'expiry_date':expiry_date,
+        'today_expiry_date':today_expiry_date,
     })
 
 
@@ -723,6 +737,19 @@ def expenses(request):
         "selected_month": selected_month,
     })
 
+def add_expense(request):
+    if request.method == 'POST':
+        expense_name = request.POST.get('expense_name')
+        price = request.POST.get('price')
+        date_spent = request.POST.get('date_spent')
+        quantity = request.POST.get('quantity')
+
+        expense = Expense(expense_name=expense_name, price=price, date_spent=date_spent, quantity=quantity)
+        expense.save()
+
+        return redirect('expenses')  # Redirect to the expenses page after adding
+    return render(request, 'your_template.html')  # Use your actual template name
+
 
 def delete_expense(request, expense_id):
     expense = Expense.objects.get(id=expense_id)
@@ -1009,9 +1036,9 @@ def save_renewal_date(request, client_id):
 #     available_services = Service.objects.all()
 #     group = Service.objects.all()
 #     return render(request,"add-members.html", {"available_services": available_services,"group":group})
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from .models import Service, AddMember
+# from django.shortcuts import render, redirect
+# from django.contrib import messages
+# from .models import Service, AddMember
 def add_member(request):
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -1175,3 +1202,100 @@ def delete_added_members(request,id):
 
 def bill(request):
     return render(request,"bill.html")
+
+
+def view_all_clients(request):
+    leads = PersonalInformation.objects.all()
+    print(leads)
+    add_members = AddMember.objects.all()
+    print(add_members)
+
+    return render(request, "all-clients.html", {'leads': leads, 'add_members': add_members})
+
+
+
+from django.http import HttpResponse
+from openpyxl import Workbook
+from openpyxl.styles import Alignment
+from .models import PersonalInformation, Payments, Sales  # Import models
+from datetime import datetime
+
+def download_report(request):
+    # Parse date range from the request if provided
+    from_date = request.GET.get('from_date', None)
+    to_date = request.GET.get('to_date', None)
+
+    # Filter data based on the date range
+    payment_data = Payments.objects.filter(date_paid__range=[from_date, to_date])
+    sales_data = Sales.objects.filter(sale_date__range=[from_date, to_date])  # Assuming 'date' is the field in Sales model
+
+    # Create a workbook and active worksheet
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Payments & Sales Report"
+
+    # Define the column headers (adding Sales columns)
+    columns = [
+        "Name", "Amount Paid", "Pending Amount", "Payment Mode", "Payment Date",  # Payments
+        "Item Name", "Quantity Sold", "Sale Amount", "Sale Date"  # Sales
+    ]
+
+    # Append the column headers to the worksheet
+    ws.append(columns)
+
+    # Loop through the Payments data and append rows to the worksheet
+    for payment in payment_data:
+        # Remove timezone info from date_paid if it exists
+        if payment.date_paid and payment.date_paid.tzinfo:
+            date_paid = payment.date_paid.replace(tzinfo=None)
+        else:
+            date_paid = payment.date_paid
+        
+        row = [
+            payment.name.name,  # Assuming payment has a related name object
+            payment.amount_paid,
+            payment.pending_amount,
+            payment.payment_mode,
+            date_paid
+        ]
+        ws.append(row)
+
+    # Loop through the Sales data and append rows to the worksheet
+    for sale in sales_data:
+        # Remove timezone info from sale date if it exists
+        if sale.sale_date and sale.sale_date.tzinfo:
+            sale_date = sale.sale_date.replace(tzinfo=None)
+        else:
+            sale_date = sale.sale_date
+        
+        row = [
+            "",  # Empty placeholder for Payment columns
+            "",  # Empty placeholder for Payment columns
+            "",  # Empty placeholder for Payment columns
+            "",  # Empty placeholder for Payment columns
+            "",  # Empty placeholder for Payment columns
+            sale.product_name,  # Assuming sale has 'item_name', change if needed
+            sale.quantity,
+            sale.sale_price,
+            sale_date
+        ]
+        ws.append(row)
+
+    # Adjust column widths for better readability
+    for col in ws.columns:
+        max_length = 0
+        column = col[0].column_letter
+        for cell in col:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(cell.value)
+            except:
+                pass
+        adjusted_width = (max_length + 2)
+        ws.column_dimensions[column].width = adjusted_width
+
+    # Return the response as an Excel file
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="gym_report.xlsx"'
+    wb.save(response)
+    return response

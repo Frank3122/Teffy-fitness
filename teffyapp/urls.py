@@ -36,6 +36,7 @@ urlpatterns = [
     path('payment/<int:client_id>/',payment, name='payment_page'),
 
     path('expenses/', expenses, name='expenses'),
+    path('add-expense/', add_expense, name='add_expense'),
     path('delete_expenses/<int:expense_id>/', delete_expense, name='delete_expense'),
     path('expenses/<int:expense_id>/', view_expense, name='view_expense'),
 
@@ -65,6 +66,10 @@ urlpatterns = [
     path('display_add_members/<int:id>/',view_add_members, name="view_add_members"),
     path('delete_added_members/<int:id>/', delete_added_members, name="delete_added_members"),
     path('bill/', bill, name="bill"),
+
+    path('view-all-clients/', view_all_clients, name="view_all_clients"),
+
+     path('download_report/', download_report, name='download_report'),
 
 
 
