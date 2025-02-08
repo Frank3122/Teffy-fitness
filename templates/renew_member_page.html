@@ -8,12 +8,12 @@
             <h2 class="mb-0">Renew Member</h2>
         </div>
         <div class="card-body">
-            <form method="POST">
-                {% csrf_token %}
-                <div class="form-group mb-3" style="width: 50%;" >
-                    <label for="renew_date">Renew Date</label>
-                    <input type="date" class="form-control" id="renew_date" name="renew_date" value="">
-                </div>
+          <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="renewal_date">Select Renewal Date:</label>
+                <input type="date" id="renewal_date" name="renewal_date" class="form-control" required>
+            </div>
 
                 <div class="mb-3" style="width: 50%; color: white;">
                     <label for="paymentMode" class="form-label">Payment Mode</label>

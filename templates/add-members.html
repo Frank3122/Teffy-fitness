@@ -167,7 +167,7 @@
                                                                         <select name="service" class="form-control" id="service" onchange="updateServiceDetails()">
                                                                             <option value="" disabled selected>Select a service</option>
                                                                             {% for service in available_services %}
-                                                                                <option value="{{ service.id }}" {% if data.services and service.id == data.services.id %} selected {% endif %} data-price="{{ service.prices }}" data-sessions="{{ service.sessions }}">
+                                                                                <option value="{{ service.id }}" {% if data.services and service.id == data.services.id %} selected {% endif %} data-price="{{ service.prices }}" data-sessions="{{ service.sessions }}" data-duration="{{ memb_plan.duration }}">
                                                                                     {{ service.name }}  
                                                                                 </option>
                                                                             {% endfor %}
@@ -179,6 +179,21 @@
                                                                         </a>
                                                                     </div>
                                                                 </div>
+
+                                                                <div class="row mb-3">
+                                                                    <label for="sessions" class="col-sm-3 col-form-label">Total Sessions</label>
+                                                                    <div class="col-sm-9">
+                                                                        <input type="text" class="form-control" name="total_sessions" id="total_sessions" value="{{ total_session }}" readonly>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="row mb-3">
+                                                                    <label for="cost_of_plan" class="col-sm-3 col-form-label">Cost of Service</label>
+                                                                    <div class="col-sm-9">
+                                                                        <input type="text" class="form-control" name="cost_of_plan" id="cost_of_plan" value="" readonly>
+                                                                    </div>
+                                                                </div>
+                                                                
                                                                 <div class="row mb-3">
                                                                     <label for="group" class="col-sm-3 col-form-label">Group</label>
                                                                     <div class="col-sm-9">
@@ -192,19 +207,36 @@
                                                                         </select>
                                                                     </div>
                                                                 </div>
+
+
                                                                 <div class="row mb-3">
-                                                                    <label for="cost_of_plan" class="col-sm-3 col-form-label">Cost of Plan</label>
+                                                                    <label for="select_membership_plan" class="col-sm-3 col-form-label">Membership Plan</label>
                                                                     <div class="col-sm-9">
-                                                                        <input type="text" class="form-control" name="cost_of_plan" id="cost_of_plan" value="" readonly>
+                                                                        <select name="select_membership_plan" id="select_membership_plan" class="form-control" onchange="updatePlanDetails()">
+                                                                            <option value="" disabled selected>Select Membership Plan</option>
+                                                                            {% for memb_plan in membership_plan %}
+                                                                                <option value="{{ memb_plan.id }}" data-duration="{{ memb_plan.duration }}" data-price="{{ memb_plan.price }}">
+                                                                                    {{ memb_plan.plan_name }}
+                                                                                </option>
+                                                                            {% endfor %}
+                                                                        </select>
                                                                     </div>
                                                                 </div>
-                                                               
+                                                                
                                                                 <div class="row mb-3">
-                                                                    <label for="sessions" class="col-sm-3 col-form-label">Total Sessions</label>
+                                                                    <label for="duration" class="col-sm-3 col-form-label">Total Duration</label>
                                                                     <div class="col-sm-9">
-                                                                        <input type="text" class="form-control" name="total_sessions" id="total_sessions" value="{{ total_session }}" readonly>
+                                                                        <input type="text" class="form-control" id="select_memebrship_plan" name="total_duration" readonly>
                                                                     </div>
                                                                 </div>
+
+                                                                <div class="row mb-3">
+                                                                    <label for="membership_price" class="col-sm-3 col-form-label">Membership Price</label>
+                                                                    <div class="col-sm-9">
+                                                                        <input type="text" class="form-control" name="membership_price" id="membership_price" value="0.00" readonly>
+                                                                    </div>
+                                                                </div>
+                                                                
 
                                                                 <div class="row mb-3">
                                                                     <label class="col-lg-3 col-12 col-form-label"></label>
@@ -428,6 +460,7 @@ function updateServiceDetails() {
     var sessions = selectedService.getAttribute('data-sessions');
     var activation_date = document.getElementById('activation_date');
     var expiry_date = document.getElementById('expiry_date');
+    var select_memebrship_plan = document.getElementById('select_memebrship_plan');
     
     // Set the enrollment and activation date to the current date
     var currentDate = new Date();
@@ -438,7 +471,7 @@ function updateServiceDetails() {
     // Update cost of plan and total sessions fields
     document.getElementById('cost_of_plan').value = price;
     document.getElementById('total_sessions').value = sessions;
-    
+    document.getElementById('select_memebrship_plan').value = duration;
     // Calculate and display the expiry date based on the selected plan's total sessions
     calculateExpiryDate(sessions, currentDate);
 
@@ -518,6 +551,134 @@ window.onload = function() {
         updateServiceDetails();
     }
 };
+function updateDuration() {
+    var membershipPlanSelect = document.getElementById('select_membership_plan');
+    var selectedOption = membershipPlanSelect.options[membershipPlanSelect.selectedIndex];
+
+    if (selectedOption.value) {
+        var duration = selectedOption.getAttribute('data-duration'); // Get duration from attribute
+        document.getElementById('select_memebrship_plan').value = duration; // Update the duration field
+    } else {
+        document.getElementById('select_memebrship_plan').value = ''; // Clear if no selection
+    }
+}
+
+// Ensure the function runs on page load if a plan is already selected
+document.addEventListener("DOMContentLoaded", function () {
+    updateDuration();
+});
+
+    // Function to update Membership Plan details (Duration & Price)
+    function updatePlanDetails() {
+        var membershipPlanSelect = document.getElementById('select_membership_plan');
+        var selectedOption = membershipPlanSelect.options[membershipPlanSelect.selectedIndex];
+
+        if (selectedOption.value) {
+            var duration = selectedOption.getAttribute('data-duration'); // Get plan duration
+            var price = parseFloat(selectedOption.getAttribute('data-price')) || 0; // Get plan price
+
+            document.getElementById('select_memebrship_plan').value = duration; // Set duration
+            document.getElementById('membership_price').value = price.toFixed(2); // Set price
+
+            calculateTotalAmount(); // Recalculate total amount
+        } else {
+            document.getElementById('select_memebrship_plan').value = ''; // Reset if no selection
+            document.getElementById('membership_price').value = '0.00'; 
+        }
+    }
+
+    // Function to update Service details (Cost, Sessions, Expiry Date)
+    function updateServiceDetails() {
+        var serviceSelect = document.getElementById('service');
+        var selectedService = serviceSelect.options[serviceSelect.selectedIndex];
+
+        if (selectedService.value) {
+            var price = parseFloat(selectedService.getAttribute('data-price')) || 0;
+            var sessions = parseInt(selectedService.getAttribute('data-sessions')) || 0;
+            var activationDate = document.getElementById('activation_date');
+            var expiryDate = document.getElementById('expiry_date');
+
+            // Set enrollment and activation date to current date
+            var currentDate = new Date();
+            var formattedDate = currentDate.toISOString().split('T')[0]; 
+            document.getElementById('enrollment_date').value = formattedDate;
+            activationDate.value = formattedDate; 
+
+            // Update cost of plan and total sessions
+            document.getElementById('cost_of_plan').value = price.toFixed(2);
+            document.getElementById('total_sessions').value = sessions;
+
+            // Calculate expiry date
+            calculateExpiryDate(sessions, currentDate);
+        }
+    }
+
+    // Function to calculate expiry date based on sessions (1 session per day)
+    function calculateExpiryDate(sessions, startDate) {
+        if (sessions > 0) {
+            var expiryDate = new Date(startDate);
+            expiryDate.setDate(startDate.getDate() + sessions);
+            document.getElementById('expiry_date').value = expiryDate.toISOString().split('T')[0];
+        }
+    }
+
+    // Function to toggle discount input visibility based on selected discount type
+    function toggleDiscountField() {
+        var discountTypeMoney = document.getElementById('discount_type_money');
+        var discountPercentageField = document.getElementById('discountpercentage');
+
+        // Reset values
+        document.getElementById('discount').value = '';
+        discountPercentageField.value = '';
+
+        if (discountTypeMoney.checked) {
+            discountPercentageField.style.display = 'none'; 
+        } else {
+            discountPercentageField.style.display = 'inline-block'; 
+        }
+
+        calculateTotalAmount();
+    }
+
+    // Function to calculate and update the total amount
+    function calculateTotalAmount() {
+        var costOfPlan = parseFloat(document.getElementById('cost_of_plan').value) || 0;
+        var membershipPrice = parseFloat(document.getElementById('membership_price').value) || 0;
+        var discountAmount = parseFloat(document.getElementById('discount').value) || 0;
+        var discountPercentage = parseFloat(document.getElementById('discountpercentage').value) || 0;
+        var convenienceFees = parseFloat(document.getElementById('conveniance_fees').value) || 0;
+        var registrationFees = parseFloat(document.getElementById('reg_amount').value) || 0;
+
+        var totalAmount = costOfPlan + membershipPrice; 
+
+        if (document.getElementById('discount_type_money').checked) {
+            totalAmount -= discountAmount;
+        } else if (document.getElementById('discount_type_percentage').checked) {
+            totalAmount -= (totalAmount * discountPercentage) / 100;
+        }
+
+        totalAmount += convenienceFees + registrationFees;
+
+        document.getElementById('total_amount').value = totalAmount.toFixed(2);
+        document.getElementById('current_installment_amount').value = totalAmount.toFixed(2);
+    }
+
+    // Event listeners
+    document.getElementById('select_membership_plan').addEventListener('change', updatePlanDetails);
+    document.getElementById('service').addEventListener('change', updateServiceDetails);
+    document.getElementById('discount').addEventListener('input', calculateTotalAmount);
+    document.getElementById('discountpercentage').addEventListener('input', calculateTotalAmount);
+    document.getElementById('conveniance_fees').addEventListener('input', calculateTotalAmount);
+    document.getElementById('discount_type_money').addEventListener('change', toggleDiscountField);
+    document.getElementById('discount_type_percentage').addEventListener('change', toggleDiscountField);
+
+    // Ensure the details update on page load if a plan is already selected
+    document.addEventListener("DOMContentLoaded", function () {
+        updatePlanDetails();
+        updateServiceDetails();
+    });
+
+
 
                                 
                

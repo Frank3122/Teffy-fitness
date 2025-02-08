@@ -21,9 +21,9 @@
                         <th style="width: 10%;">Name</th>
                         <th style="width: 10%;">Gender</th>
                         <th style="width: 7%;">Mobile Number</th>
-                        <!-- <th>Email</th> -->
                         <th style="width: 12%;">Status</th>
                         <th style="width: 13%;">Services</th>
+                        <th style="width: 13%;">Plan</th>
                         <th style = "width: 12%;">Assigned Date</th>
                         <th style="width: 10%;">Actions</th>
                     </tr>
@@ -63,7 +63,26 @@
                                 </a>
                             </form>
                         </td>
-                        <td style="width: 12%;">{{ data.assigned_date }}</td>
+
+                        <td style="width: 13%;">
+                            <form method="POST" action="{% url 'assign_plan' id=data.id %}" id="assign-form-{{ data.id }}" class="plan-form">
+                                {% csrf_token %}
+                                <select name="plan" class="form-select form-select-sm mt-1">
+                                    <option value="" disabled {% if not data.plan_leads %} selected {% endif %}>Select a Plan</option>
+                                    {% for plan in plans %}
+                                        <option value="{{ plan.id }}" {% if data.plan_leads and plan.id == data.plan_leads.id %} selected {% endif %}>
+                                            {{ plan.plan_name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-success mt-1">
+                                    <i class="fas fa-tasks"></i>
+                                </button>
+                            </form>
+                        </td>
+
+
+                        <td style="">{{ data.assigned_date }}</td>
                         <td style="width: 10%;">
                             <a href="{% url 'getone_lead' id=data.id %}" class="btn btn-sm btn-primary">
                                 <i class="fas fa-eye"></i>

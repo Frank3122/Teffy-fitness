@@ -13,8 +13,12 @@ from django.db.models import Sum
 from django.utils.timezone import now  
 from django.utils.timezone import localtime
 from datetime import datetime , timedelta
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from decimal import Decimal
+import calendar
+from openpyxl import Workbook
+from openpyxl.styles import Alignment
+
 
 # Create your views here.
 
@@ -210,6 +214,14 @@ def main(request):
         assigned_date__day=today.day
     ).count()
 
+    today_add_members_count = AddMember.objects.filter(
+        enrollment_date__year = today.year,
+        enrollment_date__month = today.month,
+        enrollment_date__day = today.day,
+    ).count()
+
+    daily_enrollments = today_enrollments + today_add_members_count
+
     # Count of all converted leads
     member_count = PersonalInformation.objects.filter(status='converted').count()
 
@@ -252,11 +264,21 @@ def main(request):
                                                           assigned_date__day = today.day ).count()
 
     # Count of enrollments for the current month
-    enrollments = PersonalInformation.objects.filter(
+    converted_count = PersonalInformation.objects.filter(
         status='converted',
         assigned_date__year=today.year,
         assigned_date__month=today.month
     ).count()
+
+    enrolled_count = AddMember.objects.filter(
+        # status='converted',
+        enrollment_date__year=today.year,
+        enrollment_date__month=today.month
+    ).count()
+
+    total_enrollments = converted_count + enrolled_count
+
+
 
     # Count of today's renewals (filter by exact date)
     today_renewals = Renew.objects.filter(
@@ -292,9 +314,9 @@ def main(request):
         'purchase': purchase,
         'follow_up': follow_up,
         'all_member_count': all_member_count,
-        'enrollments': enrollments,
+        'total_enrollments':total_enrollments,
         'renewals': renewals,
-        'today_enrollments': today_enrollments,
+        'daily_enrollments':daily_enrollments,
         'today_renewals': today_renewals,  # Add the today_renewals in the context
         'today_sales' : today_sales,
         'today_purchase':today_purchase,
@@ -316,10 +338,10 @@ def plan(request):
         plan_name = request.POST.get('plan_name')
         price = request.POST.get('price')
         duration = request.POST.get('duration')
-        batch = request.POST.get('batch')
+        # batch = request.POST.get('batch')
 
-        if plan_name and price and duration and batch:
-            Plan.objects.create(plan_name=plan_name, price=price, duration=duration, batch=batch)
+        if plan_name and price and duration:
+            Plan.objects.create(plan_name=plan_name, price=price, duration=duration,)
             return redirect('plan')  
         
     all_plans = Plan.objects.all()
@@ -348,6 +370,25 @@ def edit_plan(request, plan_id):
 
     data = obj.plan()
     return render(request, "edit-plan.html", data)
+
+def assign_plan(request, id):
+    if request.method == "POST":
+        plan_id = request.POST.get("plan")  # Ensure correct field name
+        print(f"Received Plan ID: {plan_id}")  # Debugging
+        
+        plan = Plan.objects.filter(id=plan_id).first()
+        lead = PersonalInformation.objects.filter(id=id).first()
+        print(f"Lead: {lead}, Plan: {plan}")  # Debugging
+
+        if plan and lead:
+            print(f"Assigning Plan {plan.plan_name} to Lead {lead.id}")  # Debugging
+            lead.plan_leads = plan
+            lead.save()
+            messages.success(request, "Plan successfully assigned!")
+        else:
+            messages.error(request, "Invalid Plan or Lead.")
+
+        return redirect('converted_leads')  # Ensure the page refreshes
 
 
 # def price(request):
@@ -470,8 +511,7 @@ def update_status(request, id):
 
     return redirect('new_leads')
 
-# def add_leads(request):
-#     return render(request,"add-leads.html")
+
 
 def new_leads(request):
     all_data = PersonalInformation.objects.filter(status='new') 
@@ -481,22 +521,30 @@ def new_leads(request):
 def converted_leads(request):
     if request.method == "POST":
         lead_id = request.POST.get('lead_id')
-        service_id = request.POST.get('services')  
+        service_id = request.POST.get('services')
+        plan_id = request.POST.get('plan_leads')
 
         lead = PersonalInformation.objects.get(id=lead_id)
-        selected_service = Service.objects.get(id=service_id)  
-        lead.services = selected_service  
-        lead.save()
+        selected_service = Service.objects.get(id=service_id)
+        selected_plan = Plan.objects.get(id=plan_id)
+
+        # Assigning service and plan to the client
+        lead.services = selected_service
+        lead.plan_leads = selected_plan
+
+        lead.save()  # This will automatically call save and calculate the expiry_date
 
         return redirect('converted_leads')
 
     all_data = PersonalInformation.objects.filter(status='converted')
     available_services = Service.objects.all()
+    plans = Plan.objects.all()
 
     return render(request, 'converted_leads.html', {
         'all_data': all_data,
         'status_title': 'Converted',
         'available_services': available_services,
+        'plans':plans,
     })
 
 
@@ -673,20 +721,31 @@ def overall_services(request):
 
 
 def payment(request, client_id):
-    client = PersonalInformation.objects.get(id=client_id)
-    if client.services:
-        service_price = client.services.prices 
-    else:
-        service_price = 0  
+    client = get_object_or_404(PersonalInformation, id=client_id)
+    
+    # Get the service price if it exists
+    service_price = client.services.prices if client.services else 0  
+
+    # Get the membership price if a membership plan exists
+    membership_price = client.plan_leads.price if client.plan_leads else 0  
+
+    # Calculate the total price (service price + membership price)
+    total_price = service_price + membership_price
+
+    # Get the total amount already paid by the client
     total_amount_paid = Payments.objects.filter(payments=client).aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
-    pending_amount = service_price - total_amount_paid
+
+    # Calculate pending amount
+    pending_amount = total_price - total_amount_paid
 
     if request.method == 'POST':
         amount_paid = float(request.POST.get('amount_paid', 0))
         payment_mode = request.POST.get('payment_mode')
 
         if amount_paid > 0 and payment_mode:
-            new_pending_amount = pending_amount - amount_paid 
+            new_pending_amount = pending_amount - amount_paid  
+
+            # Save payment details
             Payments.objects.create(
                 payments=client,
                 name=client,
@@ -698,17 +757,18 @@ def payment(request, client_id):
             messages.success(request, "Payment submitted successfully!")
             return redirect('payment_page', client_id=client_id)
         
+    # Get payment history
     payment_history = Payments.objects.filter(payments=client)
-    return render(request,'payment.html',
-        {
-            'client': client,
-            'service_price': service_price,
-            'total_amount_paid': total_amount_paid,
-            'pending_amount': pending_amount,
-            'payment_history': payment_history,
-        }
-    )
 
+    return render(request, 'payment.html', {
+        'client': client,
+        'service_price': service_price,
+        'membership_price': membership_price,  # Pass membership price to template
+        'total_price': total_price,  # Total price (Service + Membership)
+        'total_amount_paid': total_amount_paid,
+        'pending_amount': pending_amount,
+        'payment_history': payment_history,
+    })
 
 def expenses(request):
     current_year = datetime.now().year
@@ -781,8 +841,7 @@ def view_expense(request,expense_id):
     return render(request, "view-expense.html",data) 
         
 
-# def datatable(request):
-#     return render(request,"datatable.html")
+
 def purchase(request):
     if request.method == "POST":
         # Get data from form
@@ -952,85 +1011,110 @@ def new_reports(request):
 
     return render(request, "new-reports.html", {"leads": leads})
     
-
 def renew_member_list(request):
-    all_data = PersonalInformation.objects.filter(status='converted')  
-    print(all_data)
+    all_data = PersonalInformation.objects.filter(status='converted')
+
+    # Optionally calculate any other values you want to display
+    for client in all_data:
+        client.expiry_date_display = client.expiry_date  # Get expiry date dynamically
+
+        # If renewal date exists, you can pass it to the template
+        client.renewal_date_display = client.renewal_date if client.renewal_date else 'Not Renewed Yet'
+
     return render(request, "renew_member_list.html", {"all_data": all_data})
 
 
 
-import calendar
-from datetime import date
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
-from .models import PersonalInformation, Renew
+# def renew_member_page(request, member_id):
+#     # Fetch the member's details using their ID
+#     member = get_object_or_404(PersonalInformation, id=member_id)
+
+#     # Check if the member has a service assigned
+#     if not member.services:
+#         messages.error(request, "This member does not have a service assigned.")
+#         return redirect("renew_member_list")
+
+#     service = member.services
+
+#     # Extract the duration of the service in months (e.g., "5 months")
+#     try:
+#         duration_months = int(service.duration.split()[0])
+#     except ValueError:
+#         messages.error(request, "Invalid service duration format.")
+#         return redirect("renew_member_list")
+
+#     # Get the renewal date (either from the last renewal or assigned date)
+#     renew_date = member.renew_set.last().renew_date if member.renew_set.exists() else member.assigned_date
+
+#     # Calculate the new expiry date
+#     new_month = renew_date.month + duration_months
+#     new_year = renew_date.year + (new_month - 1) // 12  # Adjust year if month exceeds 12
+#     new_month = (new_month - 1) % 12 + 1  # Keep month between 1-12
+
+#     # Get the last valid day of the new month
+#     last_day_of_month = calendar.monthrange(new_year, new_month)[1]
+#     new_day = min(renew_date.day, last_day_of_month)  # Adjust if the day is out of range
+
+#     # Create the new expiry date
+#     expiry_date = date(new_year, new_month, new_day)
+
+#     # If the form is submitted, save the renewal details
+#     if request.method == "POST":
+#         payment_method = request.POST.get("payment_method")
+        
+#         # Save the renewal record
+#         Renew.objects.create(
+#             name=member,
+#             service=service,
+#             renew_date=renew_date,
+#             expiry_date=expiry_date,
+#             payment_method=payment_method,
+#         )
+
+#         # Show a success message and redirect
+#         messages.success(request, "Membership renewed successfully!")
+#         return redirect("renew_member_list")
+
+#     # If not a POST request, show the renewal page
+#     return render(request, "renew_member_page.html", {"member": member, "renew_date": renew_date})
 
 def renew_member_page(request, member_id):
     # Fetch the member's details using their ID
     member = get_object_or_404(PersonalInformation, id=member_id)
 
-    # Check if the member has a service assigned
-    if not member.services:
-        messages.error(request, "This member does not have a service assigned.")
-        return redirect("renew_member_list")
-
-    service = member.services
-
-    # Extract the duration of the service in months (e.g., "5 months")
-    try:
-        duration_months = int(service.duration.split()[0])
-    except ValueError:
-        messages.error(request, "Invalid service duration format.")
-        return redirect("renew_member_list")
-
-    # Get the renewal date (either from the last renewal or assigned date)
-    renew_date = member.renew_set.last().renew_date if member.renew_set.exists() else member.assigned_date
-
-    # Calculate the new expiry date
-    new_month = renew_date.month + duration_months
-    new_year = renew_date.year + (new_month - 1) // 12  # Adjust year if month exceeds 12
-    new_month = (new_month - 1) % 12 + 1  # Keep month between 1-12
-
-    # Get the last valid day of the new month
-    last_day_of_month = calendar.monthrange(new_year, new_month)[1]
-    new_day = min(renew_date.day, last_day_of_month)  # Adjust if the day is out of range
-
-    # Create the new expiry date
-    expiry_date = date(new_year, new_month, new_day)
-
-    # If the form is submitted, save the renewal details
     if request.method == "POST":
-        payment_method = request.POST.get("payment_method")
+        # Get the renewal date from the form input
+        renewal_date = request.POST.get("renewal_date")
         
-        # Save the renewal record
-        Renew.objects.create(
-            name=member,
-            service=service,
-            renew_date=renew_date,
-            expiry_date=expiry_date,
-            payment_method=payment_method,
-        )
+        # Update the renewal date for the member
+        member.renewal_date = renewal_date
+        member.save()
 
-        # Show a success message and redirect
+        # Show success message and redirect
         messages.success(request, "Membership renewed successfully!")
         return redirect("renew_member_list")
 
-    # If not a POST request, show the renewal page
-    return render(request, "renew_member_page.html", {"member": member, "renew_date": renew_date})
+    return render(request, "renew_member_page.html", {"member": member})
 
 
 
 def save_renewal_date(request, client_id):
     client = get_object_or_404(PersonalInformation, id=client_id)
+    
     if request.method == 'POST':
-        renewal_date = request.POST.get('renewal_date')
+        renewal_date_str = request.POST.get('renewal_date')
+        
+        # Convert the string to a date object
+        renewal_date = datetime.strptime(renewal_date_str, '%Y-%m-%d').date()
+        
+        # Save the renewal date to the model
         client.renewal_date = renewal_date
         client.save()
-        return redirect('some_success_page')  
+
+        messages.success(request, "Renewal date updated successfully!")
+        return redirect('renew_member_list')
 
     return render(request, 'renew_member_page.html', {'client': client})
-
 
 # def add_members(request):
 #     available_services = Service.objects.all()
@@ -1039,6 +1123,14 @@ def save_renewal_date(request, client_id):
 # from django.shortcuts import render, redirect
 # from django.contrib import messages
 # from .models import Service, AddMember
+
+
+def parse_date(date_str):
+    try:
+        return datetime.strptime(date_str, "%Y-%m-%d").date() if date_str else None
+    except ValueError:
+        return None  # Handle invalid date formats
+
 def add_member(request):
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -1047,43 +1139,48 @@ def add_member(request):
         aadhar_number = request.POST.get('aadhar_number')
         uploaded_file = request.FILES.get('filename')
         email = request.POST.get('email')
-        date_of_birth = request.POST.get('date_of_birth')
+        date_of_birth = parse_date(request.POST.get('date_of_birth', ''))
         location = request.POST.get('location')
         source = request.POST.get('source')
         occupation = request.POST.get('occupation')
         emergency_number = request.POST.get('emergency_number')
         registration_amount = request.POST.get('reg_amount')
+        conveniance_fees = float(request.POST.get('conveniance_fees', 0))
+
+        # Ensure total_amount is a valid number (Default to 0 if empty)
+        total_amount = request.POST.get('total_amount', '0')
+        total_amount = float(total_amount) if total_amount.replace('.', '', 1).isdigit() else 0.0
+
+        # Convert dates safely
+        enrollment_date = parse_date(request.POST.get('enrollment_date', ''))
+        activation_date = parse_date(request.POST.get('activation_date', ''))
+        expiry_date = parse_date(request.POST.get('expiry_date', ''))
+        payment_date = parse_date(request.POST.get('payment_date', ''))
+
+        current_installment_amount = request.POST.get('current_installment_amount')
+        payment_mode = request.POST.get('payment_mode')
+        sold_by_id = request.POST.get('sold_by')
+        select_membership_plan_id = request.POST.get("select_membership_plan")
+
+        # Handle discount field: If empty, set to 0
+        discount = request.POST.get('discount', '0')
+        discount = float(discount) if discount.replace('.', '', 1).isdigit() else 0.0
+        discount_type = request.POST.get('discount_type')
+
+        # Convert IDs safely
         service_id = request.POST.get('service')
         batch_id = request.POST.get('group')
         cost_of_plan_id = request.POST.get('cost_of_plan')
         total_session_id = request.POST.get('total_session')
-        conveniance_fees = float(request.POST.get('conveniance_fees', 0))
-        total_amount = request.POST.get('total_amount')
-        enrollment_date = request.POST.get('enrollment_date')
-        activation_date = request.POST.get('activation_date')
-        expiry_date = request.POST.get('expiry_date')
-        current_installment_amount = request.POST.get('current_installment_amount')
-        payment_mode = request.POST.get('payment_mode')
-        payment_date = request.POST.get('payment_date')
-        sold_by_id = request.POST.get('sold_by')  # Get the ID of the UserProfile
-        
-        # Handle discount field: If it's empty, set it to 0
-        discount = request.POST.get('discount')
-        if discount == '':
-            discount = 0.0
-        else:
-            discount = float(discount)  # Ensure it's a float
 
-        discount_type = request.POST.get('discount_type')
+        service = Service.objects.filter(id=int(service_id)).first() if service_id and service_id.isdigit() else None
+        batch = Service.objects.filter(id=int(batch_id)).first() if batch_id and batch_id.isdigit() else None
+        cost_of_plan = Service.objects.filter(id=int(cost_of_plan_id)).first() if cost_of_plan_id and cost_of_plan_id.isdigit() else None
+        total_session = Service.objects.filter(id=int(total_session_id)).first() if total_session_id and total_session_id.isdigit() else None
+        select_membership_plan = Plan.objects.filter(id=int(select_membership_plan_id)).first() if select_membership_plan_id and select_membership_plan_id.isdigit() else None
 
-        # Convert IDs to objects
-        service = Service.objects.filter(id=int(service_id)).first() if service_id else None
-        batch = Service.objects.filter(id=int(batch_id)).first() if batch_id else None
-        cost_of_plan = Service.objects.filter(id=int(cost_of_plan_id)).first() if cost_of_plan_id else None
-        total_session = Service.objects.filter(id=int(total_session_id)).first() if total_session_id else None
-        
         # Get the UserProfile object for sold_by
-        sold_by = UserProfile.objects.filter(id=int(sold_by_id)).first() if sold_by_id else None
+        sold_by = UserProfile.objects.filter(id=int(sold_by_id)).first() if sold_by_id and sold_by_id.isdigit() else None
 
         # Validate required fields
         if not name or not gender or not mobile_number or not aadhar_number or not email:
@@ -1123,6 +1220,7 @@ def add_member(request):
             sold_by=sold_by,
             discount=discount,
             discount_type=discount_type,
+            select_membership_plan=select_membership_plan,
         )
 
         member.save()
@@ -1131,14 +1229,16 @@ def add_member(request):
 
     available_services = Service.objects.all()
     group = Service.objects.all()
-    sale_by = UserProfile.objects.all()  # Query for the list of salespeople
-    print(UserProfile.objects.all()) 
+    sale_by = UserProfile.objects.all()
+    membership_plan = Plan.objects.all()
 
     return render(request, 'add-members.html', {
         'available_services': available_services,
         'group': group,
-        'sale_by': sale_by
+        'sale_by': sale_by,
+        'membership_plan': membership_plan,
     })
+
 
 
 
@@ -1183,6 +1283,7 @@ def view_add_members(request, id):
         obj.sold_by = request.POST.get('sold_by', obj.sold_by)
         obj.discount = request.POST.get('discount', obj.discount)
         obj.discount_type = request.POST.get('discount_type', obj.discount_type)
+        obj.select_membership_plan = request.POST.get('select_membership_plan', obj.select_membership_plan)
 
         # File Upload
         uploaded_file = request.FILES.get('filename')
@@ -1213,12 +1314,6 @@ def view_all_clients(request):
     return render(request, "all-clients.html", {'leads': leads, 'add_members': add_members})
 
 
-
-from django.http import HttpResponse
-from openpyxl import Workbook
-from openpyxl.styles import Alignment
-from .models import PersonalInformation, Payments, Sales  # Import models
-from datetime import datetime
 
 def download_report(request):
     # Parse date range from the request if provided

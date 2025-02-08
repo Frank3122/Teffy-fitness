@@ -17,6 +17,8 @@
                 <div class="col-md-6">
                   <p><strong>Client Name:</strong> {{ client.name }}</p>
                   <p><strong>Service:</strong> {{ client.services.name }}</p>
+                  <p><strong>Membership Name:</strong> {{client.plan_leads }}</p>
+                  <p><strong>Membership Price:</strong> ₹{{ membership_price }}</p>
                   <p><strong>Service Price:</strong> ₹{{ service_price }}</p>
                   <p><strong>Total Paid:</strong> ₹{{ total_amount_paid }}</p>
                   <p><strong>Pending Amount:</strong> ₹{{ pending_amount }}</p>
@@ -55,7 +57,7 @@
     </div>
 
     <!-- Payment History Table -->
-    <div class="col-md-6">
+    <div class="col-md-10">
       <div class="card mb-4">
         <div class="card-body">
           <h3>Payment History for {{ client.name }}</h3> <!-- Display Client Name in <h3> Tag -->

@@ -22,23 +22,23 @@
                     <table id="primaryLeadsTable" class="styled-table">
                         <thead>
                             <tr>
-                                <th>Name</th>
-                                <th>Gender</th>
-                                <th>Mobile Number</th>
-                                <th>Email</th>
-                                <th>Status</th>
-                                <th>Services</th>
+                                <th style="text-align: center;">Name</th>
+                                <th style="text-align: center;">Gender</th>
+                                <th style="text-align: center;">Mobile Number</th>
+                                <th style="text-align: center;">Email</th>
+                                <th style="text-align: center;">Status</th>
+                                <th style="text-align: center;">Services</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for data in leads %}
                             <tr>
-                                <td>{{ data.name }}</td>
-                                <td>{{ data.gender }}</td>
-                                <td>{{ data.mobile_number }}</td>
-                                <td>{{ data.email }}</td>
-                                <td>{{ data.status }}</td>
-                                <td>{{ data.services }}</td>
+                                <td style="text-align: center;">{{ data.name }}</td>
+                                <td style="text-align: center;">{{ data.gender }}</td>
+                                <td style="text-align: center;">{{ data.mobile_number }}</td>
+                                <td style="text-align: center;">{{ data.email }}</td>
+                                <td style="text-align: center;">{{ data.status }}</td>
+                                <td style="text-align: center;">{{ data.services }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -53,21 +53,21 @@
                     <table id="membersTable" class="styled-table">
                         <thead>
                             <tr>
-                                <th>Name</th>
-                                <th>Gender</th>
-                                <th>Mobile Number</th>
-                                <th>Email</th>
-                                <th>Service Assigned</th>
+                                <th style="text-align: center;">Name</th>
+                                <th style="text-align: center;">Gender</th>
+                                <th style="text-align: center;">Mobile Number</th>
+                                <th style="text-align: center;">Email</th>
+                                <th style="text-align: center;">Service Assigned</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for data in add_members %}
                             <tr>
-                                <td>{{ data.name }}</td>
-                                <td>{{ data.gender }}</td>
-                                <td>{{ data.mobile_number }}</td>
-                                <td>{{ data.email }}</td>
-                                <td>{{ data.service }}</td>
+                                <td style="text-align: center;">{{ data.name }}</td>
+                                <td style="text-align: center;">{{ data.gender }}</td>
+                                <td style="text-align: center;">{{ data.mobile_number }}</td>
+                                <td style="text-align: center;">{{ data.email }}</td>
+                                <td style="text-align: center;">{{ data.service }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>

@@ -41,7 +41,7 @@
                                 <input type="text" id="price" class="form-control" name="price" placeholder="Enter plan price" reqired>
                             </div>
 
-                            <div class="mb-3">
+                            <!-- <div class="mb-3">
                                 <label for="batch" class="form-label">Batch</label>
                                 <select id="batch" class="form-control" name="batch" required>
                                     <option value="" disabled selected>Select Batch</option>
@@ -49,7 +49,7 @@
                                     <option value="afternoon">Afternoon Batch</option>
                                     <option value="evening">Evening Batch</option>
                                 </select>
-                            </div>
+                            </div> -->
 
                             <div class="mb-3">
                                 <label for="duration" class="form-label">Duration</label>
@@ -79,7 +79,7 @@
                                     <th style="width:5px">S.No</th>
                                     <th>PLAN NAME</th>
                                     <th>PRICE</th>
-                                    <th>BATCH</th>
+                                    <!-- <th>BATCH</th> -->
                                     <th>DURATION</th>
                                     <th>ACTION</th>
                                 </tr>
@@ -90,7 +90,7 @@
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{ plans.plan_name }}</td>
                                     <td>{{ plans.price }}</td>
-                                    <td>{{ plans.batch }}</td>
+                                    <!-- <td>{{ plans.batch }}</td> -->
                                     <td>{{ plans.duration }}</td>
                                     <td>
                                         <!-- Edit Icon Button -->

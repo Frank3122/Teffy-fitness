@@ -3,8 +3,13 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.utils.timezone import now
 from datetime import datetime
-
+from dateutil.relativedelta import relativedelta
+from django.utils import timezone
+import calendar
+from datetime import timedelta
 # Create your models here.
+
+
 class Service(models.Model):
     name = models.CharField(max_length=100)
     duration = models.CharField(max_length=50, null=True, blank=True)  
@@ -12,12 +17,26 @@ class Service(models.Model):
     group = models.CharField(max_length=100, null=True, blank=True)
     sessions = models.CharField(max_length=100,null=True, blank=True)
 
-    
-
     def __str__(self):
         return self.name
     
+class Plan(models.Model):
+    plan_name = models.CharField(max_length=100,null=True, blank=True)
+    price = models.PositiveIntegerField(null=True, blank=True)
+    batch = models.CharField(max_length=50,null=True, blank=True )
+    duration = models.CharField(max_length=50, null=True, blank=True) 
 
+    def __str__(self):
+        return self.plan_name
+    
+    def plan(self):
+        return {"plan_name":self.plan_name,
+                "price" : self.price,
+                "batch" : self.batch,
+                "duration":self.duration,
+                "id": self.id,  # Include the id
+        }
+    
     #1st page
 class PersonalInformation(models.Model):
     name = models.CharField(max_length=50)
@@ -53,16 +72,22 @@ class PersonalInformation(models.Model):
     #status
     status = models.CharField(max_length=20, default='new')  # Track the status of the lead
     follow_up_date = models.DateTimeField(default=timezone.now)
-
     created_date = models.DateTimeField(default=timezone.now)
 
     #services
+    # services = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, related_name="users")
+    # assigned_date = models.DateField(default=timezone.now)
+    # renewal_date = models.DateField(null=True, blank=True)
 
-    services = models.ForeignKey(Service,on_delete=models.SET_NULL, null=True, related_name="users")   # for services
+    services = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, related_name="users")
     assigned_date = models.DateField(default=timezone.now)
     renewal_date = models.DateField(null=True, blank=True)
+    # expiry_date = models.ForeignKey()
 
+    # plans assigned
+    plan_leads = models.ForeignKey(to=Plan, on_delete=models.SET_NULL, null=True, related_name="plan_leads")
 
+    
     # reports
 
     # report = models.ForeignKey(Report, on_delete=models.SET_NULL, null=True, blank=True, related_name='leads')
@@ -122,24 +147,6 @@ class UserProfile(models.Model):
         return str(self.id)
 
 
-
-
-class Plan(models.Model):
-    plan_name = models.CharField(max_length=100,null=True, blank=True)
-    price = models.PositiveIntegerField(null=True, blank=True)
-    batch = models.CharField(max_length=50,null=True, blank=True )
-    duration = models.CharField(max_length=50, null=True, blank=True) 
-
-    def __str__(self):
-        return self.plan_name
-    
-    def plan(self):
-        return {"plan_name":self.plan_name,
-                "price" : self.price,
-                "batch" : self.batch,
-                "duration":self.duration,
-                "id": self.id,  # Include the id
-        }
     
 class Expense(models.Model):
     expense_name = models.CharField(max_length=100)
@@ -265,6 +272,7 @@ class AddMember(models.Model):
     sold_by = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, blank=True)
     discount = models.FloatField(null=True, blank=True)  
     discount_type = models.CharField(max_length=50, null=True, blank=True)  
+    select_membership_plan = models.ForeignKey(to=Plan, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -297,6 +305,8 @@ class AddMember(models.Model):
                 "gender":self.gender,
                 "name":self.name,
                 "cost_of_plan":self.cost_of_plan,
+                "select_membership_plan":self.select_membership_plan,
+
  
 
         }

@@ -8,6 +8,7 @@ urlpatterns = [
     path("follow-up/", follow_up, name="follow_up"),
     path("plan/", plan, name="plan"),
     path('edit_plan/<int:plan_id>/', edit_plan, name='edit_plan'),
+    path('assign_plan<int:id>/', assign_plan, name='assign_plan'),
     # path("price/", price, name="price"),
     path("work/", workplan, name="workplan"),
     path("personal/", personal_info_list, name="personal_information"),
