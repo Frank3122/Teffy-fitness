@@ -70,7 +70,9 @@ urlpatterns = [
 
     path('view-all-clients/', view_all_clients, name="view_all_clients"),
 
-     path('download_report/', download_report, name='download_report'),
+    #  path('download_report/', download_report, name='download_report'),
+
+    path('download-report/', download_report, name='download_report'),
 
 
 

@@ -1315,82 +1315,271 @@ def view_all_clients(request):
 
 
 
+# from django.http import HttpResponse
+# from openpyxl import Workbook
+# from datetime import datetime
+
+
+# # from django.http import HttpResponse
+# # from openpyxl import Workbook
+# # from datetime import datetime
+# # from your_app.models import Payments, PersonalInformation  # Replace 'your_app' with your actual app name
+
+# def download_report(request):
+#     # Get query parameters
+#     from_date = request.GET.get('from_date', None)
+#     to_date = request.GET.get('to_date', None)
+#     status = request.GET.get('status', None)
+
+#     # Convert date strings to datetime objects
+#     if from_date and to_date:
+#         from_date = datetime.strptime(from_date, "%Y-%m-%d")
+#         to_date = datetime.strptime(to_date, "%Y-%m-%d")
+
+#     # Filter Payments data based on the date range
+#     payment_data = Payments.objects.filter(date_paid__range=[from_date, to_date]) if from_date and to_date else Payments.objects.all()
+
+#     # Filter Leads data based on the date range and status
+#     leads_data = PersonalInformation.objects.filter(created_date__range=[from_date, to_date]) if from_date and to_date else PersonalInformation.objects.all()
+    
+#     if status:  # Apply status filter if provided
+#         leads_data = leads_data.filter(status=status)
+
+#     # Create a workbook and worksheet
+#     wb = Workbook()
+#     ws = wb.active
+#     ws.title = "Payments & Leads Report"
+
+#     # Define column headers
+#     columns = [
+#         "Name", "Amount Paid", "Pending Amount", "Payment Mode", "Payment Date",  # Payments
+#         "Lead Name", "Phone Number", "Email", "Created Date", "Status"  # Leads
+#     ]
+#     ws.append(columns)
+
+#     # Append Payments data to the worksheet
+#     for payment in payment_data:
+#         date_paid = payment.date_paid.replace(tzinfo=None) if payment.date_paid and payment.date_paid.tzinfo else payment.date_paid
+#         row = [
+#             payment.name,  
+#             payment.amount_paid,
+#             payment.pending_amount,
+#             payment.payment_mode,
+#             date_paid,
+#             "", "", "", "", ""  # Empty placeholders for Leads
+#         ]
+#         ws.append(row)
+
+#     # Append Leads data to the worksheet
+#     for lead in leads_data:
+#         created_date = lead.created_date.replace(tzinfo=None) if lead.created_date and lead.created_date.tzinfo else lead.created_date
+#         row = [
+#             "", "", "", "", "",  # Empty placeholders for Payments
+#             str(lead.name),  
+#             str(lead.phone_number),
+#             str(lead.email),
+#             created_date,
+#             str(lead.status)  # Ensure status is a string
+#         ]
+#         ws.append(row)
+
+#     # Adjust column widths for better readability
+#     for col in ws.columns:
+#         max_length = 0
+#         column = col[0].column_letter
+#         for cell in col:
+#             try:
+#                 if cell.value:
+#                     max_length = max(max_length, len(str(cell.value)))
+#             except:
+#                 pass
+#         ws.column_dimensions[column].width = max_length + 2
+
+#     # Return the Excel file as a response
+#     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+#     response['Content-Disposition'] = 'attachment; filename="gym_report.xlsx"'
+#     wb.save(response)
+#     return response
+
+from django.http import HttpResponse
+from openpyxl import Workbook
+from openpyxl.styles import Font, Alignment, PatternFill
+from datetime import datetime
+from django.shortcuts import render
+from django.core.exceptions import BadRequest
+from django.db.models import Q
+
 def download_report(request):
-    # Parse date range from the request if provided
-    from_date = request.GET.get('from_date', None)
-    to_date = request.GET.get('to_date', None)
+    # Get filter parameters
+    from_date = request.GET.get('from_date')
+    to_date = request.GET.get('to_date')
+    status = request.GET.get('status')
 
-    # Filter data based on the date range
-    payment_data = Payments.objects.filter(date_paid__range=[from_date, to_date])
-    sales_data = Sales.objects.filter(sale_date__range=[from_date, to_date])  # Assuming 'date' is the field in Sales model
+    if not all([from_date, to_date, status]):
+        raise BadRequest("Please provide all required parameters")
 
-    # Create a workbook and active worksheet
+    # Create workbook
     wb = Workbook()
     ws = wb.active
-    ws.title = "Payments & Sales Report"
 
-    # Define the column headers (adding Sales columns)
-    columns = [
-        "Name", "Amount Paid", "Pending Amount", "Payment Mode", "Payment Date",  # Payments
-        "Item Name", "Quantity Sold", "Sale Amount", "Sale Date"  # Sales
-    ]
+    # Define styles
+    header_font = Font(bold=True, color="FFFFFF")
+    header_fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
 
-    # Append the column headers to the worksheet
-    ws.append(columns)
-
-    # Loop through the Payments data and append rows to the worksheet
-    for payment in payment_data:
-        # Remove timezone info from date_paid if it exists
-        if payment.date_paid and payment.date_paid.tzinfo:
-            date_paid = payment.date_paid.replace(tzinfo=None)
-        else:
-            date_paid = payment.date_paid
-        
-        row = [
-            payment.name.name,  # Assuming payment has a related name object
-            payment.amount_paid,
-            payment.pending_amount,
-            payment.payment_mode,
-            date_paid
+    # Configure report based on category
+    if status == 'PersonalInformation':
+        ws.title = "Personal Information Report"
+        headers = [
+            "Name", "Address", "Occupation", "Gender", "Mobile", "Email",
+            "Perfect Body", "Body Type", "Goal", "Body You Want",
+            "Level of Body Fat", "Problem Areas", "Diets",
+            "Water Intake", "Food Division", "Event Coming Up",
+            "Height", "Current Weight", "Target Weight", "Level of Fitness"
         ]
-        ws.append(row)
-
-    # Loop through the Sales data and append rows to the worksheet
-    for sale in sales_data:
-        # Remove timezone info from sale date if it exists
-        if sale.sale_date and sale.sale_date.tzinfo:
-            sale_date = sale.sale_date.replace(tzinfo=None)
-        else:
-            sale_date = sale.sale_date
+        queryset = PersonalInformation.objects.filter(
+            created_date__range=[from_date, to_date]
+        )
         
-        row = [
-            "",  # Empty placeholder for Payment columns
-            "",  # Empty placeholder for Payment columns
-            "",  # Empty placeholder for Payment columns
-            "",  # Empty placeholder for Payment columns
-            "",  # Empty placeholder for Payment columns
-            sale.product_name,  # Assuming sale has 'item_name', change if needed
-            sale.quantity,
-            sale.sale_price,
-            sale_date
+    elif status in ['new', 'converted', 'not-converted', 'follow-up', 'pending']:
+        ws.title = f"{status.title()} Leads Report"
+        headers = [
+            "Name", "Mobile", "Email", "Status", "Follow Up Date",
+            "Created Date", "Service", "Plan", "Height", "Current Weight",
+            "Target Weight", "Goal"
         ]
-        ws.append(row)
+        queryset = PersonalInformation.objects.filter(
+            Q(created_date__range=[from_date, to_date]) &
+            Q(status=status)
+        )
 
-    # Adjust column widths for better readability
-    for col in ws.columns:
-        max_length = 0
-        column = col[0].column_letter
-        for cell in col:
-            try:
-                if len(str(cell.value)) > max_length:
-                    max_length = len(cell.value)
-            except:
-                pass
-        adjusted_width = (max_length + 2)
-        ws.column_dimensions[column].width = adjusted_width
+    elif status == 'sales':
+        ws.title = "Sales Report"
+        headers = [
+            "Product Name", "Customer", "Quantity", "Sale Price",
+            "Discount", "Sale Date", "Total Amount"
+        ]
+        queryset = Sales.objects.filter(sale_date__range=[from_date, to_date])
 
-    # Return the response as an Excel file
-    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = 'attachment; filename="gym_report.xlsx"'
+    elif status == 'purchase':
+        ws.title = "Purchase Report"
+        headers = [
+            "Product Name", "Brand", "Quantity", "Amount",
+            "Purchase Date"
+        ]
+        queryset = Purchase.objects.filter(purchase_date__range=[from_date, to_date])
+
+    elif status == 'returns':
+        ws.title = "Returns Report"
+        headers = [
+            "Product Name", "Customer", "Quantity", "Reason",
+            "Return Date"
+        ]
+        queryset = Returns.objects.filter(return_date__range=[from_date, to_date])
+
+    elif status == 'stocks':
+        ws.title = "Stock Report"
+        headers = [
+            "Product Name", "Quantity", "Purchase Details"
+        ]
+        queryset = Stock.objects.all()  # Usually stocks don't need date filtering
+
+    elif status == 'payments':
+        ws.title = "Payments Report"
+        headers = [
+            "Member Name", "Amount Paid", "Pending Amount",
+            "Payment Mode", "Date Paid", "Created Date"
+        ]
+        queryset = Payments.objects.filter(date_paid__range=[from_date, to_date])
+
+    else:
+        raise BadRequest("Invalid report type")
+
+    # Apply headers
+    for col, header in enumerate(headers, 1):
+        cell = ws.cell(row=1, column=col, value=header)
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = Alignment(horizontal="center")
+        ws.column_dimensions[chr(64 + col)].width = 15
+
+    # Add data based on report type
+    for row, item in enumerate(queryset, 2):
+        if status == 'PersonalInformation':
+            data = [
+                item.name, item.address, item.occupation, item.gender,
+                item.mobile_number, item.email, item.perfect_body,
+                item.body_type, item.goal, item.body_you_want,
+                item.level_of_body_fat, item.problem_areas, item.diets,
+                item.water_you_drink_daily, item.eat_or_dividie_foods_or_beverages,
+                item.event_coming_up, item.height, item.current_weight,
+                item.target_weight, item.level_of_fitness
+            ]
+        elif status in ['new', 'converted', 'not-converted', 'follow-up', 'pending']:
+            data = [
+                item.name, item.mobile_number, item.email, item.status,
+                str(item.follow_up_date), str(item.created_date),
+                item.services.name if item.services else '',
+                item.plan_leads.plan_name if item.plan_leads else '',
+                item.height, item.current_weight, item.target_weight, item.goal
+            ]
+        elif status == 'sales':
+            total_amount = (item.sale_price or 0) * item.quantity
+            if item.discount:
+                total_amount = total_amount * (1 - item.discount/100)
+            data = [
+                item.product_name, item.customer, item.quantity,
+                item.sale_price, item.discount, str(item.sale_date),
+                total_amount
+            ]
+        elif status == 'purchase':
+            data = [
+                item.product_name, item.brand, item.quantity,
+                item.amount, str(item.purchase_date)
+            ]
+        elif status == 'returns':
+            data = [
+                item.product_name, item.customer, item.quantity,
+                item.reason, str(item.return_date)
+            ]
+        elif status == 'stocks':
+            data = [
+                item.product_name, item.quantity,
+                f"Purchase ID: {item.purchase.id}" if item.purchase else 'N/A'
+            ]
+        elif status == 'payments':
+            data = [
+                item.name.name if item.name else '', item.amount_paid,
+                item.pending_amount, item.payment_mode,
+                str(item.date_paid), str(item.created_date)
+            ]
+
+        for col, value in enumerate(data, 1):
+            ws.cell(row=row, column=col, value=value)
+
+    # Add summary section
+    summary_row = len(queryset) + 3
+    ws.cell(row=summary_row, column=1, value="Report Summary").font = Font(bold=True)
+    ws.cell(row=summary_row + 1, column=1, value="Total Records:")
+    ws.cell(row=summary_row + 1, column=2, value=len(queryset))
+    ws.cell(row=summary_row + 2, column=1, value="Date Range:")
+    ws.cell(row=summary_row + 2, column=2, value=f"{from_date} to {to_date}")
+
+    # Add totals for relevant reports
+    if status in ['sales', 'payments', 'purchase']:
+        total_amount = sum(item.amount_paid if status == 'payments' 
+                         else item.amount if status == 'purchase'
+                         else (item.sale_price * item.quantity * (1 - (item.discount or 0)/100))
+                         for item in queryset)
+        ws.cell(row=summary_row + 3, column=1, value="Total Amount:")
+        ws.cell(row=summary_row + 3, column=2, value=total_amount)
+
+    # Create response
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = (
+        f'attachment; filename={status}_report_{datetime.now().strftime("%Y%m%d")}.xlsx'
+    )
+
     wb.save(response)
     return response
