@@ -68,24 +68,26 @@ class PersonalInformation(models.Model):
     current_weight = models.CharField(max_length=50)
     target_weight = models.CharField(max_length=50)
     level_of_fitness = models.CharField(max_length=50,null=True,blank=True)
+
+    reason = models.TextField(blank=True, null=True)  # New field for pending reason
     
     #status
     status = models.CharField(max_length=20, default='new')  # Track the status of the lead
     follow_up_date = models.DateTimeField(default=timezone.now)
     created_date = models.DateTimeField(default=timezone.now)
 
-    #services
-    # services = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, related_name="users")
-    # assigned_date = models.DateField(default=timezone.now)
-    # renewal_date = models.DateField(null=True, blank=True)
 
     services = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, related_name="users")
     assigned_date = models.DateField(default=timezone.now)
     renewal_date = models.DateField(null=True, blank=True)
-    # expiry_date = models.ForeignKey()
+    
 
     # plans assigned
     plan_leads = models.ForeignKey(to=Plan, on_delete=models.SET_NULL, null=True, related_name="plan_leads")
+
+    # converted_member = models.OneToOneField('AddMember', null=True, blank=True, on_delete=models.SET_NULL, related_name='converted_from_lead')
+    # conversion_date = models.DateTimeField(null=True, blank=True)
+
 
     
     # reports
@@ -248,9 +250,9 @@ class AddMember(models.Model):
     name = models.CharField(max_length=45, null=True, blank=True)
     gender = models.CharField(max_length=10)
     mobile_number = models.CharField(max_length=12, null=True, blank=True)
-    aadhar_number  = models.CharField(max_length=16, unique=True)
+    aadhar_number  = models.CharField(max_length=16, unique=True ,null=True)
     uploaded_file = models.FileField(upload_to='member_files/', blank=True, null=True)
-    email = models.EmailField()
+    email = models.EmailField(unique=True, blank=True, null=True)
     date_of_birth = models.DateField(null=True, blank=True)
     location = models.CharField(max_length=30, null=True, blank=True)
     source = models.CharField(max_length=50, null=True, blank=True)
@@ -310,3 +312,6 @@ class AddMember(models.Model):
  
 
         }
+
+
+        

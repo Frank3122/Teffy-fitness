@@ -74,6 +74,21 @@ urlpatterns = [
 
     path('download-report/', download_report, name='download_report'),
 
+    path('view_all_staffs/', view_all_staffs, name='view_all_staffs'),
 
+    # path('members_list/',members_list, name="members_list"),
+
+    # path('assign_service_plan/', assign_service_plan, name="assign_service_plan"),
+
+    # path("assign_service_plan/<int:member_id>/", assign_service_plan, name="assign_service_plan"),
+
+    # path('financial-summary/', financial_summary, name='financial_summary'),
+
+    path("update_followup_date/<int:id>/", update_followup_date, name="update_followup_date"),
+
+    
 
 ]
+
+
+

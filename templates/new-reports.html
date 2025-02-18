@@ -45,6 +45,7 @@
                                     <label for="status" class="form-label">Category:</label>
                                     <select id="status" class="form-control" name="status">
                                         <option value="" disabled selected>Select Category</option>
+                                        <option value="combined_leads_members">Leads & Members</option>
                                         <option value="PersonalInformation">Personal Information</option>
                                         <option value="new">New Leads</option>
                                         <option value="converted">Converted Leads</option>
@@ -56,6 +57,8 @@
                                         <option value="returns">Returns</option>
                                         <option value="stocks">Stocks</option>
                                         <option value="payments">Payments</option>
+                                        <option value="members">Members</option>
+                                        <option value="expenses">Expenses</option>
                                     </select>
                                 </div>
                 
@@ -76,6 +79,8 @@
 {% include "footer.html" %}
 
 {% block script %}
+
+<script src="/static/js/adminlte.js"></script>
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 

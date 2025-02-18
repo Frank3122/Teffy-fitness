@@ -53,6 +53,7 @@
                     <table id="membersTable" class="styled-table">
                         <thead>
                             <tr>
+                                <th style="text-align: center;">S.NO</th>
                                 <th style="text-align: center;">Name</th>
                                 <th style="text-align: center;">Gender</th>
                                 <th style="text-align: center;">Mobile Number</th>
@@ -63,6 +64,7 @@
                         <tbody>
                             {% for data in add_members %}
                             <tr>
+                                <td style="text-align: center;">TFM {{ forloop.counter }}</td> 
                                 <td style="text-align: center;">{{ data.name }}</td>
                                 <td style="text-align: center;">{{ data.gender }}</td>
                                 <td style="text-align: center;">{{ data.mobile_number }}</td>

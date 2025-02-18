@@ -55,8 +55,21 @@
                     <li class="nav-item"> <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button"> <i class="bi bi-list"></i> </a> </li>
                     <li class="nav-item d-none d-md-block"> <a href="#" class="nav-link">Home</a> </li>
                     <li class="nav-item d-none d-md-block"> <a href="#" class="nav-link">Contact</a> </li>
+
+                    
+
                 </ul> <!--end::Start Navbar Links--> <!--begin::End Navbar Links-->
                 <ul class="navbar-nav ms-auto">
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'follow_up_leads' %}">
+                            <i class="fas fa-bell"></i> Notifications 
+                            {% if overdue_follow_up_count > 0 %}
+                                <span class="badge bg-danger">{{ overdue_follow_up_count }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+
                     <li class="nav-item">
                         <a class="nav-link" href="#" data-lte-toggle="fullscreen">
                             <i data-lte-icon="maximize" class="bi bi-arrows-fullscreen"></i>
@@ -166,15 +179,31 @@
                                             <p style="font-size: 14px;">FOLLOW - UP</p>
                                         </a>
                                     </li> -->
-                                    
+
                                     {% if user.is_superuser %}
-                                    <li class="nav-item">
-                                        <a href="/user_management/" class="nav-link">
-                                            <i class="nav-icon bi bi-person-lines-fill" style="font-size: 12px;"></i>
-                                            <p style="font-size: 14px;">USERS</p>
-                                        </a>
-                                    </li>
+                                        <li class="nav-item has-treeview">
+                                            <a href="#" class="nav-link">  
+                                                <i class="nav-icon bi bi-person-lines-fill" style="font-size: 12px;"></i>
+                                                <p style="font-size: 14px;">Staff/Trainer<i class="right fas fa-angle-right"></i></p>
+                                            </a>
+                                            <ul class="nav nav-treeview">
+                                                <li class="nav-item">
+                                                    <a href="/user_management/" class="nav-link">
+                                                        <i class="far fa-circle nav-icon"></i>
+                                                        <p>ADD STAFF</p>
+                                                    </a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a href="{% url 'view_all_staffs' %}" class="nav-link">
+                                                        <i class="far fa-circle nav-icon"></i>
+                                                        <p>All Staffs</p>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </li>
                                     {% endif %}
+                                    
+                                    
                                         <!-- SERVICE MENU  -->
                                     <li class="nav-item">
                                         <a href="/service/" class="nav-link">
@@ -195,12 +224,12 @@
                                             <p style="font-size: 14px;">EXPENSE</p>
                                         </a>
                                     </li> -->
-                                    <li class="nav-item">
+                                    <!-- <li class="nav-item">
                                         <a href="/work/" class="nav-link">
                                             <i class="nav-icon bi bi-calendar-check" style="font-size: 12px;"></i>
                                             <p style="font-size: 14px;">WORKPLAN</p>
                                         </a>
-                                    </li>
+                                    </li> -->
                                 </ul>
                             </div>
                         </li>

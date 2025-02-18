@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>All Members</h2>
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Mobile</th>
+        <th>Email</th>
+        <th>Source</th>
+    </tr>
+
+    {% for member in members %}
+    <tr>
+        <td>{{ member.name }}</td>
+        <td>{{ member.mobile_number }}</td>
+        <td>{{ member.email }}</td>
+        <td>{{ member.source }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="4">No members found</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

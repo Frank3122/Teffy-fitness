@@ -59,6 +59,16 @@
                             <i class="fas fa-plus mb-2" style="color: white;"></i>
                             <span>Add Members</span>
                         </a>
+
+                        <a 
+                            class="btn btn-app bg-dark" 
+                            href="{% url 'user_management' %}" 
+                            style="color: white;"
+                        >
+                        <i class="fa-solid fa-user-group" style="color: white;"></i>
+                            <span>Add Staff</span>
+                        </a>
+
                     </div>
                 </div>
             </div>
@@ -71,8 +81,32 @@
                             <i class="bi bi-people-fill"></i>
                         </a>
                         <div class="info-box-content">
-                            <span class="info-box-text">ALL MEMBERS</span>
+                            <span class="info-box-text">ALL CLIENTS</span>
                             <span class="info-box-number">{{ all_member_count }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-md-3 mb-4">
+                    <div class="info-box">
+                        <a href="{% url 'display_add_members' %}" class="info-box-icon">
+                            <i class="bi bi-people-fill"></i>
+                        </a>
+                        <div class="info-box-content">
+                            <span class="info-box-text">MEMBERS</span>
+                            <span class="info-box-number">{{ total_members }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-md-3 mb-4">
+                    <div class="info-box">
+                        <a href="{% url 'new_leads' %}" class="info-box-icon text-bg-success shadow-sm">
+                            <i class="bi bi-people-fill"></i>
+                        </a>
+                        <div class="info-box-content">
+                            <span class="info-box-text">NEW LEADS</span>
+                            <span class="info-box-number">{{ new_leads_count }}</span>
                         </div>
                     </div>
                 </div>
@@ -88,6 +122,44 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="col-12 col-sm-6 col-md-3 mb-4">
+                    <div class="info-box">
+                        <a href="{% url 'not_converted_leads' %}" class="info-box-icon">
+                            <i class="bi bi-people-fill"></i>
+                        </a>
+                        <div class="info-box-content">
+                            <span class="info-box-text">NOT CONVERTED LEADS</span>
+                            <span class="info-box-number">{{ not_converted_count }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-md-3 mb-4">
+                    <div class="info-box">
+                        <a href="{% url 'pending_leads' %}" class="info-box-icon">
+                            <i class="bi bi-people-fill"></i>
+                        </a>
+                        <div class="info-box-content">
+                            <span class="info-box-text">PENDING LEADS</span>
+                            <span class="info-box-number">{{ pending_leads_count }}</span>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-12 col-sm-6 col-md-3 mb-4">
+                    <div class="info-box">
+                        <a href="{% url 'follow_up_leads' %}" class="info-box-icon text-bg-danger shadow-sm">
+                            <i class="bi bi-person-exclamation"></i>
+                        </a>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Follow-Up</span>
+                            <span class="info-box-number">{{ follow_up }}</span>
+                        </div>
+                    </div>
+                </div>
+
 
                 <div class="col-12 col-sm-6 col-md-3 mb-4">
                     <div class="info-box">
@@ -115,20 +187,87 @@
 
                 <div class="col-12 col-sm-6 col-md-3 mb-4">
                     <div class="info-box">
-                        <a href="{% url 'follow_up_leads' %}" class="info-box-icon text-bg-danger shadow-sm">
-                            <i class="bi bi-person-exclamation"></i>
+                        <a href="{% url 'stocks' %}" class="info-box-icon text-bg-success shadow-sm">
+                            <i class="bi bi-stack"></i>
                         </a>
                         <div class="info-box-content">
-                            <span class="info-box-text">Follow-Up</span>
-                            <span class="info-box-number">{{ follow_up }}</span>
+                            <span class="info-box-text">Stocks</span>
+                            <span class="info-box-number">{{ stocks_count }}</span>
                         </div>
                     </div>
                 </div>
+
+                <div class="col-12 col-sm-6 col-md-3 mb-4">
+                    <div class="info-box">
+                        <a href="{% url 'returns' %}" class="info-box-icon text-bg-success shadow-sm">
+                            <i class="bi bi-bag-x-fill"></i>
+                        </a>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Returns</span>
+                            <span class="info-box-number">{{ returns_count }}</span>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-12 col-sm-6 col-md-3 mb-4">
+                    <div class="info-box">
+                        <a href="{% url 'view_all_staffs' %}" class="info-box-icon text-bg-success shadow-sm">
+                            <i class="bi bi-person-rolodex"></i>
+                        </a>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Staffs</span>
+                            <span class="info-box-number">{{ staffs_count }}</span>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-12 col-sm-6 col-md-3 mb-4">
+                    <div class="info-box">
+                        <a href="{% url 'expenses' %}" class="info-box-icon  shadow-sm">
+                            <i class="bi bi-cash"></i>
+                        </a>
+                        <div class="info-box-content">
+                            <span class="info-box-text">TOTAL REVENUE</span>
+                            <span class="info-box-number">{{ today_revenue }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-md-3 mb-4">
+                    <div class="info-box">
+                        <a href="{% url 'expenses' %}" class="info-box-icon  shadow-sm">
+                            <i class="bi bi-cash"></i>
+                        </a>
+                        <div class="info-box-content">
+                            <span class="info-box-text">TOTAL EXPENSE</span>
+                            <span class="info-box-number">{{ today_expense }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-md-3 mb-4">
+                    <div class="info-box">
+                        <a href="{% url 'expenses' %}" class="info-box-icon  shadow-sm">
+                            <i class="bi bi-currency-rupee"></i>
+                        </a>
+                        <div class="info-box-content">
+                            <span class="info-box-text">TODAY PROFIT</span>
+                            <span class="info-box-number">{{ today_profit }}</span>
+                        </div>
+                    </div>
+                </div>
+
+
+                
+
+
             </div>
         </div>
 
         <!-- This Month Stats -->
-        <div class="row">
+        <!-- <div class="row">
             <div class="col-lg-3 col-12">
                 <div class="card tip-tool" data-tippy-content="Click me for details" data-tippy-placement="top-end">
                     <div class="card-header" style="border: none;">
@@ -215,10 +354,10 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
             <!-- Today's Stats -->
-            <div class="col-lg-9 col-12">
+            <!-- <div class="col-lg-9 col-12">
                 <div class="card tip-tool" data-tippy-content="Click me for details" data-tippy-placement="top-end">
                     <div class="card-header" style="border: none;">
                         <h5 class="card-title">TODAY'S STATS</h5>
@@ -269,7 +408,7 @@
                                         </div>
                                     </div>
                                 </a>
-                            </div>
+                            </div> -->
 
                             <!-- <div class="col-lg-6 col-xl-4 col-12">
                                 <a href="" class="thismonthexpiry">
@@ -285,7 +424,7 @@
                                 </a>
                             </div> -->
 
-                            <div class="col-lg-6 col-xl-4 col-12">
+                            <!-- <div class="col-lg-6 col-xl-4 col-12">
                                 <a href="{% url 'purchase' %}" class="thismonthexpiry">
                                     <div class="info-box mb-2">
                                         <span class="info-box-icon">
@@ -325,17 +464,17 @@
                                         </div>
                                     </div>
                                 </a>
-                            </div>
+                            </div> -->
 
                         
                             
 
-                        </div>
-                    </div>
+                        <!-- </div>
+                    </div> -->
                     
-                </div>
-            </div>
-        </div>
+                <!-- </div> -->
+            <!-- </div> -->
+        <!-- </div> -->
     </section>
 </main>
 
@@ -504,6 +643,148 @@
     });
 });
 
+
+
+tippy('.tip-tool',{
+            animation : "scale-extreme",
+        });
+
+        if(popupAlert == "No"){
+            $('#bellicon').toggleClass('fa-bell-slash');
+            $('#bellicon').toggleClass('fa-bell');
+        }
+
+        if(voiceAlert == "No"){
+            $('#speakericon').toggleClass('fa-volume-mute');
+            $('#speakericon').toggleClass('fa-volume-up');
+        }
+
+        $('#stopPopup').click(function (){
+            if($("#bellicon").hasClass("fa-bell-slash")){
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You want popup Alerts?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, Start it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $('#bellicon').toggleClass('fa-bell-slash');
+                        $('#bellicon').toggleClass('fa-bell');
+                        popupAlert = "Yes";
+                        $.ajax({
+                            url: "/api/setsessionnotify",
+                            data: JSON.stringify({ "type" : "popup"  , "status" : "Yes"}),
+                            cache: false,
+                            type: 'post',
+                            dataType: 'json',
+                            contentType: "application/json",
+                            success: function (data) {
+
+                            }
+                        });
+                    }
+                })
+            }else {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Your want to stop popup Alerts",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, Stop it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $('#bellicon').toggleClass('fa-bell-slash');
+                        $('#bellicon').toggleClass('fa-bell');
+                        popupAlert = "No";
+                        $.ajax({
+                            url: "/api/setsessionnotify",
+                            data: JSON.stringify({ "type" : "popup"  , "status" : "No"}),
+                            cache: false,
+                            type: 'post',
+                            dataType: 'json',
+                            contentType: "application/json",
+                            success: function (data) {
+
+                            }
+                        });
+                    }
+                })
+            }
+
+        })
+
+        $('#stopSpeaker').click(function (){
+            if($("#speakericon").hasClass("fa-volume-mute")){
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You want Voice Alerts",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, Start it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $('#speakericon').toggleClass('fa-volume-mute');
+                        $('#speakericon').toggleClass('fa-volume-up');
+                        voiceAlert = "Yes";
+                        $.ajax({
+                            url: "/api/setsessionnotify",
+                            data: JSON.stringify({ "type" : "voice"  , "status" : "Yes"}),
+                            cache: false,
+                            type: 'post',
+                            dataType: 'json',
+                            contentType: "application/json",
+                            success: function (data) {
+
+                            }
+                        });
+                    }
+                })
+            }else {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Your dont want voice alerts",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, Stop it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $('#speakericon').toggleClass('fa-volume-mute');
+                        $('#speakericon').toggleClass('fa-volume-up');
+                        voiceAlert = "No";
+                        $.ajax({
+                            url: "/api/setsessionnotify",
+                            data: JSON.stringify({ "type" : "voice"  , "status" : "No"}),
+                            cache: false,
+                            type: 'post',
+                            dataType: 'json',
+                            contentType: "application/json",
+                            success: function (data) {
+
+                            }
+                        });
+                    }
+                })
+            }
+        })
+
+       // var settingsOption = ;
+
+        $(document).on('click', function (e) {
+            if ($(e.target).closest("#rightbar").length === 0) {
+                // $("#rightbar").toggle()
+                $("#rightbar").css( "display", "none");
+            }
+        });
+    
   </script>
         
 {% endblock script %}

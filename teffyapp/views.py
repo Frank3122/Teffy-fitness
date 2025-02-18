@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponseForbidden
 from django.utils import timezone
 from datetime import date, datetime
-from django.db.models import Sum
+from django.db.models import Sum, F
 from django.utils.timezone import now  
 from django.utils.timezone import localtime
 from datetime import datetime , timedelta
@@ -205,96 +205,89 @@ def main(request):
     # Get today's date
     today = timezone.now().date()
 
-    # Count of today's enrollments (filter by today's exact date)
-   
+    # Today's enrollments
     today_enrollments = PersonalInformation.objects.filter(
-        status='converted',
+        status='converted', 
         assigned_date__year=today.year,
         assigned_date__month=today.month,
         assigned_date__day=today.day
     ).count()
 
     today_add_members_count = AddMember.objects.filter(
-        enrollment_date__year = today.year,
-        enrollment_date__month = today.month,
-        enrollment_date__day = today.day,
+        enrollment_date__year=today.year,
+        enrollment_date__month=today.month,
+        enrollment_date__day=today.day
     ).count()
 
     daily_enrollments = today_enrollments + today_add_members_count
 
-    # Count of all converted leads
+    # Lead counts
     member_count = PersonalInformation.objects.filter(status='converted').count()
-
-    # Count of all members (all leads)
     all_member_count = PersonalInformation.objects.count() + AddMember.objects.count()
+    not_converted_count = PersonalInformation.objects.filter(status='not_converted').count()
+    pending_leads_count = PersonalInformation.objects.filter(status="pending").count()
+    new_leads_count = PersonalInformation.objects.filter(status="new").count()
+    total_members = AddMember.objects.count()
 
+    # Other counts
+    staffs_count = UserProfile.objects.all().count()
+    stocks_count = Stock.objects.all().count()
+    returns_count = Returns.objects.all().count()
 
-    # Count of sales records
-    sales = Sales.objects.filter(
-        sale_date__year = today.year,
-        sale_date__month = today.month,
-    ).count()
-
-
+    # Sales count
+    sales = Sales.objects.filter(sale_date__year=today.year, sale_date__month=today.month).count()
     today_sales = Sales.objects.filter(
-        sale_date__year = today.year,
-        sale_date__month = today.month,
-        sale_date__day = today.day,
-
+        sale_date__year=today.year,
+        sale_date__month=today.month,
+        sale_date__day=today.day
     ).count()
 
-    # Count of purchase records
-    purchase = Purchase.objects.filter(
-        purchase_date__year = today.year,
-        purchase_date__month = today.month,
-    ).count()
-
+    # Purchase count
+    purchase = Purchase.objects.filter(purchase_date__year=today.year, purchase_date__month=today.month).count()
     today_purchase = Purchase.objects.filter(
-        purchase_date__year = today.year,
-        purchase_date__month = today.month,
-        purchase_date__day  = today.day
-
+        purchase_date__year=today.year,
+        purchase_date__month=today.month,
+        purchase_date__day=today.day
     ).count()
 
-    # Count of follow-up leads
+    # Follow-up leads
     follow_up = PersonalInformation.objects.filter(status='follow_up').count()
-
-    today_follow_up = PersonalInformation.objects.filter(status="follow_up", assigned_date__year = today.year,
-                                                         assigned_date__month = today.month,
-                                                          assigned_date__day = today.day ).count()
-
-    # Count of enrollments for the current month
-    converted_count = PersonalInformation.objects.filter(
-        status='converted',
+    today_follow_up = PersonalInformation.objects.filter(
+        status="follow_up", 
         assigned_date__year=today.year,
+        assigned_date__month=today.month,
+        assigned_date__day=today.day
+    ).count()
+
+    # Monthly enrollments
+    converted_count = PersonalInformation.objects.filter(
+        status='converted', 
+        assigned_date__year=today.year, 
         assigned_date__month=today.month
     ).count()
 
     enrolled_count = AddMember.objects.filter(
-        # status='converted',
-        enrollment_date__year=today.year,
+        enrollment_date__year=today.year, 
         enrollment_date__month=today.month
     ).count()
-
+    
     total_enrollments = converted_count + enrolled_count
 
-
-
-    # Count of today's renewals (filter by exact date)
+    # Renewals
     today_renewals = Renew.objects.filter(
         renew_date__year=today.year,
         renew_date__month=today.month,
         renew_date__day=today.day
     ).count()
 
-    # Count of renewals for the current month (filter by year and month)
     renewals = Renew.objects.filter(
         renew_date__year=today.year,
         renew_date__month=today.month
     ).count()
 
+    # Expiry Dates
     expiry_date = Renew.objects.filter(
-        expiry_date__year = today.year,
+        expiry_date__year=today.year,
         expiry_date__month=today.month
     ).count()
 
@@ -304,27 +297,55 @@ def main(request):
         expiry_date__day=today.day
     ).count()
 
-    # Display success message
-    messages.success(request, "WELCOME TO TEFFY FITNESS ")
+    # Revenue Calculation (Sum of Payment Amounts)
+    today_revenue = Payments.objects.filter(date_paid__date=today).aggregate(total_revenue=Sum('amount_paid'))['total_revenue'] or 0
 
-    # Render the response with the necessary context
-    return render(request, 'main-page.html', {
-        'member_count': member_count,
-        'sales': sales,
-        'purchase': purchase,
-        'follow_up': follow_up,
-        'all_member_count': all_member_count,
-        'total_enrollments':total_enrollments,
-        'renewals': renewals,
-        'daily_enrollments':daily_enrollments,
-        'today_renewals': today_renewals,  # Add the today_renewals in the context
-        'today_sales' : today_sales,
-        'today_purchase':today_purchase,
-        'today_follow_up':today_follow_up,
-        'expiry_date':expiry_date,
-        'today_expiry_date':today_expiry_date,
-    })
+    today_expense = Expense.objects.filter(date_spent=today).aggregate(
+    total_expense=Sum(F('price') * F('quantity'))  # Multiply price by quantity
+)['total_expense'] or 0
+# Calculate Net Profit
+    today_profit = today_revenue - today_expense
 
+    # Overdue follow-ups
+    overdue_follow_ups = PersonalInformation.objects.filter(
+        follow_up_date__lte=today, status="follow_up"
+    )
+
+    # **Pass everything as context**
+    context = {
+        "member_count": member_count,
+        "sales": sales,
+        "purchase": purchase,
+        "follow_up": follow_up,
+        "all_member_count": all_member_count,
+        "total_enrollments": total_enrollments,
+        "renewals": renewals,
+        "daily_enrollments": daily_enrollments,
+        "today_renewals": today_renewals,
+        "today_sales": today_sales,
+        "today_purchase": today_purchase,
+        "today_follow_up": today_follow_up,
+        "expiry_date": expiry_date,
+        "today_expiry_date": today_expiry_date,
+        "today_revenue": today_revenue,
+        "not_converted_count": not_converted_count,
+        "pending_leads_count": pending_leads_count,
+        "new_leads_count": new_leads_count,
+        "staffs_count": staffs_count,
+        "stocks_count": stocks_count,
+        "returns_count": returns_count,
+        "overdue_follow_up_count": overdue_follow_ups.count(),
+        "overdue_follow_ups": overdue_follow_ups,
+        'today_profit':today_profit,
+        'today_expense':today_expense,
+        'total_members':total_members,
+    }
+
+    # Success message
+    messages.success(request, "WELCOME TO TEFFY FITNESS")
+
+    # Render the response
+    return render(request, 'main-page.html', context)
 
 
 def expense(request):
@@ -488,28 +509,66 @@ def getone_lead(request, id):
     
     return render(request, "one-leads.html", data)
 
+def update_followup_date(request, id):
+    """Update follow-up date when changed in the dropdown"""
+    if request.method == "POST":
+        lead = get_object_or_404(PersonalInformation, id=id)
+        follow_up_date = request.POST.get("follow_up_date")
+
+        if follow_up_date:
+            lead.follow_up_date = follow_up_date
+            lead.save()
+            messages.success(request, f"Follow-up date updated for {lead.name}")
+
+    return redirect("follow_up_leads")  # Redirect back to leads page
+
 
 def update_status(request, id):
-    if request.method == 'POST':
+    if request.method == "POST":
         lead = PersonalInformation.objects.get(id=id)
-        status = request.POST.get('status')
+        status = request.POST.get("status")
+
+        # Update status
         lead.status = status
         lead.save()
 
+        # If status is converted, move the lead to AddMember
+        if status == "converted":
+            # Check if the member already exists (avoid duplicates)
+            existing_member = AddMember.objects.filter(mobile_number=lead.mobile_number).first()
+            if not existing_member:
+                AddMember.objects.create(
+                    name=lead.name,
+                    gender=lead.gender,
+                    mobile_number=lead.mobile_number,
+                    email=lead.email,
+                    occupation=lead.occupation,
+                    source="Converted Lead",
+                    registration_amount=0,  # You can modify based on logic
+                    enrollment_date=timezone.now(),
+                )
+
         messages.success(request, f"Status updated to {status} successfully.")
 
-        if status == 'new':
-            return redirect('new_leads')
-        elif status == 'converted':
-            return redirect('converted_leads')
-        elif status == 'not_converted':
-            return redirect('not_converted_leads')
-        elif status == 'pending':
-            return redirect('pending_leads')
-        elif status == 'follow_up':
-            return redirect('follow_up_leads')
+        # Redirect based on status
+        if status == "new":
+            return redirect("new_leads")
+        elif status == "converted":
+            return redirect("converted_leads")
+        elif status == "not_converted":
+            return redirect("not_converted_leads")
+        elif status == "pending":
+            return redirect("pending_leads")
+        elif status == "follow_up":
+            return redirect("follow_up_leads")
 
-    return redirect('new_leads')
+    return redirect("new_leads")
+
+# def members_list(request):
+#     members = AddMember.objects.all()  # Get all members (including converted leads)
+
+#     return render(request, "members-list.html", {"members": members})
+
 
 
 
@@ -549,12 +608,44 @@ def converted_leads(request):
 
 
 def not_converted_leads(request):
+    if request.method == "POST":
+        lead_id = request.POST.get("lead_id")  # Get the lead ID from the form
+        lead = get_object_or_404(PersonalInformation, id=lead_id)
+
+        # Update the status
+        lead.status = request.POST.get("status")
+
+        # If the status is 'pending', store the reason; otherwise, clear it
+        if lead.status == "pending":
+            lead.reason = request.POST.get("reason", "")
+        else:
+            lead.reason = ""
+
+        lead.save()
+        return redirect("pending_leads")  # Refresh the page after updating
     all_data = PersonalInformation.objects.filter(status='not_converted')
     return render(request, 'not_converted_leads.html', {'all_data': all_data, 'status_title': 'Not Converted'})
 
 def pending_leads(request):
-    all_data = PersonalInformation.objects.filter(status='pending')
-    return render(request, 'pending_leads.html', {'all_data': all_data, 'status_title': 'Pending'})
+    if request.method == "POST":
+        lead_id = request.POST.get("lead_id")  # Get the lead ID from the form
+        lead = get_object_or_404(PersonalInformation, id=lead_id)
+
+        # Update the status
+        lead.status = request.POST.get("status")
+
+        # If the status is 'pending', store the reason; otherwise, clear it
+        if lead.status == "pending":
+            lead.reason = request.POST.get("reason", "")
+        else:
+            lead.reason = ""
+
+        lead.save()
+        return redirect("pending_leads")  # Refresh the page after updating
+
+    # Get all leads with 'pending' status
+    all_data = PersonalInformation.objects.filter(status="pending")
+    return render(request, "pending_leads.html", {"all_data": all_data, "status_title": "Pending"})
 
 def follow_up_leads(request):
     all_data = PersonalInformation.objects.filter(status='follow_up')
@@ -601,7 +692,7 @@ def user_management(request):
       
         if not profile_user_id:
             user_count = UserProfile.objects.count() + 1
-            profile_user_id = f"USER-{user_count}"
+            profile_user_id = f"TFS-{user_count}"
 
        
         UserProfile.objects.create(
@@ -615,7 +706,7 @@ def user_management(request):
 
    
     user_count = UserProfile.objects.count() + 1
-    profile_user_id = f"USER-{user_count}"
+    profile_user_id = f"TFS-{user_count}"
     data = UserProfile.objects.all()
 
    
@@ -665,6 +756,16 @@ def delete_user(request, user_id):
     
     messages.success(request, "User successfully deleted.")
     return redirect('user_management')
+
+def view_all_staffs(request):
+    admins = UserProfile.objects.filter(group="admin")
+    staff = UserProfile.objects.filter(group="staff")
+
+    context = {
+        "admins": admins,
+        "staff": staff,
+    }
+    return render(request, "view-all-staffs.html", context)
 
 def services(request):
     if request.method == "POST":
@@ -796,6 +897,7 @@ def expenses(request):
         "selected_year": selected_year,
         "selected_month": selected_month,
     })
+
 
 def add_expense(request):
     if request.method == 'POST':
@@ -1011,19 +1113,61 @@ def new_reports(request):
 
     return render(request, "new-reports.html", {"leads": leads})
     
+
 def renew_member_list(request):
     all_data = PersonalInformation.objects.filter(status='converted')
+    members_data = AddMember.objects.all()
+    today = date.today()
 
-    # Optionally calculate any other values you want to display
     for client in all_data:
-        client.expiry_date_display = client.expiry_date  # Get expiry date dynamically
+        service_duration = client.services.duration if client.services else None
+        
+        if client.assigned_date and service_duration:
+            try:
+                value, unit = service_duration.split()
+                value = int(value)
 
-        # If renewal date exists, you can pass it to the template
-        client.renewal_date_display = client.renewal_date if client.renewal_date else 'Not Renewed Yet'
+                if "month" in unit.lower():
+                    expiry_date = client.assigned_date + relativedelta(months=value)
+                    
+                    # Calculate days until expiry
+                    days_until_expiry = (expiry_date - today).days
+                    
+                    # Set notification status
+                    if days_until_expiry < 0:
+                        notification_status = "Expired"
+                    elif days_until_expiry <= 7:
+                        notification_status = "Expires this week!"
+                    elif days_until_expiry <= 15:
+                        notification_status = "Expires in 2 weeks"
+                    elif days_until_expiry <= 30:
+                        notification_status = "Expires in 1 month"
+                    else:
+                        notification_status = "Active"
+                    
+                    client.expiry_date = expiry_date
+                    client.notification_status = notification_status
+                    client.days_remaining = days_until_expiry if days_until_expiry > 0 else 0
+                    
+                else:
+                    client.expiry_date = "Invalid Duration"
+                    client.notification_status = "Error"
+                    client.days_remaining = 0
+            except ValueError:
+                client.expiry_date = "Invalid Duration"
+                client.notification_status = "Error"
+                client.days_remaining = 0
+        else:
+            client.expiry_date = "No Service Duration"
+            client.notification_status = "No Plan"
+            client.days_remaining = 0
 
-    return render(request, "renew_member_list.html", {"all_data": all_data})
+        client.renewal_date = client.renewal_date or "Not Renewed Yet"
 
-
+    return render(request, "renew_member_list.html", {
+        "all_data": all_data,
+        "today": today,
+    })
 
 # def renew_member_page(request, member_id):
 #     # Fetch the member's details using their ID
@@ -1401,185 +1545,505 @@ def view_all_clients(request):
 #     wb.save(response)
 #     return response
 
+# from django.http import HttpResponse
+# from openpyxl import Workbook
+# from openpyxl.styles import Font, Alignment, PatternFill
+# from openpyxl.utils import get_column_letter
+# from datetime import datetime
+# from django.shortcuts import render
+# from django.core.exceptions import BadRequest
+# from django.db.models import Q
+
+# def download_report(request):
+#     try:
+#         # Get filter parameters
+#         from_date = request.GET.get('from_date')
+#         to_date = request.GET.get('to_date')
+#         status = request.GET.get('status')
+
+#         if not all([from_date, to_date, status]):
+#             return HttpResponse("Please provide all required parameters", status=400)
+
+#         # Create workbook
+#         wb = Workbook()
+#         ws = wb.active
+
+#         # Define styles
+#         header_font = Font(bold=True, color="FFFFFF")
+#         header_fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
+
+#         # Configure report based on category
+#         report_config = {
+#             "members": {
+#                 "title": "Members Report",
+#                 "headers": [
+#                     'Name', 'Gender', 'Mobile Number', 'Email', 'Location', 
+#                     'Service', 'Batch', 'Registration Amount', 'Total Amount',
+#                     'Enrollment Date', 'Expiry Date', 'Payment Mode',
+#                     'Payment Date', 'Membership Plan'
+#                 ],
+#                 "queryset": AddMember.objects.filter(enrollment_date__range=[from_date, to_date])
+#             },
+#             "PersonalInformation": {
+#                 "title": "Personal Information Report",
+#                 "headers": ["Name", "Address", "Occupation", "Gender", "Mobile", "Email", "Goal", "Height", "Current Weight", "Target Weight"],
+#                 "queryset": PersonalInformation.objects.filter(created_date__range=[from_date, to_date])
+#             },
+#             "expenses": {
+#                 "title": "Expense Report",
+#                 "headers": ["Expense Name", "Price", "Quantity", "Date Spent"],
+#                 "queryset": Expense.objects.filter(date_spent__range=[from_date, to_date])
+#             },
+#             "sales": {
+#                 "title": "Sales Report",
+#                 "headers": ["Product Name", "Customer", "Quantity", "Sale Price", "Discount", "Sale Date", "Total Amount"],
+#                 "queryset": Sales.objects.filter(sale_date__range=[from_date, to_date])
+#             },
+#             "payments": {
+#                 "title": "Payments Report",
+#                 "headers": ["Member Name", "Amount Paid", "Pending Amount", "Payment Mode", "Date Paid", "Created Date"],
+#                 "queryset": Payments.objects.filter(date_paid__range=[from_date, to_date])
+#             }
+#         }
+
+#         # Leads-specific filter
+#         if status in ['new', 'converted', 'not-converted', 'follow-up', 'pending']:
+#             report_config[status] = {
+#                 "title": f"{status.title()} Leads Report",
+#                 "headers": ["Name", "Mobile", "Email", "Status", "Follow Up Date", "Created Date", "Service", "Plan"],
+#                 "queryset": PersonalInformation.objects.filter(Q(created_date__range=[from_date, to_date]) & Q(status=status))
+#             }
+
+#         # Validate status
+#         if status not in report_config:
+#             return HttpResponse("Invalid report type", status=400)
+
+#         # Get report details
+#         config = report_config[status]
+#         ws.title = config["title"]
+#         headers = config["headers"]
+#         queryset = config["queryset"]
+
+#         # Apply headers
+#         for col, header in enumerate(headers, 1):
+#             cell = ws.cell(row=1, column=col, value=header)
+#             cell.font = header_font
+#             cell.fill = header_fill
+#             cell.alignment = Alignment(horizontal="center")
+#             ws.column_dimensions[get_column_letter(col)].width = 15
+
+#         # Add data rows
+#         for row, item in enumerate(queryset, 2):
+#             data = []
+
+#             if status == "members":
+#                 member_data = item.member()
+#                 data = [
+#                     member_data.get('name', ''),
+#                     member_data.get('gender', ''),
+#                     member_data.get('mobile_number', ''),
+#                     member_data.get('email', ''),
+#                     member_data.get('location', ''),
+#                     str(member_data.get('service', '')),
+#                     str(member_data.get('batch', '')),
+#                     member_data.get('registration_amount', ''),
+#                     member_data.get('total_amount', ''),
+#                     member_data.get('enrollment_date', ''),
+#                     member_data.get('expiry_date', ''),
+#                     getattr(item, 'payment_mode', ''),
+#                     member_data.get('payment_date', ''),
+#                     str(member_data.get('select_membership_plan', ''))
+#                 ]
+            
+#             elif status == "PersonalInformation":
+#                 data = [
+#                     getattr(item, 'name', ''),
+#                     getattr(item, 'address', ''),
+#                     getattr(item, 'occupation', ''),
+#                     getattr(item, 'gender', ''),
+#                     getattr(item, 'mobile_number', ''),
+#                     getattr(item, 'email', ''),
+#                     getattr(item, 'goal', ''),
+#                     getattr(item, 'height', ''),
+#                     getattr(item, 'current_weight', ''),
+#                     getattr(item, 'target_weight', '')
+#                 ]
+
+#             elif status == "expenses":
+#                 data = [
+#                     getattr(item, "expense_name", ""),
+#                     getattr(item, "price", ""),
+#                     getattr(item, "quantity", ""),
+#                     str(getattr(item, "date_spent", ""))
+#                 ]
+            
+#             elif status in ['new', 'converted', 'not-converted', 'follow-up', 'pending']:
+#                 data = [
+#                     getattr(item, 'name', ''),
+#                     getattr(item, 'mobile_number', ''),
+#                     getattr(item, 'email', ''),
+#                     getattr(item, 'status', ''),
+#                     str(getattr(item, 'follow_up_date', '')),
+#                     str(getattr(item, 'created_date', '')),
+#                     getattr(item.services, 'name', '') if getattr(item, 'services', None) else '',
+#                     getattr(item.plan_leads, 'plan_name', '') if getattr(item, 'plan_leads', None) else ''
+#                 ]
+
+#             elif status == "sales":
+#                 total_amount = (getattr(item, 'sale_price', 0) or 0) * getattr(item, 'quantity', 0)
+#                 if getattr(item, 'discount', None):
+#                     total_amount *= (1 - item.discount / 100)
+#                 data = [
+#                     getattr(item, 'product_name', ''),
+#                     getattr(item, 'customer', ''),
+#                     getattr(item, 'quantity', ''),
+#                     getattr(item, 'sale_price', ''),
+#                     getattr(item, 'discount', ''),
+#                     str(getattr(item, 'sale_date', '')),
+#                     round(total_amount, 2)
+#                 ]
+            
+#             elif status == "payments":
+#                 data = [
+#                     getattr(item.name, 'name', '') if getattr(item, 'name', None) else '',
+#                     getattr(item, 'amount_paid', ''),
+#                     getattr(item, 'pending_amount', ''),
+#                     getattr(item, 'payment_mode', ''),
+#                     str(getattr(item, 'date_paid', '')),
+#                     str(getattr(item, 'created_date', ''))
+#                 ]
+
+#             # Write row data
+#             for col, value in enumerate(data, 1):
+#                 cell = ws.cell(row=row, column=col, value=value)
+#                 cell.alignment = Alignment(horizontal="center")
+
+#         # Create response
+#         response = HttpResponse(
+#             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+#         )
+#         response['Content-Disposition'] = f'attachment; filename={status}_report_{datetime.now().strftime("%Y%m%d")}.xlsx'
+#         wb.save(response)
+#         return response
+
+#     except Exception as e:
+#         return HttpResponse(f"Error generating report: {str(e)}", status=500)
+
+
+
+# from openpyxl import Workbook
+# from openpyxl.styles import Font, Alignment, PatternFill
+# from django.http import HttpResponse
+# from datetime import datetime
+
+
+# def generate_member_excel_report(request):
+#     # Create a new workbook and select the active sheet
+#     wb = Workbook()
+#     ws = wb.active
+#     ws.title = "Member Report"
+
+#     # Define headers based on the member method fields
+#     headers = [
+#         'Name', 'Gender', 'Mobile Number', 'Aadhar Number', 'Email',
+#         'Date of Birth', 'Location', 'Source', 'Occupation',
+#         'Emergency Number', 'Registration Amount', 'Service',
+#         'Batch', 'Cost of Plan', 'Total Sessions', 'Convenience Fees',
+#         'Total Amount', 'Enrollment Date', 'Activation Date',
+#         'Expiry Date', 'Current Installment Amount', 'Payment Mode',
+#         'Payment Date', 'Sold By', 'Discount', 'Discount Type',
+#         'Membership Plan', 'Uploaded File'
+#     ]
+
+#     # Style the headers
+#     header_font = Font(bold=True, color="FFFFFF")
+#     header_fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
+    
+#     # Write headers
+#     for col, header in enumerate(headers, 1):
+#         cell = ws.cell(row=1, column=col, value=header)
+#         cell.font = header_font
+#         cell.fill = header_fill
+#         cell.alignment = Alignment(horizontal='center')
+#         ws.column_dimensions[chr(64 + col)].width = 15  # Set column width
+
+#     # Get all members
+#     members = AddMember.objects.all()
+
+#     # Write data
+#     for row, member in enumerate(members, 2):
+#         member_data = member.member()  # Get member data using the member method
+        
+#         # Map the data to columns
+#         row_data = [
+#             member_data['name'],
+#             member_data['gender'],
+#             member_data['mobile_number'],
+#             member_data['aadhar_number'],
+#             member_data['email'],
+#             member_data['date_of_birth'],
+#             member_data['location'],
+#             member_data['source'],
+#             member_data['occupation'],
+#             member_data['emergency_number'],
+#             member_data['registration_amount'],
+#             str(member_data['service']) if member_data['service'] else '',
+#             str(member_data['batch']) if member_data['batch'] else '',
+#             str(member_data['cost_of_plan']) if member_data['cost_of_plan'] else '',
+#             str(member_data['total_session']) if member_data['total_session'] else '',
+#             member_data['conveniance_fees'],
+#             member_data['total_amount'],
+#             member_data['enrollment_date'],
+#             member_data['activation_date'],
+#             member_data['expiry_date'],
+#             member_data['current_installment_amount'],
+#             member.payment_mode,  # Direct from model as it's not in member method
+#             member_data['payment_date'],
+#             str(member_data['sold_by']) if member_data['sold_by'] else '',
+#             member_data['discount'],
+#             member_data['discount_type'],
+#             str(member_data['select_membership_plan']) if member_data['select_membership_plan'] else '',
+#             str(member_data['uploaded_file']) if member_data['uploaded_file'] else ''
+#         ]
+
+#         for col, value in enumerate(row_data, 1):
+#             cell = ws.cell(row=row, column=col, value=value)
+#             cell.alignment = Alignment(horizontal='center')
+
+#     # Create the HTTP response
+#     response = HttpResponse(
+#         content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+#     )
+#     response['Content-Disposition'] = f'attachment; filename=member_report_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
+
+#     # Save the workbook to the response
+#     wb.save(response)
+#     return response
+
+
 from django.http import HttpResponse
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill
+from openpyxl.utils import get_column_letter
 from datetime import datetime
 from django.shortcuts import render
 from django.core.exceptions import BadRequest
 from django.db.models import Q
+from .models import AddMember, PersonalInformation, Payments, Sales, Purchase, Expense
 
 def download_report(request):
-    # Get filter parameters
-    from_date = request.GET.get('from_date')
-    to_date = request.GET.get('to_date')
-    status = request.GET.get('status')
+    try:
+        # Get filter parameters
+        from_date = request.GET.get('from_date')
+        to_date = request.GET.get('to_date')
+        status = request.GET.get('status')
 
-    if not all([from_date, to_date, status]):
-        raise BadRequest("Please provide all required parameters")
+        if not all([from_date, to_date, status]):
+            return HttpResponse("Please provide all required parameters", status=400)
 
-    # Create workbook
-    wb = Workbook()
-    ws = wb.active
+        # Create workbook
+        wb = Workbook()
+        ws = wb.active
 
-    # Define styles
-    header_font = Font(bold=True, color="FFFFFF")
-    header_fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
+        # Define styles
+        header_font = Font(bold=True, color="FFFFFF")
+        header_fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
 
-    # Configure report based on category
-    if status == 'PersonalInformation':
-        ws.title = "Personal Information Report"
-        headers = [
-            "Name", "Address", "Occupation", "Gender", "Mobile", "Email",
-            "Perfect Body", "Body Type", "Goal", "Body You Want",
-            "Level of Body Fat", "Problem Areas", "Diets",
-            "Water Intake", "Food Division", "Event Coming Up",
-            "Height", "Current Weight", "Target Weight", "Level of Fitness"
-        ]
-        queryset = PersonalInformation.objects.filter(
-            created_date__range=[from_date, to_date]
+        # Configure report structure
+        report_config = {
+            "combined_leads_members": {
+                "title": "Leads & Members Report",
+                "headers": [
+                    "Name", "Gender", "Mobile Number", "Email", "Location",
+                    "Occupation", "Source", "Service", "Membership Plan",
+                    "Registration Amount", "Enrollment Date", "Expiry Date", "Type"
+                ],
+                "queryset": list(AddMember.objects.filter(enrollment_date__range=[from_date, to_date])) +
+                            list(PersonalInformation.objects.filter(created_date__range=[from_date, to_date]))
+            },
+            "payments": {
+                "title": "Payments Report",
+                "headers": ["Member Name", "Amount Paid", "Pending Amount", "Payment Mode", "Date Paid", "Created Date"],
+                "queryset": Payments.objects.filter(date_paid__range=[from_date, to_date])
+            },
+            "sales": {
+                "title": "Sales Report",
+                "headers": ["Product Name", "Customer", "Quantity", "Sale Price", "Discount", "Sale Date", "Total Amount"],
+                "queryset": Sales.objects.filter(sale_date__range=[from_date, to_date])
+            },
+            "purchases": {
+                "title": "Purchases Report",
+                "headers": ["Item Name", "Supplier", "Quantity", "Purchase Price", "Purchase Date"],
+                "queryset": Purchase.objects.filter(purchase_date__range=[from_date, to_date])
+            },
+            "expenses": {
+                "title": "Expenses Report",
+                "headers": ["Expense Name", "Price", "Quantity", "Date Spent"],
+                "queryset": Expense.objects.filter(date_spent__range=[from_date, to_date])
+            },
+        }
+
+        # Validate requested report type
+        if status not in report_config:
+            return HttpResponse("Invalid report type", status=400)
+
+        # Get report details
+        config = report_config[status]
+        ws.title = config["title"]
+        headers = config["headers"]
+        queryset = config["queryset"]
+
+        # Apply headers
+        for col, header in enumerate(headers, 1):
+            cell = ws.cell(row=1, column=col, value=header)
+            cell.font = header_font
+            cell.fill = header_fill
+            cell.alignment = Alignment(horizontal="center")
+            ws.column_dimensions[get_column_letter(col)].width = 18
+
+        row = 2  # Start from second row after headers
+
+        # Process data for combined Leads & Members
+        if status == "combined_leads_members":
+            for item in queryset:
+                data = [
+                    getattr(item, "name", ""),
+                    getattr(item, "gender", ""),
+                    getattr(item, "mobile_number", ""),
+                    getattr(item, "email", ""),
+                    getattr(item, "location", "N/A") if isinstance(item, AddMember) else "N/A",
+                    getattr(item, "occupation", ""),
+                    getattr(item, "source", ""),
+                    getattr(item.service, "name", "N/A") if isinstance(item, AddMember) else 
+                    (getattr(item.services, "name", "N/A") if getattr(item, "services", None) else "N/A"),
+                    getattr(item.select_membership_plan, "plan_name", "N/A") if isinstance(item, AddMember) else 
+                    (getattr(item.plan_leads, "plan_name", "N/A") if getattr(item, "plan_leads", None) else "N/A"),
+                    getattr(item, "registration_amount", "N/A") if isinstance(item, AddMember) else "N/A",
+                    getattr(item, "enrollment_date", "N/A") if isinstance(item, AddMember) else "N/A",
+                    getattr(item, "expiry_date", "N/A") if isinstance(item, AddMember) else "N/A",
+                    "Member" if isinstance(item, AddMember) else "Lead"
+                ]
+                for col, value in enumerate(data, 1):
+                    cell = ws.cell(row=row, column=col, value=value)
+                    cell.alignment = Alignment(horizontal="center")
+                row += 1
+
+        # Process Payments
+        elif status == "payments":
+            for item in queryset:
+                data = [
+                    getattr(item.name, 'name', '') if getattr(item, 'name', None) else '',
+                    getattr(item, 'amount_paid', ''),
+                    getattr(item, 'pending_amount', ''),
+                    getattr(item, 'payment_mode', ''),
+                    str(getattr(item, 'date_paid', '')),
+                    str(getattr(item, 'created_date', ''))
+                ]
+                for col, value in enumerate(data, 1):
+                    ws.cell(row=row, column=col, value=value)
+                row += 1
+
+        # Process Sales
+        elif status == "sales":
+            for item in queryset:
+                total_amount = (getattr(item, 'sale_price', 0) or 0) * getattr(item, 'quantity', 0)
+                if getattr(item, 'discount', None):
+                    total_amount *= (1 - item.discount / 100)
+                data = [
+                    getattr(item, 'product_name', ''),
+                    getattr(item, 'customer', ''),
+                    getattr(item, 'quantity', ''),
+                    getattr(item, 'sale_price', ''),
+                    getattr(item, 'discount', ''),
+                    str(getattr(item, 'sale_date', '')),
+                    round(total_amount, 2)
+                ]
+                for col, value in enumerate(data, 1):
+                    ws.cell(row=row, column=col, value=value)
+                row += 1
+
+        # Process Purchases
+        elif status == "purchases":
+            for item in queryset:
+                data = [
+                    getattr(item, "item_name", ""),
+                    getattr(item, "supplier", ""),
+                    getattr(item, "quantity", ""),
+                    getattr(item, "price", ""),
+                    str(getattr(item, "purchase_date", ""))
+                ]
+                for col, value in enumerate(data, 1):
+                    ws.cell(row=row, column=col, value=value)
+                row += 1
+
+        # Process Expenses
+        elif status == "expenses":
+            for item in queryset:
+                data = [
+                    getattr(item, "expense_name", ""),
+                    getattr(item, "price", ""),
+                    getattr(item, "quantity", ""),
+                    str(getattr(item, "date_spent", ""))
+                ]
+                for col, value in enumerate(data, 1):
+                    ws.cell(row=row, column=col, value=value)
+                row += 1
+
+        # Create response
+        response = HttpResponse(
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
-        
-    elif status in ['new', 'converted', 'not-converted', 'follow-up', 'pending']:
-        ws.title = f"{status.title()} Leads Report"
-        headers = [
-            "Name", "Mobile", "Email", "Status", "Follow Up Date",
-            "Created Date", "Service", "Plan", "Height", "Current Weight",
-            "Target Weight", "Goal"
-        ]
-        queryset = PersonalInformation.objects.filter(
-            Q(created_date__range=[from_date, to_date]) &
-            Q(status=status)
-        )
+        response['Content-Disposition'] = f'attachment; filename={status}_report_{datetime.now().strftime("%Y%m%d")}.xlsx'
+        wb.save(response)
+        return response
 
-    elif status == 'sales':
-        ws.title = "Sales Report"
-        headers = [
-            "Product Name", "Customer", "Quantity", "Sale Price",
-            "Discount", "Sale Date", "Total Amount"
-        ]
-        queryset = Sales.objects.filter(sale_date__range=[from_date, to_date])
+    except Exception as e:
+        return HttpResponse(f"Error generating report: {str(e)}", status=500)
 
-    elif status == 'purchase':
-        ws.title = "Purchase Report"
-        headers = [
-            "Product Name", "Brand", "Quantity", "Amount",
-            "Purchase Date"
-        ]
-        queryset = Purchase.objects.filter(purchase_date__range=[from_date, to_date])
 
-    elif status == 'returns':
-        ws.title = "Returns Report"
-        headers = [
-            "Product Name", "Customer", "Quantity", "Reason",
-            "Return Date"
-        ]
-        queryset = Returns.objects.filter(return_date__range=[from_date, to_date])
+# from decimal import Decimal  # Import Decimal
 
-    elif status == 'stocks':
-        ws.title = "Stock Report"
-        headers = [
-            "Product Name", "Quantity", "Purchase Details"
-        ]
-        queryset = Stock.objects.all()  # Usually stocks don't need date filtering
+# def financial_summary(request):
+#     today = now().date()
+#     start_of_month = today.replace(day=1)
 
-    elif status == 'payments':
-        ws.title = "Payments Report"
-        headers = [
-            "Member Name", "Amount Paid", "Pending Amount",
-            "Payment Mode", "Date Paid", "Created Date"
-        ]
-        queryset = Payments.objects.filter(date_paid__range=[from_date, to_date])
+#     # **Today's Financial Data**
+#     today_revenue = Payments.objects.filter(date_paid__date=today).aggregate(total=Sum('amount_paid'))['total'] or 0
+#     today_expenditure = Expense.objects.filter(date_spent=today).aggregate(total=Sum('price'))['total'] or 0
+#     today_profit_or_loss = today_revenue - today_expenditure
+#     today_absolute_profit_or_loss = abs(today_profit_or_loss)
+#     today_total_pending = Payments.objects.filter(date_paid__date=today).aggregate(total=Sum('pending_amount'))['total'] or 0
 
-    else:
-        raise BadRequest("Invalid report type")
+#     # **Monthly Financial Data**
+#     total_revenue = Payments.objects.filter(date_paid__date__range=[start_of_month, today]).aggregate(total=Sum('amount_paid'))['total'] or 0
+#     total_expenditure = Expense.objects.filter(date_spent__range=[start_of_month, today]).aggregate(total=Sum('price'))['total'] or 0
+#     profit_or_loss = total_revenue - total_expenditure
+#     absolute_profit_or_loss = abs(profit_or_loss)
+#     total_pending = Payments.objects.filter(date_paid__date__range=[start_of_month, today]).aggregate(total=Sum('pending_amount'))['total'] or 0
 
-    # Apply headers
-    for col, header in enumerate(headers, 1):
-        cell = ws.cell(row=1, column=col, value=header)
-        cell.font = header_font
-        cell.fill = header_fill
-        cell.alignment = Alignment(horizontal="center")
-        ws.column_dimensions[chr(64 + col)].width = 15
+#     # **Debugging: Print Values in Terminal**
+#     print("========== Financial Summary Debug ==========")
+#     print("Today's Revenue:", today_revenue)
+#     print("Today's Expenses:", today_expenditure)
+#     print("Today's Profit/Loss:", today_profit_or_loss)
+#     print("Today's Pending Amount:", today_total_pending)
+#     print("Monthly Revenue:", total_revenue)
+#     print("Monthly Expenses:", total_expenditure)
+#     print("Monthly Profit/Loss:", profit_or_loss)
+#     print("Monthly Pending Amount:", total_pending)
+#     print("=============================================")
 
-    # Add data based on report type
-    for row, item in enumerate(queryset, 2):
-        if status == 'PersonalInformation':
-            data = [
-                item.name, item.address, item.occupation, item.gender,
-                item.mobile_number, item.email, item.perfect_body,
-                item.body_type, item.goal, item.body_you_want,
-                item.level_of_body_fat, item.problem_areas, item.diets,
-                item.water_you_drink_daily, item.eat_or_dividie_foods_or_beverages,
-                item.event_coming_up, item.height, item.current_weight,
-                item.target_weight, item.level_of_fitness
-            ]
-        elif status in ['new', 'converted', 'not-converted', 'follow-up', 'pending']:
-            data = [
-                item.name, item.mobile_number, item.email, item.status,
-                str(item.follow_up_date), str(item.created_date),
-                item.services.name if item.services else '',
-                item.plan_leads.plan_name if item.plan_leads else '',
-                item.height, item.current_weight, item.target_weight, item.goal
-            ]
-        elif status == 'sales':
-            total_amount = (item.sale_price or 0) * item.quantity
-            if item.discount:
-                total_amount = total_amount * (1 - item.discount/100)
-            data = [
-                item.product_name, item.customer, item.quantity,
-                item.sale_price, item.discount, str(item.sale_date),
-                total_amount
-            ]
-        elif status == 'purchase':
-            data = [
-                item.product_name, item.brand, item.quantity,
-                item.amount, str(item.purchase_date)
-            ]
-        elif status == 'returns':
-            data = [
-                item.product_name, item.customer, item.quantity,
-                item.reason, str(item.return_date)
-            ]
-        elif status == 'stocks':
-            data = [
-                item.product_name, item.quantity,
-                f"Purchase ID: {item.purchase.id}" if item.purchase else 'N/A'
-            ]
-        elif status == 'payments':
-            data = [
-                item.name.name if item.name else '', item.amount_paid,
-                item.pending_amount, item.payment_mode,
-                str(item.date_paid), str(item.created_date)
-            ]
+#     context = {
+#         'today_revenue': today_revenue,
+#         'today_expenditure': today_expenditure,
+#         'today_profit_or_loss': today_profit_or_loss,
+#         'today_absolute_profit_or_loss': today_absolute_profit_or_loss,
+#         'today_total_pending': today_total_pending,
+#         'total_revenue': total_revenue,
+#         'total_expenditure': total_expenditure,
+#         'profit_or_loss': profit_or_loss,
+#         'absolute_profit_or_loss': absolute_profit_or_loss,
+#         'total_pending': total_pending
+#     }
 
-        for col, value in enumerate(data, 1):
-            ws.cell(row=row, column=col, value=value)
-
-    # Add summary section
-    summary_row = len(queryset) + 3
-    ws.cell(row=summary_row, column=1, value="Report Summary").font = Font(bold=True)
-    ws.cell(row=summary_row + 1, column=1, value="Total Records:")
-    ws.cell(row=summary_row + 1, column=2, value=len(queryset))
-    ws.cell(row=summary_row + 2, column=1, value="Date Range:")
-    ws.cell(row=summary_row + 2, column=2, value=f"{from_date} to {to_date}")
-
-    # Add totals for relevant reports
-    if status in ['sales', 'payments', 'purchase']:
-        total_amount = sum(item.amount_paid if status == 'payments' 
-                         else item.amount if status == 'purchase'
-                         else (item.sale_price * item.quantity * (1 - (item.discount or 0)/100))
-                         for item in queryset)
-        ws.cell(row=summary_row + 3, column=1, value="Total Amount:")
-        ws.cell(row=summary_row + 3, column=2, value=total_amount)
-
-    # Create response
-    response = HttpResponse(
-        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    )
-    response['Content-Disposition'] = (
-        f'attachment; filename={status}_report_{datetime.now().strftime("%Y%m%d")}.xlsx'
-    )
-
-    wb.save(response)
-    return response
+#     return render(request, "financial_summary.html", context)
