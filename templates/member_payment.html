@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Member Payment</h2>
+
+    <div>
+        <p><strong>Name:</strong> {{ member.name }}</p>
+        <p><strong>Total Amount:</strong> ₹{{ member.total_amount }}</p>
+        <p><strong>Paid Amount:</strong> ₹{{ member.current_installment_amount }}</p>
+        <p><strong>Pending Amount:</strong> ₹{{ member.pending_amount }}</p>
+        <p><strong>Payment Status:</strong> 
+            {% if member.payment_status == "Paid" %}
+                <span class="paid">Paid</span>
+            {% else %}
+                <span class="pending">Pending</span>
+            {% endif %}
+        </p>
+    </div>
+
+    <h3>Make a Payment</h3>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="amount_paid">Amount Paid:</label>
+        <input type="number" name="amount_paid" required min="1" max="{{ member.pending_amount }}">
+
+        <button type="submit">Submit Payment</button>
+    </form>
+
+    <a href="{% url 'pending_members_list' %}">View Pending Payments</a>
+</div>
+{% endblock %}

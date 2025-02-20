@@ -86,9 +86,28 @@ urlpatterns = [
 
     path("update_followup_date/<int:id>/", update_followup_date, name="update_followup_date"),
 
-    
+    path('generate_invoice/<int:client_id>/', generate_invoice, name='generate_invoice'),
 
+    path('invoice/<int:member_id>/', generate_invoice, name='generate_invoice'),
+
+    path('update-payment/<int:member_id>/', update_member_payment, name='update_member_payment'),
+
+    path('update-payment/<int:member_id>/', update_member_payment, name='update_member_payment'),
+    path('view-member/<int:member_id>/', view_each_member, name='view_each_member'),  
 ]
+
+    # path('pending-members/', pending_members_list, name='pending_members_list'),
+
+    # path('pending-members/', pending_members_list, name='pending_members_list'),
+    # path('add-payment/<int:member_id>/', add_payment, name='add_payment'),
+
+
+#     path('pending-members/', pending_members_list, name='pending_members_list'),
+#     # path('member-payment/<int:member_id>/', update_member_payment, name='member_payment_page'),
+
+#     path('member-payment/<int:member_id>/', update_member_payment, name='member_payment_page'),
+
+
 
 
 

@@ -350,16 +350,16 @@
                                                             </div>
                                                             <div class="card-body">
                                                                 <div class="row mb-3">
-                                                                    <label f class="col-sm-3 col-form-label" for="currentInstallment">Current Installment Amount</label>
+                                                                    <label for="currentInstallment" class="col-sm-3 col-form-label">Current Installment Amount</label>
                                                                     <div class="col-sm-9">
-                                                                        <input type="text" class="form-control" name="current_installment_amount" id="current_installment_amount" placeholder="Enter Amount">
+                                                                        <input type="text" class="form-control" name="current_installment_amount" id="current_installment_amount" placeholder="Enter Amount" oninput="updatePendingAmount()">
                                                                         <br>
                                                                         <span id="pendingSpan">
-                                                                            <!-- Pending Amount -->
-                                                                            <b id="pending" style="color: red;"></b>
+                                                                            <b style="color: red;">Pending Amount: </b> <b id="pending_amount">0</b>
                                                                         </span>
                                                                     </div>
                                                                 </div>
+                                                                
      
                                                                 <div class="row mb-3">
                                                                     <label for="group" class="col-sm-3 col-form-label">Select Online Payment Method</label>
@@ -695,6 +695,19 @@ document.addEventListener("DOMContentLoaded", function () {
                                         });
                                     }
                                 });
+                                function updatePendingAmount() {
+    var totalAmount = parseFloat(document.getElementById('total_amount').value) || 0;
+    var paidAmount = parseFloat(document.getElementById('current_installment_amount').value) || 0;
+
+    var pendingAmount = totalAmount - paidAmount;
+
+    document.getElementById('pending_amount').textContent = pendingAmount.toFixed(2);
+}
+
+// Trigger pending amount update when the page loads
+window.onload = function () {
+    updatePendingAmount();
+};
                             </script>
                             {% endblock script %}
                             

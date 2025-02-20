@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Members List</title>
+</head>
+<body>
+
+<h1>All Members</h1>
+
+<h2>Active Members</h2>
+<ul>
+    {% for member in members %}
+        <li>{{ member.name }} - {{ member.email }} - {{ member.status }}
+            <a href="{% url 'convert_lead_to_member' member.converted_from_lead.id %}">Convert to Member</a>
+        </li>
+    {% empty %}
+        <li>No active members found.</li>
+    {% endfor %}
+</ul>
+
+<h2>Converted Members</h2>
+<ul>
+    {% for converted_member in converted_members %}
+        <li>{{ converted_member.name }} - {{ converted_member.email }} (Converted on {{ converted_member.conversion_date }})</li>
+    {% empty %}
+        <li>No converted members found.</li>
+    {% endfor %}
+</ul>
+
+</body>
+</html>

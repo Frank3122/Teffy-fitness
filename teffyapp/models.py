@@ -6,6 +6,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 import calendar
+from django.db.models import Sum
 from datetime import timedelta
 # Create your models here.
 
@@ -271,10 +272,18 @@ class AddMember(models.Model):
     current_installment_amount = models.FloatField(null=True, blank=True)
     payment_mode = models.CharField(max_length=50, null=True, blank=True)
     payment_date = models.DateField(null=True, blank=True)
-    sold_by = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, blank=True)
+    sold_by = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True, blank=True)
     discount = models.FloatField(null=True, blank=True)  
     discount_type = models.CharField(max_length=50, null=True, blank=True)  
     select_membership_plan = models.ForeignKey(to=Plan, on_delete=models.CASCADE, null=True, blank=True)
+    
+    def pending_amount(self):
+        """Calculate pending amount dynamically"""
+        return max(self.total_amount - self.current_installment_amount, 0)
+
+    def payment_status(self):
+        """Check if fully paid"""
+        return "Paid" if self.pending_amount() == 0 else "Pending"
 
     def __str__(self):
         return self.name
@@ -314,4 +323,22 @@ class AddMember(models.Model):
         }
 
 
-        
+class MemberPayment(models.Model):
+    member = models.ForeignKey("AddMember", on_delete=models.CASCADE, related_name="payments")
+    amount_paid = models.FloatField(default=0)
+    pending_amount = models.FloatField(default=0)
+    payment_mode = models.CharField(max_length=50, choices=[
+        ("Cash", "Cash"),
+        ("Card", "Card"),
+        ("Online Transfer", "Online Transfer"),
+    ])
+    payment_date = models.DateTimeField(default=now)
+
+    def __str__(self):
+        return f"{self.member.name} - ₹{self.amount_paid} (Pending: ₹{self.pending_amount})"
+
+    def save(self, *args, **kwargs):
+        """Auto-update pending amount when saving."""
+        total_paid = sum(payment.amount_paid for payment in MemberPayment.objects.filter(member=self.member))
+        self.pending_amount = self.member.total_amount - total_paid
+        super().save(*args, **kwargs)

@@ -13,11 +13,14 @@ from django.db.models import Sum, F
 from django.utils.timezone import now  
 from django.utils.timezone import localtime
 from datetime import datetime , timedelta
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, Http404
 from decimal import Decimal
 import calendar
 from openpyxl import Workbook
 from openpyxl.styles import Alignment
+from django.http import HttpResponse
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
 
 
 # Create your views here.
@@ -205,6 +208,10 @@ def main(request):
     # Get today's date
     today = timezone.now().date()
 
+    pending_members = AddMember.objects.annotate(
+        pending_amount=F('total_amount') - F('current_installment_amount')
+    ).filter(pending_amount__gt=0)
+
     # Today's enrollments
     today_enrollments = PersonalInformation.objects.filter(
         status='converted', 
@@ -298,12 +305,15 @@ def main(request):
     ).count()
 
     # Revenue Calculation (Sum of Payment Amounts)
-    today_revenue = Payments.objects.filter(date_paid__date=today).aggregate(total_revenue=Sum('amount_paid'))['total_revenue'] or 0
+    total_revenue = Payments.objects.aggregate(total=Sum('amount_paid'))['total'] or 0
+    today_revenue = Payments.objects.filter(date_paid__date=today).aggregate(total=Sum('amount_paid'))['total'] or 0
 
-    today_expense = Expense.objects.filter(date_spent=today).aggregate(
-    total_expense=Sum(F('price') * F('quantity'))  # Multiply price by quantity
-)['total_expense'] or 0
-# Calculate Net Profit
+    # Total expense calculation
+    total_expense = Expense.objects.aggregate(total=Sum(F('price') * F('quantity')))['total'] or 0
+    today_expense = Expense.objects.filter(date_spent=today).aggregate(total=Sum(F('price') * F('quantity')))['total'] or 0
+
+    # Total profit calculation
+    total_profit = total_revenue - total_expense
     today_profit = today_revenue - today_expense
 
     # Overdue follow-ups
@@ -327,7 +337,7 @@ def main(request):
         "today_follow_up": today_follow_up,
         "expiry_date": expiry_date,
         "today_expiry_date": today_expiry_date,
-        "today_revenue": today_revenue,
+        # "today_revenue": today_revenue,
         "not_converted_count": not_converted_count,
         "pending_leads_count": pending_leads_count,
         "new_leads_count": new_leads_count,
@@ -336,9 +346,18 @@ def main(request):
         "returns_count": returns_count,
         "overdue_follow_up_count": overdue_follow_ups.count(),
         "overdue_follow_ups": overdue_follow_ups,
-        'today_profit':today_profit,
-        'today_expense':today_expense,
+        # 'today_profit':today_profit,
+        # 'today_expense':today_expense,
         'total_members':total_members,
+        "pending_members": pending_members,  # Pass to the dashboard
+        "pending_count": pending_members.count(),
+
+        "total_revenue": total_revenue,
+        "today_revenue": today_revenue,
+        "total_expense": total_expense,
+        "today_expense": today_expense,
+        "total_profit": total_profit,
+        "today_profit": today_profit,
     }
 
     # Success message
@@ -524,52 +543,26 @@ def update_followup_date(request, id):
 
 
 def update_status(request, id):
-    if request.method == "POST":
+    if request.method == 'POST':
         lead = PersonalInformation.objects.get(id=id)
-        status = request.POST.get("status")
-
-        # Update status
+        status = request.POST.get('status')
         lead.status = status
         lead.save()
 
-        # If status is converted, move the lead to AddMember
-        if status == "converted":
-            # Check if the member already exists (avoid duplicates)
-            existing_member = AddMember.objects.filter(mobile_number=lead.mobile_number).first()
-            if not existing_member:
-                AddMember.objects.create(
-                    name=lead.name,
-                    gender=lead.gender,
-                    mobile_number=lead.mobile_number,
-                    email=lead.email,
-                    occupation=lead.occupation,
-                    source="Converted Lead",
-                    registration_amount=0,  # You can modify based on logic
-                    enrollment_date=timezone.now(),
-                )
-
         messages.success(request, f"Status updated to {status} successfully.")
 
-        # Redirect based on status
-        if status == "new":
-            return redirect("new_leads")
-        elif status == "converted":
-            return redirect("converted_leads")
-        elif status == "not_converted":
-            return redirect("not_converted_leads")
-        elif status == "pending":
-            return redirect("pending_leads")
-        elif status == "follow_up":
-            return redirect("follow_up_leads")
+        if status == 'new':
+            return redirect('new_leads')
+        elif status == 'converted':
+            return redirect('converted_leads')
+        elif status == 'not_converted':
+            return redirect('not_converted_leads')
+        elif status == 'pending':
+            return redirect('pending_leads')
+        elif status == 'follow_up':
+            return redirect('follow_up_leads')
 
-    return redirect("new_leads")
-
-# def members_list(request):
-#     members = AddMember.objects.all()  # Get all members (including converted leads)
-
-#     return render(request, "members-list.html", {"members": members})
-
-
+    return redirect('new_leads')
 
 
 def new_leads(request):
@@ -587,11 +580,16 @@ def converted_leads(request):
         selected_service = Service.objects.get(id=service_id)
         selected_plan = Plan.objects.get(id=plan_id)
 
-        # Assigning service and plan to the client
+        # Assign service and plan
         lead.services = selected_service
         lead.plan_leads = selected_plan
+        lead.status = "converted"  # Ensure status is updated
 
-        lead.save()  # This will automatically call save and calculate the expiry_date
+        lead.save()
+
+        # Ensure no automatic AddMember creation
+        if AddMember.objects.filter(email=lead.email).exists():
+            print(f"Lead {lead.name} is already a member, skipping AddMember creation.")
 
         return redirect('converted_leads')
 
@@ -603,9 +601,8 @@ def converted_leads(request):
         'all_data': all_data,
         'status_title': 'Converted',
         'available_services': available_services,
-        'plans':plans,
+        'plans': plans,
     })
-
 
 def not_converted_leads(request):
     if request.method == "POST":
@@ -1168,59 +1165,17 @@ def renew_member_list(request):
         "all_data": all_data,
         "today": today,
     })
+def renew_member_page(request, member_id):
+    member = get_object_or_404(AddMember, id=member_id)
+    if request.method == "POST":
+        renewal_date = request.POST.get("renewal_date")
+        member.renewal_date = renewal_date
+        member.save()
+        messages.success(request, "Membership renewed successfully!")
+        return redirect("renew_member_list")
+    return render(request, "renew_member_page.html", {"member": member})
 
-# def renew_member_page(request, member_id):
-#     # Fetch the member's details using their ID
-#     member = get_object_or_404(PersonalInformation, id=member_id)
 
-#     # Check if the member has a service assigned
-#     if not member.services:
-#         messages.error(request, "This member does not have a service assigned.")
-#         return redirect("renew_member_list")
-
-#     service = member.services
-
-#     # Extract the duration of the service in months (e.g., "5 months")
-#     try:
-#         duration_months = int(service.duration.split()[0])
-#     except ValueError:
-#         messages.error(request, "Invalid service duration format.")
-#         return redirect("renew_member_list")
-
-#     # Get the renewal date (either from the last renewal or assigned date)
-#     renew_date = member.renew_set.last().renew_date if member.renew_set.exists() else member.assigned_date
-
-#     # Calculate the new expiry date
-#     new_month = renew_date.month + duration_months
-#     new_year = renew_date.year + (new_month - 1) // 12  # Adjust year if month exceeds 12
-#     new_month = (new_month - 1) % 12 + 1  # Keep month between 1-12
-
-#     # Get the last valid day of the new month
-#     last_day_of_month = calendar.monthrange(new_year, new_month)[1]
-#     new_day = min(renew_date.day, last_day_of_month)  # Adjust if the day is out of range
-
-#     # Create the new expiry date
-#     expiry_date = date(new_year, new_month, new_day)
-
-#     # If the form is submitted, save the renewal details
-#     if request.method == "POST":
-#         payment_method = request.POST.get("payment_method")
-        
-#         # Save the renewal record
-#         Renew.objects.create(
-#             name=member,
-#             service=service,
-#             renew_date=renew_date,
-#             expiry_date=expiry_date,
-#             payment_method=payment_method,
-#         )
-
-#         # Show a success message and redirect
-#         messages.success(request, "Membership renewed successfully!")
-#         return redirect("renew_member_list")
-
-#     # If not a POST request, show the renewal page
-#     return render(request, "renew_member_page.html", {"member": member, "renew_date": renew_date})
 
 def renew_member_page(request, member_id):
     # Fetch the member's details using their ID
@@ -1259,14 +1214,6 @@ def save_renewal_date(request, client_id):
         return redirect('renew_member_list')
 
     return render(request, 'renew_member_page.html', {'client': client})
-
-# def add_members(request):
-#     available_services = Service.objects.all()
-#     group = Service.objects.all()
-#     return render(request,"add-members.html", {"available_services": available_services,"group":group})
-# from django.shortcuts import render, redirect
-# from django.contrib import messages
-# from .models import Service, AddMember
 
 
 def parse_date(date_str):
@@ -1385,10 +1332,9 @@ def add_member(request):
 
 
 
-
 def display_add_members(request):
     add_members = AddMember.objects.all()
-    return render(request,"display-all-add-members.html", {"add_members":add_members})
+    return render(request, "display-all-add-members.html", {"add_members": add_members})
 
 
 def view_add_members(request, id):
@@ -1456,369 +1402,6 @@ def view_all_clients(request):
     print(add_members)
 
     return render(request, "all-clients.html", {'leads': leads, 'add_members': add_members})
-
-
-
-# from django.http import HttpResponse
-# from openpyxl import Workbook
-# from datetime import datetime
-
-
-# # from django.http import HttpResponse
-# # from openpyxl import Workbook
-# # from datetime import datetime
-# # from your_app.models import Payments, PersonalInformation  # Replace 'your_app' with your actual app name
-
-# def download_report(request):
-#     # Get query parameters
-#     from_date = request.GET.get('from_date', None)
-#     to_date = request.GET.get('to_date', None)
-#     status = request.GET.get('status', None)
-
-#     # Convert date strings to datetime objects
-#     if from_date and to_date:
-#         from_date = datetime.strptime(from_date, "%Y-%m-%d")
-#         to_date = datetime.strptime(to_date, "%Y-%m-%d")
-
-#     # Filter Payments data based on the date range
-#     payment_data = Payments.objects.filter(date_paid__range=[from_date, to_date]) if from_date and to_date else Payments.objects.all()
-
-#     # Filter Leads data based on the date range and status
-#     leads_data = PersonalInformation.objects.filter(created_date__range=[from_date, to_date]) if from_date and to_date else PersonalInformation.objects.all()
-    
-#     if status:  # Apply status filter if provided
-#         leads_data = leads_data.filter(status=status)
-
-#     # Create a workbook and worksheet
-#     wb = Workbook()
-#     ws = wb.active
-#     ws.title = "Payments & Leads Report"
-
-#     # Define column headers
-#     columns = [
-#         "Name", "Amount Paid", "Pending Amount", "Payment Mode", "Payment Date",  # Payments
-#         "Lead Name", "Phone Number", "Email", "Created Date", "Status"  # Leads
-#     ]
-#     ws.append(columns)
-
-#     # Append Payments data to the worksheet
-#     for payment in payment_data:
-#         date_paid = payment.date_paid.replace(tzinfo=None) if payment.date_paid and payment.date_paid.tzinfo else payment.date_paid
-#         row = [
-#             payment.name,  
-#             payment.amount_paid,
-#             payment.pending_amount,
-#             payment.payment_mode,
-#             date_paid,
-#             "", "", "", "", ""  # Empty placeholders for Leads
-#         ]
-#         ws.append(row)
-
-#     # Append Leads data to the worksheet
-#     for lead in leads_data:
-#         created_date = lead.created_date.replace(tzinfo=None) if lead.created_date and lead.created_date.tzinfo else lead.created_date
-#         row = [
-#             "", "", "", "", "",  # Empty placeholders for Payments
-#             str(lead.name),  
-#             str(lead.phone_number),
-#             str(lead.email),
-#             created_date,
-#             str(lead.status)  # Ensure status is a string
-#         ]
-#         ws.append(row)
-
-#     # Adjust column widths for better readability
-#     for col in ws.columns:
-#         max_length = 0
-#         column = col[0].column_letter
-#         for cell in col:
-#             try:
-#                 if cell.value:
-#                     max_length = max(max_length, len(str(cell.value)))
-#             except:
-#                 pass
-#         ws.column_dimensions[column].width = max_length + 2
-
-#     # Return the Excel file as a response
-#     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-#     response['Content-Disposition'] = 'attachment; filename="gym_report.xlsx"'
-#     wb.save(response)
-#     return response
-
-# from django.http import HttpResponse
-# from openpyxl import Workbook
-# from openpyxl.styles import Font, Alignment, PatternFill
-# from openpyxl.utils import get_column_letter
-# from datetime import datetime
-# from django.shortcuts import render
-# from django.core.exceptions import BadRequest
-# from django.db.models import Q
-
-# def download_report(request):
-#     try:
-#         # Get filter parameters
-#         from_date = request.GET.get('from_date')
-#         to_date = request.GET.get('to_date')
-#         status = request.GET.get('status')
-
-#         if not all([from_date, to_date, status]):
-#             return HttpResponse("Please provide all required parameters", status=400)
-
-#         # Create workbook
-#         wb = Workbook()
-#         ws = wb.active
-
-#         # Define styles
-#         header_font = Font(bold=True, color="FFFFFF")
-#         header_fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
-
-#         # Configure report based on category
-#         report_config = {
-#             "members": {
-#                 "title": "Members Report",
-#                 "headers": [
-#                     'Name', 'Gender', 'Mobile Number', 'Email', 'Location', 
-#                     'Service', 'Batch', 'Registration Amount', 'Total Amount',
-#                     'Enrollment Date', 'Expiry Date', 'Payment Mode',
-#                     'Payment Date', 'Membership Plan'
-#                 ],
-#                 "queryset": AddMember.objects.filter(enrollment_date__range=[from_date, to_date])
-#             },
-#             "PersonalInformation": {
-#                 "title": "Personal Information Report",
-#                 "headers": ["Name", "Address", "Occupation", "Gender", "Mobile", "Email", "Goal", "Height", "Current Weight", "Target Weight"],
-#                 "queryset": PersonalInformation.objects.filter(created_date__range=[from_date, to_date])
-#             },
-#             "expenses": {
-#                 "title": "Expense Report",
-#                 "headers": ["Expense Name", "Price", "Quantity", "Date Spent"],
-#                 "queryset": Expense.objects.filter(date_spent__range=[from_date, to_date])
-#             },
-#             "sales": {
-#                 "title": "Sales Report",
-#                 "headers": ["Product Name", "Customer", "Quantity", "Sale Price", "Discount", "Sale Date", "Total Amount"],
-#                 "queryset": Sales.objects.filter(sale_date__range=[from_date, to_date])
-#             },
-#             "payments": {
-#                 "title": "Payments Report",
-#                 "headers": ["Member Name", "Amount Paid", "Pending Amount", "Payment Mode", "Date Paid", "Created Date"],
-#                 "queryset": Payments.objects.filter(date_paid__range=[from_date, to_date])
-#             }
-#         }
-
-#         # Leads-specific filter
-#         if status in ['new', 'converted', 'not-converted', 'follow-up', 'pending']:
-#             report_config[status] = {
-#                 "title": f"{status.title()} Leads Report",
-#                 "headers": ["Name", "Mobile", "Email", "Status", "Follow Up Date", "Created Date", "Service", "Plan"],
-#                 "queryset": PersonalInformation.objects.filter(Q(created_date__range=[from_date, to_date]) & Q(status=status))
-#             }
-
-#         # Validate status
-#         if status not in report_config:
-#             return HttpResponse("Invalid report type", status=400)
-
-#         # Get report details
-#         config = report_config[status]
-#         ws.title = config["title"]
-#         headers = config["headers"]
-#         queryset = config["queryset"]
-
-#         # Apply headers
-#         for col, header in enumerate(headers, 1):
-#             cell = ws.cell(row=1, column=col, value=header)
-#             cell.font = header_font
-#             cell.fill = header_fill
-#             cell.alignment = Alignment(horizontal="center")
-#             ws.column_dimensions[get_column_letter(col)].width = 15
-
-#         # Add data rows
-#         for row, item in enumerate(queryset, 2):
-#             data = []
-
-#             if status == "members":
-#                 member_data = item.member()
-#                 data = [
-#                     member_data.get('name', ''),
-#                     member_data.get('gender', ''),
-#                     member_data.get('mobile_number', ''),
-#                     member_data.get('email', ''),
-#                     member_data.get('location', ''),
-#                     str(member_data.get('service', '')),
-#                     str(member_data.get('batch', '')),
-#                     member_data.get('registration_amount', ''),
-#                     member_data.get('total_amount', ''),
-#                     member_data.get('enrollment_date', ''),
-#                     member_data.get('expiry_date', ''),
-#                     getattr(item, 'payment_mode', ''),
-#                     member_data.get('payment_date', ''),
-#                     str(member_data.get('select_membership_plan', ''))
-#                 ]
-            
-#             elif status == "PersonalInformation":
-#                 data = [
-#                     getattr(item, 'name', ''),
-#                     getattr(item, 'address', ''),
-#                     getattr(item, 'occupation', ''),
-#                     getattr(item, 'gender', ''),
-#                     getattr(item, 'mobile_number', ''),
-#                     getattr(item, 'email', ''),
-#                     getattr(item, 'goal', ''),
-#                     getattr(item, 'height', ''),
-#                     getattr(item, 'current_weight', ''),
-#                     getattr(item, 'target_weight', '')
-#                 ]
-
-#             elif status == "expenses":
-#                 data = [
-#                     getattr(item, "expense_name", ""),
-#                     getattr(item, "price", ""),
-#                     getattr(item, "quantity", ""),
-#                     str(getattr(item, "date_spent", ""))
-#                 ]
-            
-#             elif status in ['new', 'converted', 'not-converted', 'follow-up', 'pending']:
-#                 data = [
-#                     getattr(item, 'name', ''),
-#                     getattr(item, 'mobile_number', ''),
-#                     getattr(item, 'email', ''),
-#                     getattr(item, 'status', ''),
-#                     str(getattr(item, 'follow_up_date', '')),
-#                     str(getattr(item, 'created_date', '')),
-#                     getattr(item.services, 'name', '') if getattr(item, 'services', None) else '',
-#                     getattr(item.plan_leads, 'plan_name', '') if getattr(item, 'plan_leads', None) else ''
-#                 ]
-
-#             elif status == "sales":
-#                 total_amount = (getattr(item, 'sale_price', 0) or 0) * getattr(item, 'quantity', 0)
-#                 if getattr(item, 'discount', None):
-#                     total_amount *= (1 - item.discount / 100)
-#                 data = [
-#                     getattr(item, 'product_name', ''),
-#                     getattr(item, 'customer', ''),
-#                     getattr(item, 'quantity', ''),
-#                     getattr(item, 'sale_price', ''),
-#                     getattr(item, 'discount', ''),
-#                     str(getattr(item, 'sale_date', '')),
-#                     round(total_amount, 2)
-#                 ]
-            
-#             elif status == "payments":
-#                 data = [
-#                     getattr(item.name, 'name', '') if getattr(item, 'name', None) else '',
-#                     getattr(item, 'amount_paid', ''),
-#                     getattr(item, 'pending_amount', ''),
-#                     getattr(item, 'payment_mode', ''),
-#                     str(getattr(item, 'date_paid', '')),
-#                     str(getattr(item, 'created_date', ''))
-#                 ]
-
-#             # Write row data
-#             for col, value in enumerate(data, 1):
-#                 cell = ws.cell(row=row, column=col, value=value)
-#                 cell.alignment = Alignment(horizontal="center")
-
-#         # Create response
-#         response = HttpResponse(
-#             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-#         )
-#         response['Content-Disposition'] = f'attachment; filename={status}_report_{datetime.now().strftime("%Y%m%d")}.xlsx'
-#         wb.save(response)
-#         return response
-
-#     except Exception as e:
-#         return HttpResponse(f"Error generating report: {str(e)}", status=500)
-
-
-
-# from openpyxl import Workbook
-# from openpyxl.styles import Font, Alignment, PatternFill
-# from django.http import HttpResponse
-# from datetime import datetime
-
-
-# def generate_member_excel_report(request):
-#     # Create a new workbook and select the active sheet
-#     wb = Workbook()
-#     ws = wb.active
-#     ws.title = "Member Report"
-
-#     # Define headers based on the member method fields
-#     headers = [
-#         'Name', 'Gender', 'Mobile Number', 'Aadhar Number', 'Email',
-#         'Date of Birth', 'Location', 'Source', 'Occupation',
-#         'Emergency Number', 'Registration Amount', 'Service',
-#         'Batch', 'Cost of Plan', 'Total Sessions', 'Convenience Fees',
-#         'Total Amount', 'Enrollment Date', 'Activation Date',
-#         'Expiry Date', 'Current Installment Amount', 'Payment Mode',
-#         'Payment Date', 'Sold By', 'Discount', 'Discount Type',
-#         'Membership Plan', 'Uploaded File'
-#     ]
-
-#     # Style the headers
-#     header_font = Font(bold=True, color="FFFFFF")
-#     header_fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
-    
-#     # Write headers
-#     for col, header in enumerate(headers, 1):
-#         cell = ws.cell(row=1, column=col, value=header)
-#         cell.font = header_font
-#         cell.fill = header_fill
-#         cell.alignment = Alignment(horizontal='center')
-#         ws.column_dimensions[chr(64 + col)].width = 15  # Set column width
-
-#     # Get all members
-#     members = AddMember.objects.all()
-
-#     # Write data
-#     for row, member in enumerate(members, 2):
-#         member_data = member.member()  # Get member data using the member method
-        
-#         # Map the data to columns
-#         row_data = [
-#             member_data['name'],
-#             member_data['gender'],
-#             member_data['mobile_number'],
-#             member_data['aadhar_number'],
-#             member_data['email'],
-#             member_data['date_of_birth'],
-#             member_data['location'],
-#             member_data['source'],
-#             member_data['occupation'],
-#             member_data['emergency_number'],
-#             member_data['registration_amount'],
-#             str(member_data['service']) if member_data['service'] else '',
-#             str(member_data['batch']) if member_data['batch'] else '',
-#             str(member_data['cost_of_plan']) if member_data['cost_of_plan'] else '',
-#             str(member_data['total_session']) if member_data['total_session'] else '',
-#             member_data['conveniance_fees'],
-#             member_data['total_amount'],
-#             member_data['enrollment_date'],
-#             member_data['activation_date'],
-#             member_data['expiry_date'],
-#             member_data['current_installment_amount'],
-#             member.payment_mode,  # Direct from model as it's not in member method
-#             member_data['payment_date'],
-#             str(member_data['sold_by']) if member_data['sold_by'] else '',
-#             member_data['discount'],
-#             member_data['discount_type'],
-#             str(member_data['select_membership_plan']) if member_data['select_membership_plan'] else '',
-#             str(member_data['uploaded_file']) if member_data['uploaded_file'] else ''
-#         ]
-
-#         for col, value in enumerate(row_data, 1):
-#             cell = ws.cell(row=row, column=col, value=value)
-#             cell.alignment = Alignment(horizontal='center')
-
-#     # Create the HTTP response
-#     response = HttpResponse(
-#         content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-#     )
-#     response['Content-Disposition'] = f'attachment; filename=member_report_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
-
-#     # Save the workbook to the response
-#     wb.save(response)
-#     return response
 
 
 from django.http import HttpResponse
@@ -2000,50 +1583,125 @@ def download_report(request):
     except Exception as e:
         return HttpResponse(f"Error generating report: {str(e)}", status=500)
 
+import os
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.colors import red, black
+from .models import AddMember
 
-# from decimal import Decimal  # Import Decimal
+def generate_invoice(request, member_id):
+    """Generate a professional PDF invoice with gym details, logo, and payment info."""
+    member = get_object_or_404(AddMember, id=member_id)
 
-# def financial_summary(request):
-#     today = now().date()
-#     start_of_month = today.replace(day=1)
+    # Ensure pending amount is correct
+    pending_amount = max(member.total_amount - member.current_installment_amount, 0)
 
-#     # **Today's Financial Data**
-#     today_revenue = Payments.objects.filter(date_paid__date=today).aggregate(total=Sum('amount_paid'))['total'] or 0
-#     today_expenditure = Expense.objects.filter(date_spent=today).aggregate(total=Sum('price'))['total'] or 0
-#     today_profit_or_loss = today_revenue - today_expenditure
-#     today_absolute_profit_or_loss = abs(today_profit_or_loss)
-#     today_total_pending = Payments.objects.filter(date_paid__date=today).aggregate(total=Sum('pending_amount'))['total'] or 0
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="invoice_{member.name}.pdf"'
 
-#     # **Monthly Financial Data**
-#     total_revenue = Payments.objects.filter(date_paid__date__range=[start_of_month, today]).aggregate(total=Sum('amount_paid'))['total'] or 0
-#     total_expenditure = Expense.objects.filter(date_spent__range=[start_of_month, today]).aggregate(total=Sum('price'))['total'] or 0
-#     profit_or_loss = total_revenue - total_expenditure
-#     absolute_profit_or_loss = abs(profit_or_loss)
-#     total_pending = Payments.objects.filter(date_paid__date__range=[start_of_month, today]).aggregate(total=Sum('pending_amount'))['total'] or 0
+    pdf = canvas.Canvas(response, pagesize=letter)
+    width, height = letter
 
-#     # **Debugging: Print Values in Terminal**
-#     print("========== Financial Summary Debug ==========")
-#     print("Today's Revenue:", today_revenue)
-#     print("Today's Expenses:", today_expenditure)
-#     print("Today's Profit/Loss:", today_profit_or_loss)
-#     print("Today's Pending Amount:", today_total_pending)
-#     print("Monthly Revenue:", total_revenue)
-#     print("Monthly Expenses:", total_expenditure)
-#     print("Monthly Profit/Loss:", profit_or_loss)
-#     print("Monthly Pending Amount:", total_pending)
-#     print("=============================================")
+    # **Gym Name - TEFFEY FITNESS**
+    pdf.setFont("Helvetica-Bold", 20)
+    pdf.drawCentredString(width / 2, height - 50, "TEFFEY FITNESS")
 
-#     context = {
-#         'today_revenue': today_revenue,
-#         'today_expenditure': today_expenditure,
-#         'today_profit_or_loss': today_profit_or_loss,
-#         'today_absolute_profit_or_loss': today_absolute_profit_or_loss,
-#         'today_total_pending': today_total_pending,
-#         'total_revenue': total_revenue,
-#         'total_expenditure': total_expenditure,
-#         'profit_or_loss': profit_or_loss,
-#         'absolute_profit_or_loss': absolute_profit_or_loss,
-#         'total_pending': total_pending
-#     }
+    # **Gym Logo - Dynamic Path Handling**
+    gym_logo_path = 'static/image/Mask group (2).png'  # Update this with your actual logo path
+    if gym_logo_path:
+        pdf.drawImage(gym_logo_path, 30, height - 110, width=100, height=100)
 
-#     return render(request, "financial_summary.html", context)
+    # **Invoice Title**
+    pdf.setFont("Helvetica-Bold", 18)
+    pdf.drawCentredString(width / 2, height - 120, "INVOICE")
+
+    # **Member Details**
+    pdf.setFont("Helvetica-Bold", 14)
+    pdf.drawString(50, height - 160, "Member Information")
+    pdf.setFont("Helvetica", 12)
+    pdf.drawString(50, height - 180, f"Name: {member.name}")
+    pdf.drawString(50, height - 200, f"Email: {member.email or 'N/A'}")
+    pdf.drawString(50, height - 220, f"Phone: {member.mobile_number or 'N/A'}")
+    pdf.drawString(50, height - 240, f"Gender: {member.gender or 'N/A'}")
+    pdf.drawString(50, height - 260, f"Location: {member.location or 'N/A'}")
+
+    # **Service & Membership**
+    pdf.setFont("Helvetica-Bold", 14)
+    pdf.drawString(50, height - 290, "Service & Membership Details")
+    pdf.setFont("Helvetica", 12)
+    service_name = member.service.name if member.service else "N/A"
+    membership_name = member.select_membership_plan.plan_name if member.select_membership_plan else "N/A"
+    pdf.drawString(50, height - 310, f"Service Taken: {service_name}")
+    pdf.drawString(50, height - 330, f"Membership Plan: {membership_name}")
+    pdf.drawString(50, height - 350, f"Enrollment Date: {member.enrollment_date}")
+    pdf.drawString(50, height - 370, f"Expiry Date: {member.expiry_date}")
+
+    # **Payment Details**
+    pdf.setFont("Helvetica-Bold", 14)
+    pdf.drawString(50, height - 400, "Payment Details")
+    pdf.setFont("Helvetica", 12)
+    pdf.drawString(50, height - 420, f"Total Amount: RS.{member.total_amount:.2f}")
+    pdf.drawString(50, height - 440, f"Amount Paid: RS.{member.current_installment_amount:.2f}")
+    pdf.drawString(50, height - 460, f"Pending Amount: RS.{pending_amount:.2f}")
+
+    # **Highlight Pending Amount if Any**
+    if pending_amount > 0:
+        pdf.setFont("Helvetica-Bold", 14)
+        pdf.setFillColor(red)
+        pdf.drawString(50, height - 490, f" PENDING DUE: RS.{pending_amount:.2f}")
+        pdf.setFillColor(black)
+
+    # **Footer - Contact Info**
+    pdf.setFont("Helvetica", 10)
+    pdf.drawString(50, 30, "TEFFEY FITNESS | www.teffeyfitness.com | CONTACT US : 9865638121")
+
+    # **Finalize and Save the PDF**
+    pdf.showPage()
+    pdf.save()
+
+    return response
+
+
+
+
+def update_member_payment(request, member_id):
+    """Handles updating member payments and prevents overpayment."""
+    member = get_object_or_404(AddMember, id=member_id)
+
+    if request.method == 'POST':
+        amount_paid = float(request.POST.get('amount_paid', 0))
+        pending_amount = max(member.total_amount - member.current_installment_amount, 0)
+
+        if amount_paid > pending_amount:
+            messages.error(request, f"Payment failed! You cannot pay more than ₹{pending_amount}.")
+        elif amount_paid > 0:
+            member.current_installment_amount += amount_paid
+            member.payment_date = now()
+
+            # Ensure the total paid does not exceed the total amount
+            if member.current_installment_amount >= member.total_amount:
+                member.current_installment_amount = member.total_amount  # Set it to total amount if overpaid
+
+            member.save()
+            pending_amount = max(member.total_amount - member.current_installment_amount, 0)
+
+            messages.success(request, f"Payment of ₹{amount_paid} updated! Pending: ₹{pending_amount}")
+
+    return redirect('view_each_member', member_id=member.id)
+
+
+
+
+def view_each_member(request, member_id):
+    """Retrieve a specific member and ensure pending amount is included"""
+    member = get_object_or_404(AddMember, id=member_id)
+    
+    # Fetch the pending amount (same logic as in add-members.html)
+    pending_amount = max(member.total_amount - member.current_installment_amount, 0)
+
+    return render(request, 'view-each-add-members.html', {
+        'member': member,
+        'pending_amount': pending_amount,  # Pass this to the template
+    })

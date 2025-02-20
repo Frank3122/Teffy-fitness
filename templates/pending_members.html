@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Pending Payments</h2>
+
+    {% if pending_members %}
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Total Amount</th>
+                <th>Paid Amount</th>
+                <th>Pending Amount</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for member in pending_members %}
+            <tr>
+                <td>{{ member.name }}</td>
+                <td>₹{{ member.total_amount }}</td>
+                <td>₹{{ member.payments.all|sum:"amount_paid" }}</td>
+                <td>₹{{ member.total_amount|add:"-{{ member.payments.all|sum:'amount_paid' }}" }}</td>
+                <td>
+                    <a href="{% url 'member_payment_page' member.id %}" class="btn-pay">Update Payment</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No pending payments at the moment.</p>
+    {% endif %}
+</div>
+{% endblock %}
