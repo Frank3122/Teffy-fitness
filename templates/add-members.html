@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}ADD LEADS{% endblock %}
+{% block title %}ADD MEMBERS{% endblock %}
 
 {% block content %}
 <main class="app-main">
@@ -11,6 +11,15 @@
                 
             </div>
         </div>
+        {% if messages %}
+<div id="message-container">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
     <!--end::App Content Header-->
         <!--begin::App Content-->
         <!-- <div class="container-fluid">
@@ -156,22 +165,24 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="card">
-                                                            <div class="card-header">
-                                                                <h5>Package Information</h5>
-                                                            </div>
-                                                            <div class="card-body">
-                                                                <div class="row mb-3">
-                                                                    <label for="program" class="col-sm-1 col-form-label">Service</label>
-                                                                    <div class="col-sm-9">
-                                                                        <select name="service" class="form-control" id="service" onchange="updateServiceDetails()">
-                                                                            <option value="" disabled selected>Select a service</option>
-                                                                            {% for service in available_services %}
-                                                                                <option value="{{ service.id }}" {% if data.services and service.id == data.services.id %} selected {% endif %} data-price="{{ service.prices }}" data-sessions="{{ service.sessions }}" data-duration="{{ memb_plan.duration }}">
-                                                                                    {{ service.name }}  
-                                                                                </option>
-                                                                            {% endfor %}
-                                                                        </select>
+                                                        
+                                                        <div class="card-body shadow-lg ">
+                                                            <div class="row mb-3 ">
+                                                                <label for="program" class="col-sm-1 col-form-label">Service</label>
+                                                                <div class="col-sm-9">
+                                                                    <select name="service" class="form-control" id="service" onchange="updateServiceDetails()">
+                                                                        <option value="" disabled selected>Select a service</option>
+                                                                        <option value="nil">NIL</option> <!-- Adding NIL option -->
+                                                                        {% for service in available_services %}
+                                                                            <option value="{{ service.id }}" 
+                                                                                {% if data.services and service.id == data.services.id %} selected {% endif %} 
+                                                                                data-price="{{ service.prices }}" 
+                                                                                data-sessions="{{ service.sessions }}" 
+                                                                                data-duration="{{ memb_plan.duration }}">
+                                                                                {{ service.name }}  
+                                                                            </option>
+                                                                        {% endfor %}
+                                                                    </select>
                                                                     </div>
                                                                     <div class="col-lg-2 col-12 mt-lg-0 mt-2">
                                                                         <a class="btn btn-warning btn-sm" href="{% url 'services' %}" aria-controls="staticBackdrop">
@@ -193,9 +204,9 @@
                                                                         <input type="text" class="form-control" name="cost_of_plan" id="cost_of_plan" value="" readonly>
                                                                     </div>
                                                                 </div>
-                                                                
+
                                                                 <div class="row mb-3">
-                                                                    <label for="group" class="col-sm-3 col-form-label">Group</label>
+                                                                    <label for="group" class="col-sm-3 col-form-label">Session</label>
                                                                     <div class="col-sm-9">
                                                                         <select name="group" id="group" class="form-control">
                                                                             <option value="" disabled selected>Select a Group</option>
@@ -207,12 +218,14 @@
                                                                         </select>
                                                                     </div>
                                                                 </div>
+                                                                
+                                                                
 
 
                                                                 <div class="row mb-3">
                                                                     <label for="select_membership_plan" class="col-sm-3 col-form-label">Membership Plan</label>
                                                                     <div class="col-sm-9">
-                                                                        <select name="select_membership_plan" id="select_membership_plan" class="form-control" onchange="updatePlanDetails()">
+                                                                        <select name="select_membership_plan" id="select_membership_plan" class="form-control" onchange="calculateExpiry()">
                                                                             <option value="" disabled selected>Select Membership Plan</option>
                                                                             {% for memb_plan in membership_plan %}
                                                                                 <option value="{{ memb_plan.id }}" data-duration="{{ memb_plan.duration }}" data-price="{{ memb_plan.price }}">
@@ -236,6 +249,24 @@
                                                                         <input type="text" class="form-control" name="membership_price" id="membership_price" value="0.00" readonly>
                                                                     </div>
                                                                 </div>
+
+                                                                <div class="row mb-3">
+                                                                    <label for="batches" class="col-sm-3 col-form-label">Batch</label>
+                                                                    <div class="col-sm-9">
+                                                                        <select name="batches" id="batches" class="form-control">
+                                                                            <option value="" disabled selected>Select a Batch</option>
+                                                                            {% for batch in batches %}  
+                                                                            <!-- Assuming batches come from membership_plan -->
+                                                                            <option value="{{ batch.id }}">
+                                                                                {{ batch.batch }}  <!-- Adjust field name if necessary -->
+                                                                            </option>
+                                                                            {% endfor %}
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                                
+
+                                                                
                                                                 
 
                                                                 <div class="row mb-3">
@@ -407,6 +438,7 @@
                                                         </form>
                                                     </div>
                                                 </div>
+                                                
     </div>
 </main>
 
@@ -446,6 +478,7 @@
                                     scrollbarAutoHide: "leave",       
                                     scrollbarClickScroll: true,       
                                 };
+
                                 // Function to format date as "DD MMM YYYY"
 function formatDate(date) {
     var options = { year: 'numeric', month: 'short', day: 'numeric' };
@@ -622,6 +655,22 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    function calculateExpiry() {
+    let membershipDropdown = document.getElementById("select_membership_plan");
+    let selectedOption = membershipDropdown.options[membershipDropdown.selectedIndex];
+    let duration = parseInt(selectedOption.getAttribute("data-duration")); // Get plan duration (in months)
+
+    if (duration > 0) {
+        let assignedDate = new Date(); // Current date as assigned date
+        assignedDate.setMonth(assignedDate.getMonth() + duration); // Add duration to current date
+
+        let expiryDate = assignedDate.toISOString().split('T')[0]; // Convert to YYYY-MM-DD format
+        document.getElementById("expiry_date").value = expiryDate;
+    } else {
+        document.getElementById("expiry_date").value = "";
+    }
+}
+
     // Function to toggle discount input visibility based on selected discount type
     function toggleDiscountField() {
         var discountTypeMoney = document.getElementById('discount_type_money');
@@ -708,6 +757,17 @@ document.addEventListener("DOMContentLoaded", function () {
 window.onload = function () {
     updatePendingAmount();
 };
+document.addEventListener("DOMContentLoaded", function () {
+    // Automatically hide messages after 5 seconds
+    setTimeout(function () {
+        let messageContainer = document.getElementById("message-container");
+        if (messageContainer) {
+            messageContainer.style.transition = "opacity 0.5s";
+            messageContainer.style.opacity = "0";
+            setTimeout(() => messageContainer.remove(), 500); // Remove after fade out
+        }
+    }, 5000); // 5 seconds timeout
+});
                             </script>
                             {% endblock script %}
                             

@@ -84,7 +84,15 @@
                         </td>
 
 
-                        <td >{{ data.assigned_date }}</td>
+                        <td>
+                            <form method="POST" action="{% url 'update_assigned_date' id=data.id %}">
+                                {% csrf_token %}
+                                <input type="date" name="assigned_date" class="form-control form-control-sm"
+                                       value="{{ data.assigned_date|date:'Y-m-d' }}"
+                                       onchange="this.form.submit();">
+                            </form>
+                        </td>
+                        
                         <td style="width: 10%;">
                             <a href="{% url 'getone_lead' id=data.id %}" class="btn btn-sm btn-primary">
                                 <i class="fas fa-eye"></i>

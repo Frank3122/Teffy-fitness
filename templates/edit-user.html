@@ -8,12 +8,14 @@
             <div class="card-header">
                 <h3 class="card-title">EDIT DETAILS</h3>
                 {% if messages %}
-                <div class="alert alert-info" role="alert">
                     {% for message in messages %}
-                        <p>{{ message }}</p>
+                        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} alert-dismissible fade show mt-3" role="alert">
+                            <i class="fas fa-check-circle"></i> <!-- FontAwesome Icon -->
+                            <span>{{ message }}</span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
                     {% endfor %}
-                </div>
-            {% endif %}
+                {% endif %}
             </div>
             <div class="card-body">
                 <form method="POST">
@@ -94,6 +96,13 @@
         });
       }
     });
+    setTimeout(function () {
+      let alerts = document.querySelectorAll(".alert");
+      alerts.forEach(alert => {
+          alert.classList.remove("show");
+          alert.classList.add("fade");
+      });
+  }, 3000); // 3 seconds
   </script>
 {% endblock script %}
   

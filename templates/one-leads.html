@@ -21,6 +21,17 @@
             </div> <!--end::Row-->
         </div> <!--end::Container-->
     </div> <!--end::App Content Header--> <!--begin::App Content-->
+    <div class="container mt-3">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle"></i> <!-- FontAwesome Icon -->
+                    <span>{{ message }}</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
     <div class="app-content">
         <!--begin::Container-->
         <div class="container-fluid">
@@ -279,6 +290,13 @@
     });
   });
 });
+setTimeout(function () {
+    let alerts = document.querySelectorAll(".alert");
+    alerts.forEach(alert => {
+        let bsAlert = new bootstrap.Alert(alert);
+        bsAlert.close();
+    });
+  }, 3000); // 3 seconds
 
 
 

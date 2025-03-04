@@ -19,6 +19,27 @@
             </div>
         </div>
     </div>
+
+    <div class="container mt-4">
+
+        <!-- Display Messages -->
+        {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+            <div class="alert 
+                {% if message.tags == 'success' %}alert-success
+                {% elif message.tags == 'error' %}alert-danger
+                {% elif message.tags == 'warning' %}alert-warning
+                {% elif message.tags == 'info' %}alert-info
+                {% endif %} alert-dismissible fade show message-alert" role="alert">
+                <i class="fas fa-check-circle"></i> <!-- FontAwesome Icon -->
+                <span>{{ message }}</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
     <div class="app-content">
         <div class="container-fluid">
             <div class="row g-4">
@@ -122,6 +143,16 @@
           },
         });
       }
+      $(document).ready(function () {
+        // Auto-hide messages after 3 seconds
+        setTimeout(function () {
+            let alerts = document.querySelectorAll(".message-alert");
+            alerts.forEach(alert => {
+                alert.classList.remove("show");
+                alert.classList.add("fade");
+            });
+        }, 3000);
+    });
     });
   </script>
 {% endblock script %}

@@ -14,20 +14,20 @@
             </div>
         </div>
     </div>
-
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Display Messages Section -->
-            {% if messages %}
-                <div class="alert alert-info w-100">
-                    {% for message in messages %}
-                        <p>{{ message }}</p>
-                    {% endfor %}
+    <div class="container mt-4">
+        <!-- Display Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle"></i> <!-- FontAwesome Icon -->
+                    <span>{{ message }}</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-            {% endif %}
+            {% endfor %}
+        {% endif %}
 
             <!-- Plan Details Form Section -->
-            <div class="container mt-4">
+
                 <div class="row">
                     <!-- User Registration Form -->
                     <div class="col-md-6 mb-4">
@@ -218,6 +218,13 @@
                   );
               });
           })();
+          setTimeout(function () {
+            let alerts = document.querySelectorAll(".alert");
+            alerts.forEach(alert => {
+                alert.classList.remove("show");
+                alert.classList.add("fade");
+            });
+        }, 3000); // 3 seconds
       </script> <!--end::JavaScript-->
 
 {% endblock script %}

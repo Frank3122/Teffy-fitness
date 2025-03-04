@@ -3,148 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Teffy Fitness Invoice</title>
     <style>
-        /* Reset page margin and padding for PDF */
         body {
+            font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
         }
-
-        /* Center the content with proper max-width */
-        .invoice-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            border: 1px solid #ccc;
+        .container {
+            width: 50%;
+            margin: auto;
+            padding: 15px;
             background-color: #fff;
+            border: 1px solid #ccc;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
         }
-
-        /* Styling for header section */
-        .invoice-header {
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 0;
+            border-bottom: 2px solid #000;
+        }
+        .header img {
+            height: 70px;
+            width: 70px;
+            margin-right: 15px;
+        }
+        .header h1 {
+            margin: 0;
+            flex-grow: 1;
             text-align: center;
-            margin-bottom: 20px;
+            font-size: 22px;
         }
-
-        .invoice-header img {
-            max-width: 100px;
-            height: auto;
-            margin-left: 80%;
+        .contact {
+            text-align: center;
+            font-size: 13px;
         }
-
-        .invoice-header p {
-            font-style: italic;
-            font-weight: 700;
-            
-            margin: 5px 0;
-           
-        }
-        .invoice-header .phone{
-            margin-left: 75%;
-
-        }
-
-        .invoice-header .address{
-            margin-left: 67%;
-        }
-
-        /* Bill To and Invoice section */
-        .row {
-            margin-bottom: 15px;
-        }
-
-        .bill-to {
-            width: 50%;
-            padding-right: 15px;
-        }
-
         .invoice-details {
-            width: 50%;
-            text-align: right;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
         }
-
-        .table th, .table td {
-            text-align: center;
-            vertical-align: middle;
+        .invoice-details p {
+            width: 45%;
+            margin: 0;
+            padding: 6px;
+            background-color: #e9f5ff;
+            border-radius: 5px;
+            font-size: 14px;
         }
-
-        /* Grand total section */
-        .grand-total {
-            text-align: right;
+        .summary {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 10px;
+            background: #f8f8f8;
+            border-radius: 5px;
+        }
+        .summary div {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+        }
+        .summary div:last-child {
             font-weight: bold;
-            font-size: 1.2em;
+            background-color: #d9edf7;
         }
-
-        .thank-you {
+        .footer {
             text-align: center;
-            margin-top: 30px;
+            margin-top: 15px;
+            padding-top: 8px;
+            border-top: 2px solid #000;
+        }
+        .terms {
+            font-size: 12px;
+            text-align: left;
+            margin-top: 8px;
+            padding: 8px;
+            background-color: #f4f4f4;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
-    <div class="invoice-container">
-        <div class="invoice-header">
-            <div style="display: flex; flex-direction: column; align-items: center;">
-                <img src="/static/image/Mask group (2).png" alt="Teffy Fitness">
-                <p class="phone">PHONE NO: 9865638121</p>
-                <p class="address">Jeyabal Complex, Round Road, Dindigul</p>
-            </div>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <img src="/static/image/n1.png" alt="logo">
+            <h1>Teffy Fitness</h1>
+        </div>
+        <div class="contact">
+            <p>Phone: 9901774143 | Email: gorailakshikanta@gmail.com | GSTIN: -</p>
         </div>
 
-        <hr>
-
-        <div class="row">
-            <div class="bill-to">
-                <h5>Bill To:</h5>
-                <p>Customer Name<br>Address<br>City, Country</p>
-            </div>
-            <div class="invoice-details">
-                <h5>Invoice #12345</h5>
-                <p>Date: 01-Jan-2024</p>
-            </div>
+        <!-- Invoice Details -->
+        <h2>Payment Receipt</h2>
+        <div class="invoice-details">
+            <p><strong>BILL TO:</strong> {{ client.name }}</p>  
+            <p><strong>BIO ID:</strong> {{ client.id }}</p>  
+            <p><strong>Phone:</strong> {{ client.mobile_number }}</p>  
+            <p><strong>Bill Number:</strong> {{ bill_number }}</p>  
+            <p><strong>Bill Date:</strong> {{ bill_date }}</p>  
+            <p><strong>Receipt Type:</strong> {{ receipt_type }}</p>  
         </div>
 
-        <table class="table table-bordered mt-3">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Description</th>
-                    <th>Quantity</th>
-                    <th>Unit Price</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>Product A</td>
-                    <td>2</td>
-                    <td>$50</td>
-                    <td>$100</td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>Product B</td>
-                    <td>1</td>
-                    <td>$80</td>
-                    <td>$80</td>
-                </tr>
-            </tbody>
-        </table>
+        <!-- Additional Information Based on Client Type -->
+        {% if client_type == 'lead' %}
+            <p><strong>Service:</strong> {{ service.name }}</p>
+            <p><strong>Plan:</strong> {{ plan.plan_name }}</p>
+        {% elif client_type == 'member' %}
+            <p><strong>Membership Plan:</strong> {{ plan.plan_name }}</p>
+            <p><strong>Batch:</strong> {{ client.batch }}</p>
+        {% endif %}
 
-        <div class="row">
-            <div class="col-6"></div>
-            <div class="col-6 grand-total">
-                <h5>Grand Total: $180</h5>
-            </div>
+        <!-- Payment Details -->
+        <h2>Purchase Details</h2>
+        <div class="summary">
+            <div><span>Description</span> <span>Amount</span></div>
+            {% for payment in payments %}
+            <div><span>{{ payment.description }}</span> <span>Rs. {{ payment.amount_paid }}</span></div>
+            {% endfor %}
+            <div><span>SUB-TOTAL</span> <span>Rs. {{ total_amount }}</span></div>
+            <div><span>DISCOUNT</span> <span>Rs. 0</span></div>
+            <div><span>GRAND TOTAL</span> <span>Rs. {{ total_amount }}</span></div>
+            <div><span>PAID AMOUNT</span> <span>Rs. {{ paid_amount }}</span></div>
+            <div><span>DUE AMOUNT</span> <span>Rs. {{ due_amount }}</span></div>
         </div>
 
-        <hr>
-
-        <div class="thank-you">
-            <p>Thank you for your business!</p>
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>Terms and Conditions</strong></p>
+            <div class="terms">
+                <p>No refund policy.</p>
+                <p>No disputes or arguments will be entertained without a valid receipt.</p>
+                <p>Cheque Dishonor Charges will be applicable in case payments made by cheque get bounced.</p>
+                <p>Amount of Tax subject to Reverse Charges.</p>
+                <p>Please go through the Terms and Conditions pasted at the entrance.</p>
+            </div>
         </div>
     </div>
 </body>

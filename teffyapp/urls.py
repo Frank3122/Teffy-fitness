@@ -56,7 +56,7 @@ urlpatterns = [
 
     path('report/',new_reports, name="new_reports"),
 
-    path('add_leads/',add_leads,name="add_leads"),
+    # path('add_leads/',add_leads,name="add_leads"),
 
     path("renew-member/", renew_member_list, name="renew_member_list"),
     path("renew-member/<int:member_id>/", renew_member_page, name="renew_member_page"),
@@ -69,6 +69,8 @@ urlpatterns = [
     path('bill/', bill, name="bill"),
 
     path('view-all-clients/', view_all_clients, name="view_all_clients"),
+    
+    path("update-assigned-date/<int:id>/", update_assigned_date, name="update_assigned_date"),
 
     #  path('download_report/', download_report, name='download_report'),
 
@@ -86,15 +88,91 @@ urlpatterns = [
 
     path("update_followup_date/<int:id>/", update_followup_date, name="update_followup_date"),
 
-    path('generate_invoice/<int:client_id>/', generate_invoice, name='generate_invoice'),
+    # path('generate_invoice/<int:client_id>/', generate_invoice, name='generate_invoice'),
 
-    path('invoice/<int:member_id>/', generate_invoice, name='generate_invoice'),
+    # path('invoice/<int:member_id>/', generate_invoice, name='generate_invoice'),
+
+    # path("invoice/download/<int:member_id>/", generate_invoice_pdf, name="generate_invoice_pdf"),
 
     path('update-payment/<int:member_id>/', update_member_payment, name='update_member_payment'),
 
     path('update-payment/<int:member_id>/', update_member_payment, name='update_member_payment'),
     path('view-member/<int:member_id>/', view_each_member, name='view_each_member'),  
+
+
+    # path('download-invoice/<int:client_id>/', generate_invoice_pdf, name='generate_invoice_pdf'),
+
+    # path("invoice/<int:client_id>/<str:client_type>/", generate_invoice, name="generate_invoice"),
+
+    # Download Invoice as PDF
+    # path("invoice/pdf/<int:client_id>/<str:client_type>/", generate_invoice_pdf, name="generate_invoice_pdf"),
+
+
+     # ✅ View Invoice for Members
+    # path("invoice/member/<int:member_id>/", generate_invoice_member, name="generate_invoice_member"),
+
+    # ✅ Download Invoice PDF for Members
+    # path("invoice/pdf/member/<int:member_id>/", generate_invoice_pdf_member, name="generate_invoice_pdf_member"),
+
+    # path("invoice/member/<int:member_id>/", generate_invoice_member, name="generate_invoice_member"),
+    # path("invoice/lead/<int:lead_id>/", generate_invoice_lead, name="generate_invoice_lead"),
+    # path("invoice/pdf/<int:client_id>/<str:client_type>/", generate_invoice_pdf, name="generate_invoice_pdf"),
+
+    path("invoice/pdf/member/<int:member_id>/", generate_invoice_pdf_member, name="generate_invoice_pdf_member"),
+    path("invoice/pdf/lead/<int:lead_id>/", generate_invoice_pdf_lead, name="generate_invoice_pdf_lead"),
+
+    path('plan/', plan, name='plan'),
+    path('plan/edit/<int:plan_id>/', edit_plan, name='edit_plan'),
+    path('plan/delete/<int:plan_id>/', delete_plan, name='delete_plan'),  # Delete URL
 ]
+
+
+    # path("invoice/lead/<int:lead_id>/", generate_invoice_lead, name="invoice_lead"),
+    # path("invoice/member/<int:member_id>/", generate_invoice_member, name="invoice_member"),
+
+    # path("invoice/lead/<int:lead_id>/", generate_invoice_lead, name="invoice_lead"),
+    # path("invoice/member/<int:member_id>/", generate_invoice_member, name="invoice_member"),
+
+    # Download Invoice as PDF
+    # path("invoice/pdf/<int:client_id>/<str:client_type>/", generate_invoice_pdf, name="invoice_pdf"),
+
+    # path("invoice/lead/<int:lead_id>/", generate_invoice_lead, name="invoice_lead"),
+    # path("invoice/member/<int:member_id>/", generate_invoice_member, name="invoice_member"),
+    # path("invoice/pdf/<int:client_id>/<str:client_type>/", generate_invoice_pdf, name="invoice_pdf"),
+
+    # path("invoice/<int:client_id>/<str:client_type>/", generate_invoice, name="generate_invoice"),
+    
+    # # Download Invoice as PDF
+    # path("invoice/pdf/<int:client_id>/<str:client_type>/", generate_invoice_pdf, name="generate_invoice_pdf"),
+
+    # path("invoice/<int:client_id>/<str:client_type>/", generate_invoice, name="generate_invoice"),
+    # path("invoice/pdf/<int:client_id>/<str:client_type>/", generate_invoice_pdf, name="generate_invoice_pdf"),
+
+
+    # path("invoice/<int:client_id>/<str:client_type>/", generate_invoice, name="generate_invoice"),
+    
+    # # Download Invoice as PDF
+    # path("invoice/pdf/<int:client_id>/<str:client_type>/", generate_invoice_pdf, name="generate_invoice_pdf"),
+
+    # path("invoice/<int:client_id>/<str:client_type>/", generate_invoice, name="generate_invoice"),
+
+    # # Download Invoice as PDF
+    # path("invoice/pdf/<int:client_id>/<str:client_type>/", generate_invoice_pdf, name="generate_invoice_pdf"),
+
+    # path("invoice/<int:client_id>/<str:client_type>/", generate_invoice, name="generate_invoice"),
+
+    # # Download Invoice as PDF
+    # path("invoice/pdf/<int:client_id>/<str:client_type>/", generate_invoice_pdf, name="generate_invoice_pdf"),
+
+
+
+
+ 
+
+
+
+    # path('invoice/<int:client_id>/', generate_invoice_pdf, name='generate_invoice'),
+
 
     # path('pending-members/', pending_members_list, name='pending_members_list'),
 

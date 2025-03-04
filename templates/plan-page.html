@@ -4,44 +4,48 @@
 
 {% block content %}
 <main class="app-main">
-    <!--begin::App Content Header-->
+    <!-- App Content Header -->
     <div class="app-content-header">
-        <!--begin::Container-->
         <div class="container-fluid">
-            <!--begin::Row-->
             <div class="row">
                 <div class="col-sm-6">
                     <h3 class="mb-0">PLAN DETAILS</h3>
                 </div>
             </div>
-            <!--end::Row-->
         </div>
-        <!--end::Container-->
     </div>
-    <!--end::App Content Header-->
 
-    <!--begin::App Content-->
+    <!-- Display Messages -->
+    <div class="container mt-3">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle"></i> <!-- FontAwesome Icon -->
+                    <span>{{ message }}</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- App Content -->
     <div class="container-fluid">
         <div class="row">
             <!-- Plan Details Form Section -->
             <div class="col-md-6">
                 <div class="card card-warning card-outline mb-4">
-                    <!--begin::Form-->
-                    <form id="planForm" method="POST" >
-                            {% csrf_token %}
-                        <!--begin::Body-->
+                    <form id="planForm" method="POST">
+                        {% csrf_token %}
                         <div class="card-body">
-
                             <div class="mb-3">
                                 <label for="plan_name" class="form-label">PLAN</label>
                                 <input type="text" id="plan_name" class="form-control" name="plan_name" placeholder="Enter plan name" required>
                             </div>
                             <div class="mb-3">
                                 <label for="price" class="form-label">Price</label>
-                                <input type="text" id="price" class="form-control" name="price" placeholder="Enter plan price" reqired>
+                                <input type="text" id="price" class="form-control" name="price" placeholder="Enter plan price" required>
                             </div>
-
-                            <!-- <div class="mb-3">
+                            <div class="mb-3">
                                 <label for="batch" class="form-label">Batch</label>
                                 <select id="batch" class="form-control" name="batch" required>
                                     <option value="" disabled selected>Select Batch</option>
@@ -49,24 +53,20 @@
                                     <option value="afternoon">Afternoon Batch</option>
                                     <option value="evening">Evening Batch</option>
                                 </select>
-                            </div> -->
-
+                            </div>
                             <div class="mb-3">
                                 <label for="duration" class="form-label">Duration</label>
                                 <input type="text" id="duration" class="form-control" name="duration" placeholder="Enter Duration" required>
                             </div>
-
-                            
                             <div class="card-footer">
-                                <button type="submit" class="btn btn-primary" id = "plansubmit">Submit</button>
+                                <button type="submit" class="btn btn-primary" id="plansubmit">Submit</button>
                             </div>
                         </div>
-                        <!--end::Body-->
                     </form>
                 </div>
             </div>
 
-            <!-- Simple Table Section -->
+            <!-- Plan Details Table Section -->
             <div class="col-md-6">
                 <div class="card mb-4">
                     <div class="card-header">
@@ -76,36 +76,34 @@
                         <table class="table" id="planTable">
                             <thead>
                                 <tr>
-                                    <th style="width:5px">S.No</th>
+                                    <th>S.No</th>
                                     <th>PLAN NAME</th>
                                     <th>PRICE</th>
-                                    <!-- <th>BATCH</th> -->
+                                    <th>BATCH</th>
                                     <th>DURATION</th>
                                     <th>ACTION</th>
                                 </tr>
                             </thead>
                             <tbody id="planTableBody">
-                                {% for plans in all_plans %}
+                                {% for plan in all_plans %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td>{{ plans.plan_name }}</td>
-                                    <td>{{ plans.price }}</td>
-                                    <!-- <td>{{ plans.batch }}</td> -->
-                                    <td>{{ plans.duration }}</td>
+                                    <td>{{ plan.plan_name }}</td>
+                                    <td>{{ plan.price }}</td>
+                                    <td>{{ plan.batch }}</td>
+                                    <td>{{ plan.duration }}</td>
                                     <td>
-                                        <!-- Edit Icon Button -->
-                                        <a href="{% url 'edit_plan' plans.id %} " class="btn btn-warning btn-sm" title="Edit">
+                                        <!-- Edit Button -->
+                                        <a href="{% url 'edit_plan' plan.id %}" class="btn btn-warning btn-sm" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <!-- Delete Icon Button -->
-                                        <a href="#" class="btn btn-danger btn-sm" title="Delete" onclick="return confirm('Are you sure you want to delete this plan?')">
+                                        <!-- Delete Button -->
+                                        <a href="{% url 'delete_plan' plan.id %}" class="btn btn-danger btn-sm" title="Delete" onclick="return confirm('Are you sure you want to delete this plan?')">
                                             <i class="fas fa-trash-alt"></i>
                                         </a>
                                     </td>
                                 </tr>
-                               
                                 {% endfor %}
-                                
                             </tbody>
                         </table>
                     </div>
@@ -113,78 +111,38 @@
             </div>
         </div>
     </div>
-    <!--end::App Content-->
 </main>
 {% endblock content %}
 
 {% include "footer.html" %}
 
 {% block script %}
-
-
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/datatables.net/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.3.0/browser/overlayscrollbars.browser.es6.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.3.0/browser/overlayscrollbars.browser.es6.min.js"></script>
 <script src="/static/js/adminlte.js"></script>
+
 <script>
-          // DataTable Initialization
-          $(function () {
-            // Initialize DataTable for example1 with default pagination
-            $("#example1").DataTable({
-              "paging": true, // Enable pagination
-              "lengthChange": true, // Allow users to change number of rows per page
-              "searching": true, // Enable searching
-              "ordering": true, // Enable column ordering
-              "info": true, // Display information about the table (e.g., "Showing 1 to 10 of 50 entries")
-              "autoWidth": false // Disable auto-width calculation to allow more control over the layout
-            });
-
-          });
-        
-          // OverlayScrollbars Initialization
-          const SELECTOR_SIDEBAR_WRAPPER = ".sidebar-wrapper";
-          
-          const Default = {
-            scrollbarTheme: "os-theme-light",  // Set the scrollbar theme
-            scrollbarAutoHide: "leave",       // Hide the scrollbar when not in use
-            scrollbarClickScroll: true,       // Enable click-to-scroll functionality
-          };
-        
-          // Ensure the script runs after the DOM is loaded
-          document.addEventListener("DOMContentLoaded", function() {
-            const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
-        
-            // Check if the sidebarWrapper element exists and if OverlayScrollbars is available
-            if (
-              sidebarWrapper &&
-              typeof OverlayScrollbarsGlobal?.OverlayScrollbars !== "undefined"
-            ) {
-              // Initialize the custom scrollbar on the sidebarWrapper
-              OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
-                scrollbars: {
-                  theme: Default.scrollbarTheme,
-                  autoHide: Default.scrollbarAutoHide,
-                  clickScroll: Default.scrollbarClickScroll,
-                },
-              });
-            }
-          });
-      
-
-  $(document).ready(function () {
-    $('#paymentHistory').DataTable({
-      "paging": true,
-      "searching": true,
-      "ordering": true,
-      "info": true,
-      "lengthMenu": [5, 10, 15, 20],  // Customize the number of records per page
-      "responsive": true,  // Make the table responsive on smaller screens
+    $(document).ready(function () {
+        $('#planTable').DataTable({
+            "paging": true,
+            "lengthChange": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false
+        });
     });
-  });
 
+    // Auto-disappear Messages
+    setTimeout(function () {
+        let alerts = document.querySelectorAll(".alert");
+        alerts.forEach(alert => {
+            alert.classList.remove("show");
+            alert.classList.add("fade");
+        });
+    }, 3000); // 3 seconds
 </script>
 {% endblock script %}
-
-

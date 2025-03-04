@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teffy Fitness Invoice</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            margin: 0;
+            padding: 0;
+            background-color: #fff;
+            color: #333;
+            width: 100%;
+        }
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: auto;
+            padding: 10px;
+            background-color: #fff;
+        }
+        /* Header */
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+        .header-table td {
+            padding: 5px;
+            vertical-align: middle;
+        }
+        .logo {
+            width: 70px;
+            height: 70px;
+        }
+        .title {
+            font-size: 22px;
+            font-weight: bold;
+            text-align: left;
+        }
+        .contact-info {
+            text-align: right;
+            font-size: 12px;
+        }
+        /* Invoice Details */
+        .invoice-details {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+        .invoice-details td {
+            padding: 5px;
+            font-size: 14px;
+            background-color: #e9f5ff;
+            border: 1px solid #ddd;
+        }
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 6px;
+            text-align: left;
+            font-size: 14px;
+        }
+        th {
+            background-color: #d9edf7;
+            font-weight: bold;
+        }
+        /* Footer */
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            margin-top: 10px;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <table class="header-table">
+            <tr>
+                <td><img src="{{ logo_url }}" class="logo" alt="logo"></td>
+                <td class="title">Teffy Fitness</td>
+                <td class="contact-info">
+                    <p>2ND FLOOR, JEYABAL COMPLEX, SA ROUND ROAD, Dindigul</p>
+                    <p>Phone: 9865638121</p>
+                    <p>Email: teffyfitness@gmail.com</p>
+                    <!-- <p>GSTIN: -</p> -->
+                   
+                </td>
+            </tr>
+        </table>
+
+        <!-- Invoice Details -->
+        <h2>Payment Receipt</h2>
+        <table class="invoice-details">
+            <tr>
+                <td><strong>BILL TO:</strong> {{ client.name }}</td>
+                <td><strong>BIO ID:</strong> {{ client.id }}</td>
+            </tr>
+            <tr>
+                <td><strong>Phone:</strong> {{ client.mobile_number }}</td>
+                <td><strong>Bill Number:</strong> {{ bill_number }}</td>
+            </tr>
+            <tr>
+                <td><strong>Bill Date:</strong> {{ bill_date }}</td>
+                <td><strong>Receipt Type:</strong> {{ receipt_type }}</td>
+            </tr>
+            
+            <!-- Service and Plan Details -->
+            <tr>
+                <td><strong>Service:</strong> {{ service.name }}</td>
+                <td><strong>Plan:</strong> {{ plan.plan_name }}</td>
+            </tr>
+
+            <!-- Expiry Date for Leads -->
+            {% if client_type == 'lead' %}
+                <tr>
+                    <td colspan="2">
+                        <strong>Expiry Date:</strong> 
+                        {% if expiry_date and expiry_date != "Not Available" %}
+                            {{ expiry_date|date:"d-m-Y" }}
+                        {% else %}
+                            Not Available
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endif %}
+
+            <!-- Expiry Date & Batch for Members -->
+            {% if client_type == 'member' %}
+                <tr>
+                    <td><strong>Batch:</strong> {{ batch }}</td>
+                    <td>
+                        <strong>Expiry Date:</strong> 
+                        {% if expiry_date and expiry_date != "Not Available" %}
+                            {{ expiry_date|date:"d-m-Y" }}
+                        {% else %}
+                            Not Available
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endif %}
+        </table>
+
+        <!-- Purchase Details Table -->
+        <h2>Purchase Details</h2>
+        <table>
+            <tr>
+                <th>Description</th>
+                <th>Amount</th>
+            </tr>
+            <tr>
+                <td><strong>Service/Plan Cost</strong></td>
+                <td>Rs. {{ total_amount }}</td>
+            </tr>
+            <tr>
+                <td><strong>Total Amount Paid</strong></td>
+                <td>Rs. {{ paid_amount }}</td>
+            </tr>
+            <tr>
+                <td><strong>Pending Amount</strong></td>
+                <td>Rs. {{ due_amount }}</td>
+            </tr>
+        </table>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p style="text-align: left; margin: 2px 0; font-weight: bold;">Terms and Conditions</p>
+            <p style="text-align: left; margin: 2px 0;">No refund policy.</p>
+            <p style="text-align: left; margin: 2px 0;">No disputes or arguments will be entertained without a valid receipt.</p>
+            <p style="text-align: left; margin: 2px 0;">Amount of Tax subject to Reverse Charges.</p>
+            <p style="text-align: left; margin: 2px 0;">Please go through the Terms and Conditions pasted at the entrance.</p>
+        </div>
+    </div>
+</body>
+</html>

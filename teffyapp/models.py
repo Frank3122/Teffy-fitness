@@ -26,6 +26,7 @@ class Plan(models.Model):
     price = models.PositiveIntegerField(null=True, blank=True)
     batch = models.CharField(max_length=50,null=True, blank=True )
     duration = models.CharField(max_length=50, null=True, blank=True) 
+    batch = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
         return self.plan_name
@@ -81,6 +82,7 @@ class PersonalInformation(models.Model):
     services = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, related_name="users")
     assigned_date = models.DateField(default=timezone.now)
     renewal_date = models.DateField(null=True, blank=True)
+    expiry_date = models.DateField(null=True, blank=True)
     
 
     # plans assigned
@@ -248,6 +250,7 @@ class Renew(models.Model):
         return self.renew_date
 
 class AddMember(models.Model):
+    member_id = models.CharField(max_length=20, unique=True, editable=False, null=True)
     name = models.CharField(max_length=45, null=True, blank=True)
     gender = models.CharField(max_length=10)
     mobile_number = models.CharField(max_length=12, null=True, blank=True)
@@ -275,7 +278,8 @@ class AddMember(models.Model):
     sold_by = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True, blank=True)
     discount = models.FloatField(null=True, blank=True)  
     discount_type = models.CharField(max_length=50, null=True, blank=True)  
-    select_membership_plan = models.ForeignKey(to=Plan, on_delete=models.CASCADE, null=True, blank=True)
+    select_membership_plan = models.ForeignKey(to=Plan, on_delete=models.SET_NULL, null=True, blank=True)
+    batches = models.ForeignKey(to=Plan,on_delete=models.SET_NULL, null=True, blank=True, related_name="batches")
     
     def pending_amount(self):
         """Calculate pending amount dynamically"""
@@ -317,6 +321,8 @@ class AddMember(models.Model):
                 "name":self.name,
                 "cost_of_plan":self.cost_of_plan,
                 "select_membership_plan":self.select_membership_plan,
+                "batches" : self.batches,
+                
 
  
 
@@ -324,7 +330,7 @@ class AddMember(models.Model):
 
 
 class MemberPayment(models.Model):
-    member = models.ForeignKey("AddMember", on_delete=models.CASCADE, related_name="payments")
+    member = models.ForeignKey(to=AddMember, on_delete=models.CASCADE, related_name="payments")
     amount_paid = models.FloatField(default=0)
     pending_amount = models.FloatField(default=0)
     payment_mode = models.CharField(max_length=50, choices=[

@@ -1,0 +1,41 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: url("/static/image/banner.jpg") no-repeat center center fixed;
+    background-size: cover;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; 
+}
+
+.card {
+    padding: 30px;
+    border-radius: 10px;
+    width: 500px; 
+    margin-top: 40px;
+    margin-right: 500px;
+    background-color: rgba(255, 255, 255, 0.7); /* White background with 70% opacity */
+    /* Adjust the opacity as needed (0 is fully transparent, 1 is fully opaque) */
+}
+
+h1 {
+    text-align: center;
+    font-size: 30px;
+    color: rgb(103, 188, 254);
+}
+
+.form-control {
+    margin-left: 5%;
+    width: 90%;
+}
+
+.text-center button {
+   margin: 5px;
+}
