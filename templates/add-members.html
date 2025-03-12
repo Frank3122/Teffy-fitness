@@ -222,7 +222,7 @@
                                                                 
 
 
-                                                                <div class="row mb-3">
+                                                                <!-- <div class="row mb-3">
                                                                     <label for="select_membership_plan" class="col-sm-3 col-form-label">Membership Plan</label>
                                                                     <div class="col-sm-9">
                                                                         <select name="select_membership_plan" id="select_membership_plan" class="form-control" onchange="calculateExpiry()">
@@ -234,9 +234,9 @@
                                                                             {% endfor %}
                                                                         </select>
                                                                     </div>
-                                                                </div>
+                                                                </div> -->
                                                                 
-                                                                <div class="row mb-3">
+                                                                <!-- <div class="row mb-3">
                                                                     <label for="duration" class="col-sm-3 col-form-label">Total Duration</label>
                                                                     <div class="col-sm-9">
                                                                         <input type="text" class="form-control" id="select_memebrship_plan" name="total_duration" readonly>
@@ -248,22 +248,22 @@
                                                                     <div class="col-sm-9">
                                                                         <input type="text" class="form-control" name="membership_price" id="membership_price" value="0.00" readonly>
                                                                     </div>
-                                                                </div>
+                                                                </div> -->
 
-                                                                <div class="row mb-3">
+                                                                <!-- <div class="row mb-3">
                                                                     <label for="batches" class="col-sm-3 col-form-label">Batch</label>
                                                                     <div class="col-sm-9">
                                                                         <select name="batches" id="batches" class="form-control">
                                                                             <option value="" disabled selected>Select a Batch</option>
-                                                                            {% for batch in batches %}  
+                                                                            {% for batch in batches %}   -->
                                                                             <!-- Assuming batches come from membership_plan -->
-                                                                            <option value="{{ batch.id }}">
-                                                                                {{ batch.batch }}  <!-- Adjust field name if necessary -->
-                                                                            </option>
-                                                                            {% endfor %}
+                                                                            <!-- <option value="{{ batch.id }}"> -->
+                                                                                <!-- {{ batch.batch }}  Adjust field name if necessary -->
+                                                                            <!-- </option> -->
+                                                                            <!-- {% endfor %}
                                                                         </select>
                                                                     </div>
-                                                                </div>
+                                                                </div> -->
                                                                 
 
                                                                 
@@ -425,6 +425,8 @@
                                                                         </select>
                                                                     </div>
                                                                 </div>
+                                                            </div>
+                                                        </div>
                             
                                                                 <div class="card-footer text-center">
                                                                     <button type="submit" class="btn btn-info" id="enrollment">ENROLL</button>
@@ -438,17 +440,20 @@
                                                         </form>
                                                     </div>
                                                 </div>
+</main>
+
                                                 
     </div>
 </main>
 
+
                             
            
 
-                            {% endblock content %}
+{% endblock content %}
                             
                                 
-                            {% include "footer.html" %}
+{% include "footer.html" %}
                             
                             {% block script %}
                             
@@ -624,27 +629,31 @@ document.addEventListener("DOMContentLoaded", function () {
     function updateServiceDetails() {
         var serviceSelect = document.getElementById('service');
         var selectedService = serviceSelect.options[serviceSelect.selectedIndex];
-
+    
         if (selectedService.value) {
             var price = parseFloat(selectedService.getAttribute('data-price')) || 0;
             var sessions = parseInt(selectedService.getAttribute('data-sessions')) || 0;
             var activationDate = document.getElementById('activation_date');
             var expiryDate = document.getElementById('expiry_date');
-
-            // Set enrollment and activation date to current date
+    
+            // Set Enrollment and Activation Date to Current Date
             var currentDate = new Date();
-            var formattedDate = currentDate.toISOString().split('T')[0]; 
+            var formattedDate = currentDate.toISOString().split('T')[0];
             document.getElementById('enrollment_date').value = formattedDate;
-            activationDate.value = formattedDate; 
-
-            // Update cost of plan and total sessions
+            activationDate.value = formattedDate;
+    
+            // Update Cost of Service
             document.getElementById('cost_of_plan').value = price.toFixed(2);
             document.getElementById('total_sessions').value = sessions;
-
-            // Calculate expiry date
+    
+            // Calculate Expiry Date
             calculateExpiryDate(sessions, currentDate);
+    
+            // Update Total Amount based on selected service
+            calculateTotalAmount();
         }
     }
+    
 
     // Function to calculate expiry date based on sessions (1 session per day)
     function calculateExpiryDate(sessions, startDate) {
@@ -688,29 +697,30 @@ document.addEventListener("DOMContentLoaded", function () {
 
         calculateTotalAmount();
     }
-
-    // Function to calculate and update the total amount
     function calculateTotalAmount() {
         var costOfPlan = parseFloat(document.getElementById('cost_of_plan').value) || 0;
-        var membershipPrice = parseFloat(document.getElementById('membership_price').value) || 0;
         var discountAmount = parseFloat(document.getElementById('discount').value) || 0;
-        var discountPercentage = parseFloat(document.getElementById('discountpercentage').value) || 0;
         var convenienceFees = parseFloat(document.getElementById('conveniance_fees').value) || 0;
         var registrationFees = parseFloat(document.getElementById('reg_amount').value) || 0;
-
-        var totalAmount = costOfPlan + membershipPrice; 
-
-        if (document.getElementById('discount_type_money').checked) {
-            totalAmount -= discountAmount;
-        } else if (document.getElementById('discount_type_percentage').checked) {
-            totalAmount -= (totalAmount * discountPercentage) / 100;
-        }
-
-        totalAmount += convenienceFees + registrationFees;
-
+    
+        var totalAmount = costOfPlan - discountAmount + convenienceFees + registrationFees;
+    
         document.getElementById('total_amount').value = totalAmount.toFixed(2);
         document.getElementById('current_installment_amount').value = totalAmount.toFixed(2);
+    
+        // Update pending amount
+        updatePendingAmount();
     }
+    function updatePendingAmount() {
+        var totalAmount = parseFloat(document.getElementById('total_amount').value) || 0;
+        var paidAmount = parseFloat(document.getElementById('current_installment_amount').value) || 0;
+    
+        var pendingAmount = totalAmount - paidAmount;
+    
+        document.getElementById('pending_amount').textContent = pendingAmount.toFixed(2);
+    }
+    
+    
 
     // Event listeners
     document.getElementById('select_membership_plan').addEventListener('change', updatePlanDetails);
@@ -728,10 +738,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 
-
-                                
-               
-                                
                                 document.addEventListener("DOMContentLoaded", function() {
                                     const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
                                     if (sidebarWrapper && typeof OverlayScrollbarsGlobal?.OverlayScrollbars !== "undefined") {

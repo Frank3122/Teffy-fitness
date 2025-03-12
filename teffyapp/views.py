@@ -356,7 +356,7 @@ def main(request):
     # Total expense calculation
     expenses = Expense.objects.all().annotate(total_price=F('price') * F('quantity'))
 
-    total_expense = Expense.objects.filter(date_spent__gte=first_day_of_month, date_spent__lt=today.replace(day=1) + timedelta(days=32)).aggregate(total=Sum(F('price') * F('quantity')))['total'] or 0
+    total_expense = Expense.objects.filter(date_spent__gte=first_day_of_month, date_spent__lt=today.replace(day=1) + timedelta(days=32)).aggregate(total=Sum('price'))['total'] or 0
     today_expense = Expense.objects.filter(date_spent=today).aggregate(total=Sum(F('price') * F('quantity')))['total'] or 0
 
     # Total profit calculation
@@ -1972,12 +1972,12 @@ def download_report(request):
         ws.title = "Members Report"
         headers = [
             "Name", "Gender", "Mobile Number", "Email", "Registration Amount", "Service", "Batch", "Cost of Plan", 
-            "Current Installment Amount", "Enrollment_date"
+            "Current Installment Amount", "Enrollment_date","Membership Plan", "Total Amount"
         ]
         queryset = AddMember.objects.filter(enrollment_date__range = [from_date, to_date]) 
 
     elif status == 'expenses':
-        ws.title == "Expense Report"
+        ws.title = "Expense Report"
         headers = [
             "Expense", "Price", "Quantity", "Date_Spent"
         ]
@@ -2046,9 +2046,13 @@ def download_report(request):
                 str(item.date_paid), str(item.created_date)
             ]
         elif status == 'members':
-            data = [
-                item.name, item.gender, item.mobile_number, item.email, item.registration_amount, item.service.name, item.service.group, item.service.prices, item.current_installment_amount,item.enrollment_date ]
-            
+          
+           data = [item.name,item.gender,item.mobile_number,item.email,item.registration_amount,
+                   item.service.name if item.service else "N/A",item.service.group if item.service else "N/A",
+                   item.service.prices if item.service else "N/A", item.current_installment_amount,item.enrollment_date,
+                   item.select_membership_plan.plan_name, item.total_amount
+                   ]
+           
         elif status == 'expenses':
             data = [
                 item.expense_name, item.price, item.quantity, item.date_spent
@@ -2406,19 +2410,18 @@ def generate_invoice_pdf_member(request, member_id):
 
     # Get service and membership details
     service = member.service
-    plan = member.select_membership_plan
     batch = member.batches.batch if member.batches else "N/A"
     expiry_date = member.expiry_date if member.expiry_date else "N/A"
+    discount = member.discount or 0
 
-    # Get total amount
+    # ✅ Get total amount correctly
     service_price = service.prices if service else 0
-    plan_price = plan.price if plan else 0
-    total_amount = service_price + plan_price
+    total_amount = max(service_price - discount, 0)  # Apply discount
 
-    # Get total paid amount directly from `current_installment_amount`
+    # ✅ Get total paid amount directly from `current_installment_amount`
     total_paid = member.current_installment_amount or 0
 
-    # Calculate pending amount
+    # ✅ Calculate correct pending amount
     total_due = max(total_amount - total_paid, 0)
 
     # Prepare context for the invoice template
@@ -2427,7 +2430,6 @@ def generate_invoice_pdf_member(request, member_id):
         "bill_number": member.id,
         "bill_date": now().date(),
         "service": service,
-        "plan": plan,
         "total_amount": total_amount,
         "paid_amount": total_paid,
         "due_amount": total_due,
@@ -2444,7 +2446,7 @@ def generate_invoice_pdf_member(request, member_id):
 
     # Generate PDF response
     response = HttpResponse(content_type="application/pdf")
-    response["Content-Disposition"] = f'attachment; filename="invoice_{member.id}.pdf"'
+    response["Content-Disposition"] = f'attachment; filename=\"invoice_{member.id}.pdf\"'
 
     pisa_status = pisa.CreatePDF(html, dest=response)
     if pisa_status.err:
@@ -2457,19 +2459,18 @@ def generate_invoice_pdf_member(request, member_id):
 def generate_invoice_pdf_lead(request, lead_id):
     lead = get_object_or_404(PersonalInformation, id=lead_id)
     service = lead.services
-    plan = lead.plan_leads
 
-    # ✅ Fetch expiry date from PersonalInformation
+    # ✅ Fetch expiry date
     expiry_date = lead.expiry_date if lead.expiry_date else "Not Available"
 
     # ✅ Get Total Paid Amount
     payments = Payments.objects.filter(payments=lead)
     total_paid = payments.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
 
-    # ✅ Calculate Total Amount
+    # ✅ Calculate Total Amount (After Discount)
     service_price = service.prices if service else 0
-    plan_price = plan.price if plan else 0
-    total_amount = service_price + plan_price
+    discount = lead.discount if lead.discount else 0
+    total_amount = max(service_price - discount, 0)
 
     # ✅ Calculate Pending Amount
     total_due = max(total_amount - total_paid, 0)
@@ -2479,7 +2480,6 @@ def generate_invoice_pdf_lead(request, lead_id):
         "bill_number": lead.id,
         "bill_date": now().date(),
         "service": service,
-        "plan": plan,
         "total_amount": total_amount,
         "paid_amount": total_paid,
         "due_amount": total_due,

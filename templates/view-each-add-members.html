@@ -51,7 +51,7 @@
                                             <th>Batch</th>
                                             <th>Location</th>
                                             <th>Service</th>
-                                            <th>Membership</th>
+                                            <!-- <th>Membership</th> -->
                                             <th>Amount Paid</th>
                                             <th>Pending Amount</th>
                                             <th>Enrollment Date</th>
@@ -66,10 +66,10 @@
                                             <td>{{ member.gender }}</td>
                                             <td>{{ member.mobile_number }}</td>
                                             <td>{{ member.email }}</td>
-                                            <td>{{ member.batches.batch }}</td>
+                                            <td>{{ member.batch.group }}</td>
                                             <td>{{ member.location }}</td>
                                             <td>{{ member.service }}</td>
-                                            <td>{{ member.select_membership_plan }}</td>
+                                            <!-- <td>{{ member.select_membership_plan }}</td> -->
                                             <td style="color: green; font-weight: bold;">₹{{ member.current_installment_amount }}</td>
                                             <td style="color: red; font-weight: bold;">₹{{ member.pending_amount }}</td>
                                             <td>{{ member.enrollment_date|date:'Y-m-d' }}</td>

@@ -88,7 +88,7 @@
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table table-hover table-striped" id="example1">
+                            <table class="table" id="salesTable">
                                 <thead class="thead-light">
                                     <tr>
                                         <th>S.No</th>
@@ -147,59 +147,44 @@
 {% include "footer.html" %}
 
 {% block script %}
-<!-- DataTables CSS & JS -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>     
-<script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.3.0/browser/overlayscrollbars.browser.es6.min.js" integrity="sha256-H2VM7BKda+v2Z4+DRy69uknwxjyDRhszjXFhsL4gD3w=" crossorigin="anonymous"></script> <!--end::Third Party Plugin(OverlayScrollbars)--><!--begin::Required Plugin(popperjs for Bootstrap 5)-->
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha256-whL0tQWoY1Ku1iskqPFvmZ+CHsvmRWx/PIoEvIeWh4I=" crossorigin="anonymous"></script> <!--end::Required Plugin(popperjs for Bootstrap 5)--><!--begin::Required Plugin(Bootstrap 5)-->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha256-YMa+wAM6QkVyz999odX7lPRxkoYAan8suedu4k2Zur8=" crossorigin="anonymous"></script> <!--end::Required Plugin(Bootstrap 5)--><!--begin::Required Plugin(AdminLTE)-->
-<script src="/static/js/adminlte.js"></script> <!--end::Required Plugin(AdminLTE)--><!--begin::OverlayScrollbars Configure-->
-
-
-  <script>
-    // DataTable Initialization
-    $(function () {
-      // Initialize DataTable for example1 with default pagination
-      $("#example1").DataTable({
-        "paging": true, // Enable pagination
-        "lengthChange": true, // Allow users to change number of rows per page
-        "searching": true, // Enable searching
-        "ordering": true, // Enable column ordering
-        "info": true, // Display information about the table (e.g., "Showing 1 to 10 of 50 entries")
-        "autoWidth": false // Disable auto-width calculation to allow more control over the layout
-      });
-
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.3.0/browser/overlayscrollbars.browser.es6.min.js" crossorigin="anonymous"></script>
+<script src="/static/js/adminlte.js"></script>
+<script>
+    // DataTable Initialization for Sales Table
+    $(document).ready(function () {
+        $('#salesTable').DataTable({
+            "paging": true,  // Enable pagination
+            "searching": true,  // Enable searching
+            "ordering": true,  // Enable ordering
+            "info": true,  // Display information like "Showing 1 to 10 of 50 entries"
+            "lengthMenu": [5, 10, 15, 20],  // Customize records per page options
+            "responsive": true,  // Make the table responsive on smaller screens
+        });
     });
-  
+
     // OverlayScrollbars Initialization
     const SELECTOR_SIDEBAR_WRAPPER = ".sidebar-wrapper";
-    
     const Default = {
-      scrollbarTheme: "os-theme-light",  // Set the scrollbar theme
-      scrollbarAutoHide: "leave",       // Hide the scrollbar when not in use
-      scrollbarClickScroll: true,       // Enable click-to-scroll functionality
+        scrollbarTheme: "os-theme-light",  
+        scrollbarAutoHide: "leave",       
+        scrollbarClickScroll: true,       
     };
-  
-    // Ensure the script runs after the DOM is loaded
+    
     document.addEventListener("DOMContentLoaded", function() {
-      const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
-  
-      // Check if the sidebarWrapper element exists and if OverlayScrollbars is available
-      if (
-        sidebarWrapper &&
-        typeof OverlayScrollbarsGlobal?.OverlayScrollbars !== "undefined"
-      ) {
-        // Initialize the custom scrollbar on the sidebarWrapper
-        OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
-          scrollbars: {
-            theme: Default.scrollbarTheme,
-            autoHide: Default.scrollbarAutoHide,
-            clickScroll: Default.scrollbarClickScroll,
-          },
-        });
-      }
+        const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
+        if (sidebarWrapper && typeof OverlayScrollbarsGlobal?.OverlayScrollbars !== "undefined") {
+            OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
+                scrollbars: {
+                    theme: Default.scrollbarTheme,
+                    autoHide: Default.scrollbarAutoHide,
+                    clickScroll: Default.scrollbarClickScroll,
+                },
+            });
+        }
     });
 
     $(document).ready(function() {

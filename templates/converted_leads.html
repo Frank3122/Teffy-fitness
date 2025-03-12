@@ -4,226 +4,160 @@
 {% block content %}
 <main class="app-main">
     <div class="app-content">
-        <div class="container-fluid" style="padding: 15px;"> <!-- Adjusted padding -->
+        <div class="container-fluid" style="padding: 15px;">
             <h3>{{ status_title }} LEADS</h3>
             {% if messages %}
-            {% for message in messages %}
-                <div class="custom-alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    <i class="fas fa-check-circle"></i> <!-- Use FontAwesome for icons -->
+                {% for message in messages %}
+                    <div class="message-alert alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle"></i>
                     <span>{{ message }}</span>
-                    <!-- <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> -->
-                </div>
-            {% endfor %}
-        {% endif %}
-            <table id="example1" class="table table-hover table-bordered table-striped table-sm" style="margin-bottom: 10px;"> <!-- Adjusted margin -->
-                <thead>
-                    <tr>
-                        <th style="width: 10%;">Name</th>
-                        <th style="width: 10%;">Gender</th>
-                        <th style="width: 7%;">Mobile Number</th>
-                        <th style="width: 12%;">Status</th>
-                        <th style="width: 13%;">Services</th>
-                        <th style="width: 13%;">Plan</th>
-                        <th style = "width: 12%;">Assigned Date</th>
-                        <th style="width: 10%;">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- converted_leads.html -->
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
 
-                    {% for data in all_data %}
-                    <tr>
-                        <td style="width: 10%;">{{ data.name }}</td>
-                        <td style="width: 10%;">{{ data.gender }}</td>
-                        <td style="width: 7%;">{{ data.mobile_number }}</td>
-                        <!-- <td>{{ data.email }}</td> -->
-                        <td style="width: 12%;">
-                            <form method="POST" action="{% url 'update_status' id=data.id %}" style="display: inline;">
-                                {% csrf_token %}
-                                <select onchange="this.form.submit()" class="form-select form-select-sm" aria-label="Status" name="status" id="status-{{ data.id }}">
-                                    <option value="converted" {% if data.status == 'converted' %} selected {% endif %}>Converted</option>
-                                    <option value="not_converted" {% if data.status == 'not_converted' %} selected {% endif %}>Not Converted</option>
-                                    <option value="pending" {% if data.status == 'pending' %} selected {% endif %}>Pending</option>
-                                    <option value="follow_up" {% if data.status == 'follow_up' %} selected {% endif %}>Follow Up</option>
-                                </select>
-                            </form>
-                        </td>
-                      
-                        <td style="width: 13%;">
-                            <form method="POST" action="{% url 'assign_service' id=data.id %}" id="assign-form-{{ data.id }}" class="services-form">
-                                {% csrf_token %}
-                                <select name="service" class="form-select form-select-sm mt-1">
-                                    <option value="" disabled {% if not data.services %} selected {% endif %}>Select a service</option>
-                                    {% for service in available_services %}
-                                        <option value="{{ service.id }}" {% if data.services and service.id == data.services.id %} selected {% endif %}>
-                                            {{ service.name }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                                <a href="#" onclick="document.getElementById('assign-form-{{ data.id }}').submit();" class="btn btn-sm btn-success mt-1">
-                                    <i class="fas fa-tasks"></i>
+
+            <div class="table-responsive">
+                <table class="table" id="salesTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Gender</th>
+                            <th>Mobile Number</th>
+                            <th>Status</th>
+                            <th>Services</th>
+                            <!-- <th>Plan</th> -->
+                            <th>Assigned Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for data in all_data %}
+                        <tr>
+                            <td>{{ data.name }}</td>
+                            <td>{{ data.gender }}</td>
+                            <td>{{ data.mobile_number }}</td>
+                            <td>
+                                <form method="POST" action="{% url 'update_status' id=data.id %}">
+                                    {% csrf_token %}
+                                    <select onchange="this.form.submit()" class="form-select form-select-sm" name="status">
+                                        <option value="converted" {% if data.status == 'converted' %} selected {% endif %}>Converted</option>
+                                        <option value="not_converted" {% if data.status == 'not_converted' %} selected {% endif %}>Not Converted</option>
+                                        <option value="pending" {% if data.status == 'pending' %} selected {% endif %}>Pending</option>
+                                        <option value="follow_up" {% if data.status == 'follow_up' %} selected {% endif %}>Follow Up</option>
+                                    </select>
+                                </form>
+                            </td>
+                            <td>
+                                <form method="POST" action="{% url 'assign_service' id=data.id %}">
+                                    {% csrf_token %}
+                                    <select name="service" class="form-select form-select-sm">
+                                        <option value="" disabled {% if not data.services %} selected {% endif %}>Select a service</option>
+                                        {% for service in available_services %}
+                                            <option value="{{ service.id }}" {% if data.services and service.id == data.services.id %} selected {% endif %}>{{ service.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="submit" class="btn btn-sm btn-success mt-1">
+                                        <i class="fas fa-tasks"></i>
+                                    </button>
+                                </form>
+                            </td>
+                            <!-- <td>
+                                <form method="POST" action="{% url 'assign_plan' id=data.id %}">
+                                    {% csrf_token %}
+                                    <select name="plan" class="form-select form-select-sm">
+                                        <option value="" disabled {% if not data.plan_leads %} selected {% endif %}>Select a Plan</option>
+                                        {% for plan in plans %}
+                                            <option value="{{ plan.id }}" {% if data.plan_leads and plan.id == data.plan_leads.id %} selected {% endif %}>{{ plan.plan_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="submit" class="btn btn-sm btn-success mt-1">
+                                        <i class="fas fa-tasks"></i>
+                                    </button>
+                                </form>
+                            </td> -->
+                            <td>
+                                <form method="POST" action="{% url 'update_assigned_date' id=data.id %}">
+                                    {% csrf_token %}
+                                    <input type="date" name="assigned_date" class="form-control form-control-sm"
+                                           value="{{ data.assigned_date|date:'Y-m-d' }}"
+                                           onchange="this.form.submit();">
+                                </form>
+                            </td>
+                            <td>
+                                <a href="{% url 'getone_lead' id=data.id %}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-eye"></i>
                                 </a>
-                            </form>
-                        </td>
-
-                        <td style="width: 13%;">
-                            <form method="POST" action="{% url 'assign_plan' id=data.id %}" id="assign-form-{{ data.id }}" class="plan-form">
-                                {% csrf_token %}
-                                <select name="plan" class="form-select form-select-sm mt-1">
-                                    <option value="" disabled {% if not data.plan_leads %} selected {% endif %}>Select a Plan</option>
-                                    {% for plan in plans %}
-                                        <option value="{{ plan.id }}" {% if data.plan_leads and plan.id == data.plan_leads.id %} selected {% endif %}>
-                                            {{ plan.plan_name }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                                <button type="submit" class="btn btn-sm btn-success mt-1">
-                                    <i class="fas fa-tasks"></i>
-                                </button>
-                            </form>
-                        </td>
-
-
-                        <td>
-                            <form method="POST" action="{% url 'update_assigned_date' id=data.id %}">
-                                {% csrf_token %}
-                                <input type="date" name="assigned_date" class="form-control form-control-sm"
-                                       value="{{ data.assigned_date|date:'Y-m-d' }}"
-                                       onchange="this.form.submit();">
-                            </form>
-                        </td>
-                        
-                        <td style="width: 10%;">
-                            <a href="{% url 'getone_lead' id=data.id %}" class="btn btn-sm btn-primary">
-                                <i class="fas fa-eye"></i>
-                            </a>
-                            <a href="{% url 'delete_lead' id=data.id %}" class="btn btn-sm btn-danger">
-                                <i class="fas fa-trash"></i>
-                            </a>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="7" class="text-center text-danger">No data available.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                                <a href="{% url 'delete_lead' id=data.id %}" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center text-danger">No data available.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </main>
 {% endblock content %}
 
-{% include "footer.html" %}
-
 {% block script %}
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/datatables.net/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.3.0/browser/overlayscrollbars.browser.es6.min.js" crossorigin="anonymous"></script>
 <script src="/static/js/adminlte.js"></script>
-<script src="/static/js/jquery.dataTables.min.js"></script>
-<script src="/static/js/dataTables.bootstrap4.min.js"></script>
-<script src="/static/js/dataTables.responsive.min.js"></script>
-<script src="/static/js/responsive.bootstrap4.min.js"></script>
-<script src="/static/js/dataTables.buttons.min.js"></script>
-<script src="/static/js/buttons.bootstrap4.min.js"></script>
-<script src="/static/js/jszip.min.js"></script>
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css">
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
 
 <script>
+    // DataTable Initialization for Sales Table
     $(document).ready(function () {
-        // Initialize DataTable with compact spacing
-        $("#example1").DataTable({
-            paging: true,
-            searching: true,
-            ordering: true,
-            lengthChange: false, // Disable length change dropdown
-            pageLength: 10, // Set default number of rows
-            autoWidth: false, // Disable auto-width
-            columnDefs: [
-                { targets: "_all", className: "text-center" } // Center align all columns
-            ],
-            dom: "Bfrtip", // Add additional elements to DataTable
-            responsive: true, // Make table responsive
-            compact: true // Apply compact mode
+        $('#salesTable').DataTable({
+            "paging": true,  // Enable pagination
+            "searching": true,  // Enable searching
+            "ordering": true,  // Enable ordering
+            "info": true,  // Display information like "Showing 1 to 10 of 50 entries"
+            "lengthMenu": [5, 10, 15, 20],  // Customize records per page options
+            "responsive": true,  // Make the table responsive on smaller screens
         });
     });
-    document.addEventListener("DOMContentLoaded", function () {
-    const alerts = document.querySelectorAll(".custom-alert");
-    alerts.forEach(alert => {
-        setTimeout(() => {
-            alert.classList.add("animate__fadeOutUp"); // Add fade-out animation
-            alert.addEventListener("animationend", () => alert.remove()); // Remove after animation
-        }, 2500); // 5 seconds
-    });
-});
 
+    // OverlayScrollbars Initialization
+    const SELECTOR_SIDEBAR_WRAPPER = ".sidebar-wrapper";
+    const Default = {
+        scrollbarTheme: "os-theme-light",  
+        scrollbarAutoHide: "leave",       
+        scrollbarClickScroll: true,       
+    };
+    
+    document.addEventListener("DOMContentLoaded", function() {
+        const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
+        if (sidebarWrapper && typeof OverlayScrollbarsGlobal?.OverlayScrollbars !== "undefined") {
+            OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
+                scrollbars: {
+                    theme: Default.scrollbarTheme,
+                    autoHide: Default.scrollbarAutoHide,
+                    clickScroll: Default.scrollbarClickScroll,
+                },
+            });
+        }
+    });
+
+setTimeout(function () {
+    document.querySelectorAll(".message-alert").forEach(function (alert) {
+        let bsAlert = new bootstrap.Alert(alert);
+        bsAlert.close(); // Dismiss the alert after timeout
+    });
+}, 3000);
+
+    
 
 </script>
-<style>
-    table#example1 {
-        margin-bottom: 100px; /* Reduce gap below the table */
-        border-spacing: 0; /* Remove gaps between cells */
-    }
-
-    table#example1 th, 
-    table#example1 td {
-        padding: 4px 8px !important; /* Reduced padding */
-        line-height: 1.2 !important; /* Tighter line height */
-    }
-
-    .container-fluid {
-        padding: 10px; /* Minimized padding */
-    }
-
-    .app-content {
-        padding-top: 0 !important; /* Reduced top padding */
-    }
-
-
-    .custom-alert {
-    display: flex;
-    align-items: center;
-    padding: 1rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    font-size: 1rem;
-    margin-bottom: 1rem;
-    transition: all 0.3s ease-in-out;
-}
-
-.custom-alert i {
-    font-size: 1.5rem;
-    margin-right: 10px;
-}
-
-.alert-success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-.alert-error {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-.alert-info {
-    background-color: #d1ecf1;
-    color: #0c5460;
-    border: 1px solid #bee5eb;
-}
-
-.alert-warning {
-    background-color: #fff3cd;
-    color: #856404;
-    border: 1px solid #ffeeba;
-}
-
-</style>
 {% endblock script %}
