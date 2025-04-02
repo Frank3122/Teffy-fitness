@@ -1,0 +1,223 @@
+
+body{
+    overflow-x: hidden;
+}.fullpage{
+    background-color: black;
+}
+
+.navbar{
+    background-color: black;
+}
+.navtext a{
+    color: white;
+}
+
+.why{
+/* color: white; */
+font-family: "Karantina", system-ui;
+font-size: 120px;
+-webkit-text-stroke: 1px #fff;
+margin-top: 0px;
+}
+
+.fitness{
+    color: white;
+font-family: "Karantina", system-ui;
+font-size: 80px;
+}
+
+.questionmark{
+    width: 120px;
+    position: relative;
+    bottom: 180px;
+    left: 80px;
+}
+
+.money {
+    font-family: "Karantina", system-ui;
+    font-size: 300px;
+    -webkit-text-stroke: 2px #fff;
+    margin-top: 0px;
+    /* padding-right: 65%; */
+    position: absolute; /* Ensure it's positioned */
+    top: 550px;
+    left: 20px;
+    z-index: 1; /* Higher than .weight */
+}
+
+.weight {
+    position: relative; /* Ensures stacking works */
+    z-index: 3;
+}
+
+.heart {
+    font-family: "Karantina", system-ui;
+    font-size: 300px;
+    -webkit-text-stroke: 2px #fff;
+    margin-top: 0px;
+    padding-left: 70%;
+    position: absolute; /* Ensure stacking works */
+    top: 850px;
+    right: 50px;
+    z-index: 2; /* Should be above .weight */
+}
+
+   
+
+    .takecare{
+        color: #feb507;
+        text-align: center;
+        font-size: 30px;
+        font-family: "Inter", sans-serif;
+        margin-top: 60px;
+    }
+
+    .centerline{
+        margin-top: 60px;
+    }
+
+    .dollermoney{
+        justify-items: end;
+        color: #feb507;
+        padding: 10px;
+    }
+
+    .doller{
+color: #feb507 !important;
+
+    }
+    .lifestyle{
+        color: white;
+        padding-left: 200px;
+    }
+    .security{
+        color: #fff;
+        padding-left: 200px;
+    }
+
+     .mission{
+        color: white;
+        font-family: "Karantina", system-ui;
+        /* margin-right: 65%; */
+        padding-right: 600px;
+        
+    }
+
+    .vision{
+        color: #fff;
+        font-family: "Karantina", system-ui;
+        /* margin-left: 75%; */
+        padding-left: 600px;
+    } 
+
+     .value{
+        color: white;
+        text-align: center;
+        font-family: "Karantina", system-ui;
+    } 
+
+    .profile{
+        margin-left: 20px;
+    }
+    .health{
+        color: #feb507;
+    }
+    .lost{
+        color: #fff;
+    }
+    .true{
+        color: #fff;
+    }
+    
+
+    .coin{
+        
+        font-family: "Karantina", system-ui;
+        font-size: 300px;
+        -webkit-text-stroke: 2px #fff;
+        margin-top: 0px;
+         position: absolute; /* Ensure it's positioned */
+    
+    left: 20px;
+    z-index: 1; /* Higher than .weight */
+    }
+    .stright{
+        position: relative; /* Ensures stacking works */
+        top: 60px;
+        z-index: 3;
+    }
+    
+    .love {
+        font-family: "Karantina", system-ui;
+        font-size: 300px;
+        -webkit-text-stroke: 2px #fff;
+        margin-top: 0px;
+        padding-left: 70%;
+        position: absolute; /* Ensure stacking works */
+        top: 620%;
+        right: 50px;
+        z-index: 2; /* Should be above .weight */
+    }
+
+    .box{
+        margin-top: 110px;
+        height: 60%;
+    }
+    .health-lifestyle{
+        padding-left: 60px;
+    }
+    .first{
+        color: #feb507;
+        border-bottom: 2px solid #FEB807 ;
+         justify-content: space-evenly;
+    }
+    .show{
+        color: #ffffff68;
+        border-bottom: 2px solid#ffffff68;
+    }
+
+    .form{
+        border-bottom: 2px solid#ffffff68;
+        border: none;
+        padding-top: 12%;
+         background: transparent;
+         justify-content: space-evenly;
+ 
+    }
+    .innovative{
+        color:#ffffff68;
+        border-bottom: 2px solid #ffffff68;
+    }
+    .gender{
+        color: #ffffff68;
+        border-bottom: 2px solid #ffffff68;
+    }
+    .long{
+        color: #ffffff68;
+        border-bottom: 2px solid #ffffff68;
+    }
+    .community{
+        color: #ffffff68;
+        border-bottom: 2px solid #ffffff68;
+    }
+
+    .footer{
+        background-color: #FEB807;
+      }
+      .fbut {
+        background-color: #000000;
+        border: 1px solid #000000;
+        color: #FEB807;
+        width: 60%;
+        border-radius: 15px;
+        font-family: "Inter", sans-serif;
+      }
+      
+      .fbut:hover {
+        background-color: #000000;
+        color: #ffffff;
+        /* border:2px solid  #FEB807; */
+      }  
+    
+      
+    

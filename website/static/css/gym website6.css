@@ -1,0 +1,249 @@
+
+body{
+    overflow-x: hidden;
+}
+.fullpage{
+    background-color: black;
+}
+.navtext a{
+    color: white;
+}
+.train{
+    color: white;
+    }
+    .beast{
+        /* color:#feb807; */
+        -webkit-text-stroke: 1px #feb807;
+        
+    }
+    .likea{
+        display: flex;
+        gap: 20px;
+        font-family: "Karantina", system-ui;
+    /* font-size: 100px; */
+    text-align: center;
+    padding-left: 120px;
+    padding-top: 120px;
+    /* margin-right: 40px; */
+    }
+    .likeaa{
+        display: flex;
+        gap: 20px;
+        font-family: "Karantina", system-ui;
+    /* font-size: 100px; */
+    padding-left: 260px;
+    }
+    .perform{
+        color: white;
+    }
+    .champion{
+        -webkit-text-stroke: 1px #feb807;
+    }
+    .follow{
+        color: white;
+    }
+    .athlete{
+        padding-right: 0px;
+    }
+    .strightline{
+        color: white;
+        font-family: "Inter", sans-serif;
+        font-size: 15px;
+        text-align: center;
+        padding:70px;
+        position: relative;
+        bottom: 110px;
+    }
+    
+    .strightline a{
+        color: white;
+        text-decoration:none;
+    padding:40px;
+    }
+    .proper{
+        color: white;
+        font-family: "Inter", sans-serif;
+        text-align: center;
+        margin-top: 60px;
+    }
+    .running{
+        border-radius: 2px;
+        height: 50%;
+    }
+    .method{
+        color: white;
+        font-family: "Karantina", system-ui; 
+        text-align: center;
+        margin-top: 40px;
+    }
+
+    .speed{
+        position: relative;
+        left: 140px;
+        bottom: 100px;
+        color: white;
+        font-family: "Inter", sans-serif;
+        font-size: 15px;
+        }
+        .base{
+        position: relative;
+        left: 140px;
+        bottom: 100px;
+        color: white;
+        font-family: "Inter", sans-serif;
+        font-size: 15px;
+        }
+        .clear{
+            position: relative;
+        left: 140px;
+        bottom: 100px;
+        color: white;
+        font-family: "Inter", sans-serif;
+        font-size: 15px;
+        }
+        .focus{
+            position: relative;
+            left: 140px;
+            bottom: 100px;
+            color: white;
+            font-family: "Inter", sans-serif;
+            font-size: 15px;  
+        }
+        .build{
+            position: relative;
+        left: 140px;
+        bottom: 100px;
+        color: white;
+        font-family: "Inter", sans-serif;
+        font-size: 15px;
+        }
+        .track{
+            position: relative;
+        left: 140px;
+        bottom: 100px;
+        color: white;
+        font-family: "Inter", sans-serif;
+        font-size: 15px;
+        }
+        .logy{
+            color: white;
+            font-family: "Karantina", system-ui;
+            text-align: center;
+        }
+        .org {
+            background-color: #feb807;
+            border: 1px solid #feb807;
+            color: black;
+            width: 40%;
+            border-radius: 20px;
+            font-family: "Inter", sans-serif;
+            margin-left: 100px;
+            margin-top: 20px;
+          }
+          
+          .org:hover {
+            background-color: #fff;
+            color: #feb807;
+            border: 2px solid #feb807;
+          }
+
+          .footer{
+            background-color: #FEB807;
+          }
+          .fbut {
+            background-color: #000000;
+            border: 1px solid #000000;
+            color: #FEB807;
+            width: 40%;
+            border-radius: 15px;
+            font-family: "Inter", sans-serif;
+          }
+          
+          .fbut:hover {
+            background-color: #000000;
+            color: #ffffff;
+            /* border:2px solid  #FEB807; */
+          }  
+
+          /* .name{
+            color: white;
+            font-family: "Inter", sans-serif;
+            margin-right: 540px;
+            font-size: 20px;
+          }
+          .gender{
+            color: white;
+            font-family: "Inter", sans-serif;
+            margin-right: 300px;
+            font-size: 20px;
+            padding: 20px;
+          }
+          .sport{
+            color: white;
+            font-family: "Inter", sans-serif;
+            margin-right: 470px;
+            font-size: 20px;
+          }
+          .before{
+            color: white;
+            font-family: "Inter", sans-serif;
+            margin-right: 300px;
+            font-size: 20px;
+            padding: 20px;
+          }
+          .age{
+            padding: 100px;
+          }
+          .after{
+            padding: 100px;
+          } */
+          .arrow{
+            /* justify-content: center; */
+            padding: 20px;
+            gap: 40px;
+          }
+          .left-arrow{
+            padding-right: 40px;
+          }
+          .name{
+            color: white;
+            font-family: "Inter", sans-serif;
+            padding-right: 14%; 
+            font-size: 20px;
+          }
+          .gender{
+            color: white;
+            font-family: "Inter", sans-serif;
+            /* padding-right: 200px; */
+            font-size: 20px;
+            padding: 20px;
+          }
+          .age{
+            padding-left: 20px;
+          }
+          .sport{
+            color: white;
+            font-family: "Inter", sans-serif;
+             padding-left: 3%; 
+            font-size: 20px;
+          }
+          .before{
+            color: white;
+            font-family: "Inter", sans-serif;
+            padding-left: 7%; 
+            font-size: 20px;
+            padding-top: 20px;
+          }
+          .after{
+            padding: 20px;
+          }
+          .form{
+            margin-right:10%;
+          }  
+          .one{
+            padding-right: 62px;
+          }
+          .four{
+            padding-right: 60px;
+          }
+          

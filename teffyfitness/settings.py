@@ -38,7 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'teffyapp'
+    'teffyapp',
+    'website',
+
 ]
 
 MIDDLEWARE = [
@@ -56,7 +58,10 @@ ROOT_URLCONF = 'teffyfitness.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR,'templates')],
+         'DIRS': [
+            os.path.join(BASE_DIR, 'templates'),  # Main templates directory
+            os.path.join(BASE_DIR, 'website/templates'),  # Templates for the 'website' app
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -122,9 +127,11 @@ USE_TZ = True  # Enable timezone-aware datetimes
 
 STATIC_URL = '/static/'  # Ensure the URL has a leading slash
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),  # Collects files from /static/
+    os.path.join(BASE_DIR, 'static'),                # Global static directory
+    os.path.join(BASE_DIR, 'website/static'),        # Website app static directory
 ]
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Where collectstatic puts files
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') # Where collectstatic puts files
+
 
 # Ensure media files (if used) are configured properly
 MEDIA_URL = '/media/'

@@ -350,14 +350,22 @@ def main(request):
     ).count()
 
     # Revenue Calculation (Sum of Payment Amounts)
-    total_revenue = Payments.objects.aggregate(total=Sum('amount_paid'))['total'] or 0
-    today_revenue = Payments.objects.filter(date_paid__date=today).aggregate(total=Sum('amount_paid'))['total'] or 0
+    # calaculation of total revenue (for a month)
+    lead_revenue = Payments.objects.aggregate(total=Sum('amount_paid'))['total'] or 0
+    member_revenue = AddMember.objects.aggregate(total=Sum('current_installment_amount'))['total'] or 0
+    total_revenue = lead_revenue + member_revenue
+    
+    # # calculation of revene for today
+    today = date.today()
+    today_lead_revenue = Payments.objects.filter(date_paid__date=today).aggregate(total=Sum('amount_paid'))['total'] or 0
+    today_member_revenue = AddMember.objects.filter(payment_date=today).aggregate(total=Sum('current_installment_amount'))['total'] or 0
+    today_revenue = today_lead_revenue + today_member_revenue
 
     # Total expense calculation
     expenses = Expense.objects.all().annotate(total_price=F('price') * F('quantity'))
 
     total_expense = Expense.objects.filter(date_spent__gte=first_day_of_month, date_spent__lt=today.replace(day=1) + timedelta(days=32)).aggregate(total=Sum('price'))['total'] or 0
-    today_expense = Expense.objects.filter(date_spent=today).aggregate(total=Sum(F('price') * F('quantity')))['total'] or 0
+    today_expense = Expense.objects.filter(date_spent=today).aggregate(total=Sum(F('price')))['total'] or 0
 
     # Total profit calculation
     total_profit = total_revenue - total_expense
@@ -399,8 +407,8 @@ def main(request):
         "pending_members": pending_members,  # Pass to the dashboard
         "pending_count": pending_members.count(),
 
-        "total_revenue": total_revenue,
-        "today_revenue": today_revenue,
+        'total_revenue':total_revenue,
+        'today_revenue':today_revenue,
         "total_expense": total_expense,
         "today_expense": today_expense,
         "total_profit": total_profit,
@@ -1875,6 +1883,45 @@ def delete_added_members(request,id):
 def bill(request):
     return render(request,"bill.html")
 
+def todays_amount(request):
+    # Todays revenue 
+    today = date.today()
+    today_lead_revenue = Payments.objects.filter(date_paid__date=today).aggregate(total=Sum('amount_paid'))['total'] or 0
+    today_member_revenue = AddMember.objects.filter(payment_date=today).aggregate(total=Sum('current_installment_amount'))['total'] or 0
+    today_revenue = today_lead_revenue + today_member_revenue
+    print(today_revenue)
+    # Todays expense
+    today_expense = Expense.objects.filter(date_spent=today).aggregate(total=Sum(F('price')))['total'] or 0
+    print(today_expense)
+    
+    # Todays Profit 
+    today_profit = today_revenue - today_expense
+    print(today_profit)
+    
+    return render(request,"today-reports-page.html", {'today_revenue':today_revenue, 'today_expense':today_expense, 'today_profit':today_profit})
+    
+def total_amount (request):
+    today = date.today()
+    first_day_of_month = today.replace(day=1)
+    # Total Revenue
+    lead_revenue = Payments.objects.aggregate(total=Sum('amount_paid'))['total'] or 0
+    member_revenue = AddMember.objects.aggregate(total=Sum('current_installment_amount'))['total'] or 0
+    total_revenue = lead_revenue + member_revenue
+    print(total_revenue)
+    
+    # Total Expense
+    expenses = Expense.objects.all().annotate(total_price=F('price') * F('quantity'))
+    total_expense = Expense.objects.filter(date_spent__gte=first_day_of_month, date_spent__lt=today.replace(day=1) + timedelta(days=32)).aggregate(total=Sum('price'))['total'] or 0
+    print(total_expense)
+    
+    # Total Profit 
+    total_profit = total_revenue - total_expense
+    print(total_profit)
+    
+
+    
+    return render(request,"total-amount-page.html", {'total_revenue':total_revenue, 'total_profit': total_profit, 'total_expense':total_expense})
+    
 
 def view_all_clients(request):
     leads = PersonalInformation.objects.all()
@@ -2373,10 +2420,11 @@ def generate_invoice(request, client_id, client_type):
     plan_price = plan.price if plan else 0
     total_amount = service_price + plan_price
     total_due = max(total_amount - total_paid, 0)
+    invoice_number = InvoiceNumber.get_next_invoice_number()
 
     context = {
         "client": client,
-        "bill_number": client.id,
+        "bill_number": invoice_number,  # ✅ Use continuous invoice number
         "bill_date": now().date(),
         "service": service,
         "plan": plan,
@@ -2423,11 +2471,13 @@ def generate_invoice_pdf_member(request, member_id):
 
     # ✅ Calculate correct pending amount
     total_due = max(total_amount - total_paid, 0)
+    
+    invoice_number = InvoiceNumber.get_next_invoice_number()
 
     # Prepare context for the invoice template
     context = {
         "client": member,
-        "bill_number": member.id,
+        "bill_number": invoice_number,  # ✅ Use continuous invoice number
         "bill_date": now().date(),
         "service": service,
         "total_amount": total_amount,
@@ -2474,10 +2524,12 @@ def generate_invoice_pdf_lead(request, lead_id):
 
     # ✅ Calculate Pending Amount
     total_due = max(total_amount - total_paid, 0)
+    
+    invoice_number = InvoiceNumber.get_next_invoice_number()
 
     context = {
         "client": lead,
-        "bill_number": lead.id,
+        "bill_number": invoice_number,  # ✅ Use continuous invoice number
         "bill_date": now().date(),
         "service": service,
         "total_amount": total_amount,
@@ -2500,3 +2552,7 @@ def generate_invoice_pdf_lead(request, lead_id):
         return HttpResponse("Error generating PDF", status=500)
 
     return response
+
+
+
+

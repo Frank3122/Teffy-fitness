@@ -1,0 +1,395 @@
+body{
+  overflow-x: hidden;
+}
+.navbar{
+    background-color: black;
+}
+.navtext a{
+    color: white;
+}
+.fullpage{
+    background-color: black;
+}
+.guide{
+  position: relative;
+  bottom:350px;
+}
+.next{
+  color: #ffffff;
+}
+.training{
+    text-align: center;
+    color: white;
+    font-family: "Karantina", system-ui;
+    font-size: 60px;
+}
+
+.paragraph{
+    color: white;
+    text-align: center;
+    font-family: "Inter", sans-serif;
+}
+
+.btn{
+    background-color:#feb807;
+    text-align: center;
+}
+
+.image{
+    width: 100%;
+}
+
+.secondpage{
+    margin-top: 100px;
+}
+
+.heading{
+    color: white;
+    font-family: "Karantina", system-ui;
+    font-size: 80px;
+    margin-top: 100px;
+}
+
+.select{
+    color: white;
+    font-family: "Inter", sans-serif;
+    margin-top: 40px;
+}
+
+.map{
+    margin-top: 100px;
+    margin-bottom: 100px;
+    padding-left: 14%;
+}
+
+.label{
+    width: 40%;
+    align-items: center;
+}
+
+/* .dhumbel{
+    margin-top: 60px;
+    width: 100px;
+} */
+
+.image-container {
+  position: relative;
+  display: inline-block; /* Keeps container size to the image */
+}
+
+.dhumbel {
+  display: block; /* Remove default inline spacing */
+  margin-top: 60px;
+  width: 100px;
+  
+}
+
+.next {
+  position: absolute;
+  top: 80%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: rgb(0, 0, 0); /* Change as needed */
+  background: rgba(0, 0, 0, 0); /* Optional for better readability */
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+
+.thirdpage{
+    margin-top: 100px;
+}
+
+.preferred{
+    color: white;
+    font-family: "Karantina", system-ui;
+    font-size: 80px;
+    margin-top: 100px;
+    text-align: center;
+}
+.left{
+    width: 100%;
+   /* padding-right: 150px; */
+   margin-top: 60px;
+}
+
+.right{
+    width: 100%;
+    /* padding-left: 200px; */
+    margin-top: 60px;
+}
+
+.image-container {
+  position: relative;
+  left: 45%;
+  display: inline-block;
+  justify-content:center;
+}
+
+.dhumbel {
+  display: block;
+  margin-top: 60px;
+  width: 100px;
+}
+
+.next {
+  position: absolute;
+  top: 80%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: rgb(0, 0, 0); 
+  background: rgba(0, 0, 0, 0);
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+
+.fourthpage{
+    margin-top: 100px;
+}
+
+ .seeking{
+    margin-top: 100px;
+    color: white;
+    font-family: "Karantina", system-ui;
+    font-size: 60px;
+} 
+
+.salad{
+    margin-top: 100px;
+    margin-bottom: 100px;
+    padding-left: 14%;
+    
+}
+
+.yes{
+    background-color: black;
+    border-color:#feb807 2px;
+    padding-left: 60px;
+}
+
+.yes:hover{
+    background-color: black;
+}
+
+.no{
+    background-color: black;
+    border-color:#feb807 2px;
+    padding-left: 60px;
+}
+
+.no:hover{
+    background-color: black;
+}
+
+.thumbel{
+    margin-top: 80px;
+    width: 100px;
+}
+
+.yesno{
+    margin-top: 60px;
+}
+.fifthpage{
+    margin-top: 100px;
+}
+
+.step{
+    margin-top: 80px;
+    color: white;
+    font-family: "Karantina", system-ui;
+    font-size: 60px;
+}
+.line{
+    border: none;
+  
+  /* padding: 10px; */
+  background: transparent;
+  border-bottom: 2px solid #FEB807;
+}
+
+.form{
+    position:absolute;
+    top: 870%;
+    right: 20%;
+    justify-content: center;
+}
+
+.fbut {
+    background-color: #FEB807;
+    border: 1px solid #000000;
+    color: #000000;
+    width: 20%;
+    border-radius: 15px;
+    font-family: "Inter", sans-serif;
+  }
+  
+  .fbut:hover {
+    background-color: #ffffff;
+    color: #000000;
+    /* border:2px solid  #FEB807; */
+  }  
+  .welcome{
+    color: #FEB807;
+    font-family: "Karantina", system-ui;
+    font-size: 60px;
+    text-align: center;
+  }
+  .book{
+    color: #ffffff;
+    font-size: 20px;
+    text-align: center;
+  } 
+  .find{
+    color: #ffffff;
+    text-align: start;
+  }
+  .box{
+    width: 1000px;
+    height: 500px;
+    padding-left: 60px;
+    /* position: relative;
+    bottom: 100px;
+    z-index: 6;
+    filter: blur(4px); */
+  }
+  .wel{
+    color: #FEB807;
+    font-family: "Karantina", system-ui;
+    font-size: 60px;
+    text-align: center;
+    position: relative;
+    top: 10px;
+    /* z-index: 1; */
+  }
+  .few{
+    color: #ffffff;
+    font-size: 20px;
+    text-align: center;
+    /* z-index: 2; */
+  }
+  .cards{
+    position: relative;
+    bottom:380px;
+    right: 20px;
+  }
+  .exploring{
+    color:black;
+    font-family: "Inter", sans-serif;
+    font-size: 12px;
+    padding-top: 60px;
+  }
+  .know{
+    color: #000;
+    font-size: 10px;
+  }
+  .read{
+    color: #FEB807;
+    font-size: 10px;
+    border-bottom: 2px solid #FEB807;
+    
+  }
+
+  .dropdown{
+    position: relative;
+    bottom: 480px;
+    left:100px;
+  }
+  .cancel{
+    position: relative;
+    bottom: 510px;
+    left:85%;
+  } 
+  .pagination{
+    gap: 20px;
+    position: relative;
+    bottom:230px;
+    left: 10%;
+  }
+  .page-link{ 
+    color:#ffffff;
+   background: transparent;
+    border-bottom: 2px solid #FEB807;
+    border-top: 2px solid #FEB807;
+    border-right: 2px solid #FEB807;
+    border-left: none;
+    border-radius: 20%;
+  }
+
+  .arrow-left{
+    color: #FEB807;
+    width: 50%;
+  }
+  .arrow-right{
+    color: #FEB807;
+    width: 50%;
+  }
+  .session{
+    color: #ffffff;
+    position: relative;
+    bottom:450px;
+  }
+  .clock-text{
+    color: #ffffff;
+    padding: 5px;
+  }
+  
+
+  .shape {
+    background: transparent;
+    border-bottom: 2px solid #FEB807;
+    border-top: 2px solid #FEB807;
+    border-right: 2px solid #FEB807;
+    border-left: none;
+    border-end-end-radius: 30px;
+    border-start-end-radius: 30px;
+    height: 60px; 
+    width: 50px;
+    display: flex;
+    align-items: center; 
+    justify-content:space-between;
+    
+}
+.date{
+  position: relative;
+  bottom:430px;
+  left: 150px;
+  width: 65%;
+} 
+.btn-btn-warning{
+padding-left: 100px;
+}
+.find {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.form-label{
+  color: #ffffff;
+}
+
+.container-image{
+  position: relative; 
+  top: 60px;
+  left: 0px;
+  display: inline-block; 
+}
+
+.dhumbel-next{
+  display: block;
+  width: 100px; /* Adjust as needed */
+}
+
+.stage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Centers text */
+  color: rgb(0, 0, 0); /* Adjust based on image */
+  font-size: 16px; /* Change as needed */
+  font-weight: bold;
+  text-align: center;
+  background: rgba(0, 0, 0, 0); /* Optional: Adds a background for visibility */
+  padding: 5px 10px;
+  border-radius: 5px;
+}

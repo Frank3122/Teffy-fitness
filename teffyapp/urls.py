@@ -124,6 +124,9 @@ urlpatterns = [
     path('plan/', plan, name='plan'),
     path('plan/edit/<int:plan_id>/', edit_plan, name='edit_plan'),
     path('plan/delete/<int:plan_id>/', delete_plan, name='delete_plan'),  # Delete URL
+    
+    path('todays-amount/', todays_amount, name='todays-amount'),
+    path('total-amount/', total_amount, name="total-amount"),
 ]
 
 

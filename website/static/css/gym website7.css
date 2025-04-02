@@ -1,0 +1,121 @@
+.top{
+  /* border:1px solid#FEB807; */
+  border: none;
+  border-top: 2px solid #FEB807;
+  padding: 10px;
+  background: transparent;
+  border-bottom: 2px solid #FEB807;
+}
+.academy{
+    font-family: "Inter", sans-serif;
+    color: white;
+}
+.events{
+   color: white;
+    font-family: "Inter", sans-serif; 
+}
+.fullpage{
+    background-color: black;
+}
+.navtext a{
+    color: white;
+}
+.achieve{
+    color: white;
+    text-align: center;
+    font-family: "Inter", sans-serif; 
+}
+.lorem{
+    color: white;
+    margin-top: 60px;
+}
+.young{
+    width: 80%;
+}
+
+.train{
+    color: white;
+    }
+    .beast{
+        /* color:#feb807; */
+        -webkit-text-stroke: 1px #feb807;
+        
+    }
+    .likea{
+        display: flex;
+        gap: 20px;
+        font-family: "Karantina", system-ui;
+    /* font-size: 100px; */
+    text-align: center;
+    /* padding-left: 200px; */
+    }
+    .likeaa{
+        display: flex;
+        gap: 20px;
+        font-family: "Karantina", system-ui;
+    /* font-size: 100px; */
+    /* padding-left: 200px; */
+    }
+
+    .perform{
+       
+        margin-left: 100px;
+         /* color:#feb807; */
+            -webkit-text-stroke: 0.5px white;
+     }
+
+     .org {
+        background-color: #feb807;
+        border: 1px solid #feb807;
+        color: black;
+        width: 60%;
+        border-radius: 20px;
+        font-family: "Inter", sans-serif;
+        margin-right: 40px;
+        margin-top: 20px;
+      }
+      
+      .org:hover {
+        background-color: #fff;
+        color: #feb807;
+        border: 2px solid #feb807;
+      }
+
+      .gro {
+        background-color: #feb807;
+        border: 1px solid #feb807;
+        color: black;
+        width: 20%;
+        border-radius: 20px;
+        font-family: "Inter", sans-serif;
+        margin-left: 40%;
+        margin-top: 40px;
+      }
+      
+      .gro:hover {
+        background-color: #fff;
+        color: #feb807;
+        border: 2px solid #feb807;
+      }
+
+      .footer{
+        background-color: #FEB807;
+        margin-top: 40px;
+      }
+      .fbut {
+        background-color: #000000;
+        border: 1px solid #000000;
+        color: #FEB807;
+        width: 60%;
+        border-radius: 15px;
+        font-family: "Inter", sans-serif;
+      }
+      
+      .fbut:hover {
+        background-color: #000000;
+        color: #ffffff;
+        /* border:2px solid  #FEB807; */
+      }  
+      .every{
+        padding-top: 100px;
+      }

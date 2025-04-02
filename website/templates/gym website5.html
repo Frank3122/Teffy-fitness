@@ -1,0 +1,257 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sports</title>
+
+    <!-- bootstrap links -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+
+  <!-- google fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Karantina:wght@300;400;700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+    rel="stylesheet">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Karantina:wght@300;400;700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+    rel="stylesheet">
+  <!--  -->
+
+  <!-- urself style -->
+  <link rel="stylesheet" href="{% static 'css/gym website5.css' %}">
+
+  <!-- goolr icons -->
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=home" />
+
+  <!-- bootstrap script links -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+    integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+    crossorigin="anonymous"></script>
+  <!-- bt icon link -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=arrow_forward_ios" />
+
+    <!-- favicon -->
+    <link rel="icon" href="/static/image/n1.png">
+  
+</head>
+<body>
+
+    <!-- nav bar -->
+    <div class="fullpage">
+        <nav class="navbar navbar-expand-lg  navbar">
+            <div class="container-fluid">
+              <a class="navbar-brand" href="{% url 'home' %}">
+                <img src="{% static '/image/Group.png' %}" alt="Bootstrap"  class="w-75">
+              </a>
+        
+              <div class="collapse navbar-collapse">
+                <div class="navbar-nav ms-auto navtext">
+                  <a class="nav-link" href="#">What We Do</a>
+                  <a class="nav-link" href="#">Why We Do</a>
+                  <a class="nav-link" href="#">Contact Us</a>
+                  <a class="nav-link" href="{% url 'gymform' %}">Enquiry</a>
+                  <!-- <a class="nav-link" href="#">Schedual Call</a> -->
+                  <button type="button" class="btn btn-warning mx-5">Schedule Call</button>
+                </div>
+              </div>
+            </div>
+          </nav>
+
+          <!-- firstpage -->
+
+           <div class="text-center">
+            <div class="row">
+              <div class="col text-center">
+                <div class="likea">
+                <h1 class="train">Train Like a </h1>
+                <h1 class="beast">Beast</h1> 
+              </div>
+                <div class="likeaa">
+                <h1 class="perform">Perform Like a</h1> 
+                <h1 class="champion">Champion</h1> 
+              </div>
+              <div>
+                <button class="btn btn-outline-success org" type="submit">Let’s get started > </button>
+              </div>
+              </div> 
+              
+              <div class="col">
+                <img src="{% static '/image/air-caucasian-professional-female-athlete-runner-training-white-studio 1.png' %}" alt="" class="athlete">
+              </div>
+            </div>
+          </div>
+
+          <div class="strightline">
+            <a href="#">Long Jump</a>
+            <a href="#">200m Race</a>
+            <a href="#">High Jump</a>
+            <a href="#">400m Race</a>
+            <a href="#">Shot Put</a>
+            <a href="#">Marathon</a>
+          </div>
+         
+
+         <div>
+          <p class="content">At Teffy’s Sports & Fitness, we believe that fitness is the key to living a healthier,<br>more vibrant life. Our approach is designed to empower individuals at every fitness<br>, from beginners to seasoned athletes.</p>
+        </div> 
+          <!-- <div class="text-center">
+            <div class="row">
+              <div class="col">
+                <img src="./image/happy-people-doing-sport-park.png" alt="" class="running" width="80%">
+              </div>
+              <div class="col form mt-5">
+                <h6 class="name mt-3">Name</h6>
+                <h6 class="gender mt-3">Gender<span class="age">Age</span></h6>
+                <h6 class="sport mt-3">Type of Sports</h6>
+                <h6 class="before mt-3">Before<span class="after">After</span></h6>
+              </div>
+            </div>
+          </div> -->
+
+          <div class="text-center ">
+            <div class="row mt-5">
+              <div class="col">
+                <img src="{% static '/image/happy-people-doing-sport-park.png' %}" alt="" class="running" >
+              </div>
+              <div class="col form mt-5">
+                <h6 class="name">Name</h6>
+                <h6 class="gender">Gender<span class="age">Age</span></h6>
+                <h6 class="sport">Type of Sports</h6>
+                <h6 class="before">Before<span class="after">After</span></h6>
+              </div>
+            </div>
+          </div>
+
+              <div>
+                <h1 class="method">Methodology</h1>
+              </div>
+
+              <div class="text-center one">
+                <div class="row mt-5">
+                  <div class="col">
+                   <img src="{% static '/image/1.png' %}" alt="">
+                   <div>
+                    <h4 class="speed">Developing Strength,<br>Speed, Endurance</h4>
+                   </div>
+                  </div>
+                  <div class="col">
+                    <img src="{% static '/image/2.png' %}" alt="">
+                    <div>
+                      <h4 class="base">Establish a <br>base line</h4>
+                    </div>
+                  </div>
+                  <div class="col">
+                    <img src="{% static '/image/3.png' %}" alt="">
+                    <div>
+                      <h4 class="clear">Set Clear <br>Goals</h4>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="text-center four">
+                <div class="row mt-5">
+                  <div class="col">
+                    <img src="{% static '/image/4.png' %}" alt="">
+                    <div>
+                      <h4 class="focus">Focus on <br>Technique</h4>
+                    </div>
+                  </div>
+                  <div class="col">
+                    <img src="{% static '/image/5.png' %}" alt="">
+                    <div>
+                      <h4 class="build">Build <br>Strength</h4>
+                    </div>
+                  </div>
+                  <div class="col">
+                    <img src="{% static '/image/6.png' %}" alt="">
+                    <div>
+                      <h4 class="track">Track <br>Progress</h4>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <button class="btn btn-outline-success gro" type="submit">Let’s get started > </button>
+              </div>
+
+          
+        <!-- footer -->
+        <div class="footer mt-5">
+          <div class="row">
+            <div class="col m-5">
+              <img src="{% static '/image/dumble.png' %}" alt="">
+              <div class="col-auto ">
+                <h6 class="vcx mt-4">We provide fitness options<br>that are suitable for<br> individuals.</h6>
+              </div>
+              <div class="bnv mt-4">
+      
+                <button class="btn fbut" type="submit"><i class="bi bi-telephone-outbound me-2"></i>Schedule call </button>
+              </div>
+            </div>
+      
+            <div class="col mt-5">
+              <h3 class="vbn mt-4">Menu</h3>
+              <div class="nbm">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                  <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="{% url 'home' %}">Home</a>
+                  </li>
+      
+                  <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="{% url 'fitness' %}">Fitness</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="{% url 'sports' %}">Sports</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="{% url 'academy' %}">Academy</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="{% url 'events' %}">Events</a>
+                  </li>
+      
+                </ul>
+              </div>
+      
+            </div>
+      
+      
+      
+            <div class="col mt-5">
+              <h3 class="vbn mt-4">Contact Us</h3>
+      
+              <p class="hhh">+91 94325-12345</p>
+      
+      
+              <p class="hnk mt-3">Teffy Fitness Hub<br>9a, jeyabal complex<br>2nd floor, Round Road ,
+                Balakrishnapuram , Dindigul-624005</p>
+              <h3 class="vbn mt-4">Follow Us</h3>
+      
+              <div class="bnv">
+                <i class="bi bi-facebook"></i>
+                <i class="bi bi-instagram"></i>
+                <i class="bi bi-youtube"></i>
+              </div>
+            </div>
+          </div>
+          </div>
+      
+      
+      
+ </div>    
+</body>
+</html>

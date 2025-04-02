@@ -1,0 +1,154 @@
+.navbar{
+    background-color: black;
+}
+.navtext a{
+    color: white;
+}
+.fullpage{
+    background-color: black;
+}
+
+.human{
+color: white !important;
+text-align: center;
+font-family: "Karantina", system-ui;
+font-size: 80px;
+}
+
+.paragraph{
+    color: white;
+    margin-top: 40px;
+    font-family: "Inter", sans-serif;
+}
+
+ /* .image{
+   
+}  */
+
+.lifetext{
+    color: white;
+    text-align: center;
+    margin-top: 40px;
+    font-family: "Karantina", system-ui;
+}
+
+.test{
+    color: white;
+    font-family: "Karantina", system-ui;
+    font-size: 80px;
+    margin-top: 80px;
+}
+
+.card{
+    background-color: black;
+    padding: 0px;
+    
+}
+
+.view{
+   width: 10%;
+}
+
+/* .circuldown{
+    width: 80px;
+    align-items: center !important;
+} */
+
+/* .circulup{
+    width: 80px;
+    justify-content: center;
+} */
+
+.success{
+    color: white;
+    text-align: center;
+    font-family: "Karantina", system-ui;
+    font-size: 60px;
+}
+
+
+
+  .image-overlay-container h6 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white; /* Adjust for contrast */
+    font-size: 5rem; /* Adjust size as needed */
+    text-align: justify;
+  }
+
+  .text-overlay h1 {
+    color: white;
+    font-size: 8rem;
+    font-family: "Karantina";
+  }
+  
+  .text-overlay p {
+    color: white;
+    font-size: 1.3rem;
+    line-height: 2.0;
+    /* padding-top: 90%; */
+    font-family: "Inter", sans-serif;
+  }
+  
+  .text-overlay button {
+    color: #000000 !important;
+    background-color: #feb807;
+    /* border: 3px solid #feb807 !important; */
+    font-family: "Inter", sans-serif;
+    width: 10%;
+    font-size: 1rem;
+    font-weight: bold;
+    opacity: 1;
+    border-radius: 10px;
+  }
+
+  .image-overlay-container {
+    position: relative;
+    /* display: inline-block; */
+    /* text-align: center; */
+  }
+  
+  .image-overlay-container img {
+    width: 100%; /* Adjust as needed */
+    height: auto;
+    /* display: block; */
+  }
+  
+  .image-overlay-container h6 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white; /* Adjust for contrast */
+    font-size: 5rem; /* Adjust size as needed */
+    text-align: justify;
+  }
+  /* .btn-primary-overflow{
+background-color: #feb807;
+  } */
+
+  .footer{
+    background-color: #FEB807;
+  }
+  .fbut {
+    background-color: #000000;
+    border: 1px solid #000000;
+    color: #FEB807;
+    width: 60%;
+    border-radius: 15px;
+    font-family: "Inter", sans-serif;
+  }
+  
+  .fbut:hover {
+    background-color: #000000;
+    color: #ffffff;
+    /* border:2px solid  #FEB807; */
+  }  
+
+  .quit{
+    padding-top: 240px; 
+  }
+
+  

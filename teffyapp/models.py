@@ -348,3 +348,22 @@ class MemberPayment(models.Model):
         total_paid = sum(payment.amount_paid for payment in MemberPayment.objects.filter(member=self.member))
         self.pending_amount = self.member.total_amount - total_paid
         super().save(*args, **kwargs)
+        
+
+class InvoiceNumber(models.Model):
+    current_number = models.PositiveIntegerField(default=0)
+
+    @classmethod
+    def get_next_invoice_number(cls):
+        invoice, created = cls.objects.get_or_create(id=1)
+
+        # Ensure it starts from 1 if it's 0
+        if invoice.current_number == 0:
+            invoice.current_number = 1
+        else:
+            invoice.current_number += 1  # Increment normally
+
+        invoice.save()
+        return invoice.current_number
+
+

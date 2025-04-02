@@ -1,0 +1,177 @@
+body{
+  overflow-x: hidden;
+}
+.top{
+  border: none;
+  border-top: 2px solid #FEB807;
+  padding: 10px;
+  background: transparent;
+  border-bottom: 2px solid #FEB807;
+}
+
+.fullpage{
+    background-color: black;
+}
+.navtext a{
+    color: white;
+}
+.academy{
+    font-family: "Inter", sans-serif;
+    color: white;
+}
+.events{
+   color: white;
+    font-family: "Inter", sans-serif; 
+}
+.group{
+    position: relative;
+    /* left: 75%; */
+}
+
+.strightline{
+    color: white;
+    font-family: "Inter", sans-serif;
+    font-size: 12px;
+    text-align: center;
+    padding:40px;
+    position: relative;
+    bottom: 90px;
+}
+.strightline a{
+    color: white;
+    text-decoration:none;
+padding:40px;
+}
+.future{
+    color: white;
+        font-family: "Karantina", system-ui; 
+        font-size: 40px;
+        text-align: center;
+        /* margin-top: 40px; */
+}
+
+.train{
+    color: white;
+    }
+    .beast{
+        /* color:#feb807; */
+        -webkit-text-stroke: 1px #feb807;
+        
+    }
+    .likea{
+        display: flex;
+        gap: 20px;
+        font-family: "Karantina", system-ui;
+    /* font-size: 100px; */
+    text-align: center;
+    padding-left: 200px;
+    }
+    .likeaa{
+        display: flex;
+        gap: 20px;
+        font-family: "Karantina", system-ui;
+    /* font-size: 100px; */
+    padding-left: 200px;
+    }
+
+    .perform{
+        color: white;
+        margin-left: 100px;
+    }
+
+    .org {
+        background-color: #feb807;
+        border: 1px solid #feb807;
+        color: black;
+        width: 40%;
+        border-radius: 20px;
+        font-family: "Inter", sans-serif;
+        margin-left: 180px;
+        margin-top: 40px;
+      }
+      
+      .org:hover {
+        background-color: #fff;
+        color: #feb807;
+        border: 2px solid #feb807;
+      }
+
+      .black-card{
+        background-color: black;
+      }
+
+      .footer{
+        background-color: #FEB807;
+      }
+      .fbut {
+        background-color: #000000;
+        border: 1px solid #000000;
+        color: #FEB807;
+        width: 60%;
+        border-radius: 15px;
+        font-family: "Inter", sans-serif;
+      }
+      
+      .fbut:hover {
+        background-color: #000000;
+        color: #ffffff;
+        /* border:2px solid  #FEB807; */
+      }  
+      .festivel{
+        font-family: "Karantina", system-ui;
+        font-size: 30px;
+        color: white;
+        padding-bottom: 20px;
+      }
+      .time{
+        color: white;
+        /* gap: 20px; */
+        font-family: "Inter", sans-serif;
+        font-size: 20px;
+      }
+      .date{
+        color: white;
+        font-family: "Inter", sans-serif;
+        font-size: 20px;
+      }
+      .adress{
+        color: white;
+        padding-top: 10px;
+        font-family: "Inter", sans-serif;
+        font-size: 20px;
+      }
+      .details{
+        padding-top: 80px;
+        border-style: outset;
+        border-color: #FEB807;
+        border-radius: 20px;
+            }
+
+      .mask-group{
+        padding-bottom: 60px;
+      }
+      .path{
+        padding-top: 80px;
+      }
+      .coimbatore{
+        padding: 60px;
+
+      }
+      .marathon{
+        color: #FEB807;
+      }
+      .january{
+        color: white;
+      }
+      .yoga{
+        color: #FEB807;
+      }
+      .august{
+        color: white;
+      }
+      .madurai{
+        color: #FEB807;
+      }
+      .febuary{
+        color: white;
+      }

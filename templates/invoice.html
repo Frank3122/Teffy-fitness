@@ -38,7 +38,7 @@
         .title {
             font-size: 22px;
             font-weight: bold;
-            text-align: left;
+            text-align: center;
         }
         .contact-info {
             text-align: right;
@@ -103,22 +103,19 @@
         <table class="invoice-details">
             <tr>
                 <td><strong>BILL TO:</strong> {{ client.name }}</td>
-                <td><strong>BIO ID:</strong> {{ client.id }}</td>
-            </tr>
-            <tr>
-                <td><strong>Phone:</strong> {{ client.mobile_number }}</td>
                 <td><strong>Bill Number:</strong> {{ bill_number }}</td>
             </tr>
             <tr>
+                <td><strong>Phone:</strong> {{ client.mobile_number }}</td>
                 <td><strong>Bill Date:</strong> {{ bill_date }}</td>
-                <td><strong>Receipt Type:</strong> {{ receipt_type }}</td>
             </tr>
-            
-            <!-- Service and Plan Details -->
             <tr>
+                <td><strong>Receipt Type:</strong> {{ receipt_type }}</td>
                 <td><strong>Service:</strong> {{ service.name }}</td>
-                <td><strong>Plan:</strong> {{ plan.plan_name }}</td>
             </tr>
+       
+
+
 
             <!-- Expiry Date for Leads -->
             {% if client_type == 'lead' %}
