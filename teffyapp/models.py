@@ -350,20 +350,30 @@ class MemberPayment(models.Model):
         super().save(*args, **kwargs)
         
 
+# class InvoiceNumber(models.Model):
+#     current_number = models.PositiveIntegerField(default=0)
+
+#     @classmethod
+#     def get_next_invoice_number(cls):
+#         invoice, created = cls.objects.get_or_create(id=1)
+
+#         # Ensure it starts from 1 if it's 0
+#         if invoice.current_number == 0:
+#             invoice.current_number = 1
+#         else:
+#             invoice.current_number += 1  # Increment normally
+
+#         invoice.save()
+#         return invoice.current_number
+
 class InvoiceNumber(models.Model):
-    current_number = models.PositiveIntegerField(default=0)
+    current_number = models.IntegerField(default=1)
 
     @classmethod
     def get_next_invoice_number(cls):
-        invoice, created = cls.objects.get_or_create(id=1)
-
-        # Ensure it starts from 1 if it's 0
-        if invoice.current_number == 0:
-            invoice.current_number = 1
-        else:
-            invoice.current_number += 1  # Increment normally
-
-        invoice.save()
-        return invoice.current_number
+        obj, created = cls.objects.get_or_create(id=1)
+        obj.current_number += 1
+        obj.save()
+        return obj.current_number
 
 
